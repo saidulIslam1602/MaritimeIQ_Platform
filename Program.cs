@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using HavilaKystruten.Maritime.Models;
 using HavilaKystruten.Maritime.Controllers;
 
@@ -9,11 +10,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
-    { 
-        Title = "Havila Kystruten Maritime API", 
-        Version = "v1",
-        Description = "Maritime operations API for vessel management, route planning, and safety monitoring"
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Havila Kystruten Maritime Platform",
+        Version = "v1.1",
+        Description = "Maritime operations API for vessel management, route planning, and safety monitoring. Updated with CI/CD pipeline automation."
     });
 });
 
