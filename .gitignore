@@ -60,4 +60,4 @@ pids
 
 # Temporary files
 *.tmp
-*.temp
+*.tempSECRETS-LOCAL-ONLY.txt
