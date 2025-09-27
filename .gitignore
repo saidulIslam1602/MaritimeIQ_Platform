@@ -1,0 +1,63 @@
+# .NET Core build outputs
+bin/
+obj/
+out/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio temp files
+.vs/
+*.tmp
+*.temp
+
+# Docker
+.dockerignore
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Azure credentials (keep secure)
+*.publishsettings
+*.azurePubxml
+
+# Temporary files
+*.tmp
+*.temp
