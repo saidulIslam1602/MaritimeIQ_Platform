@@ -1,0 +1,241 @@
+{
+  "logging": {
+    "applicationInsights": {
+      "enableLiveMetricsFilters": true,
+      "enableDependencyTracking": true,
+      "enableRequestTrackingTelemetryModule": true,
+      "enablePerformanceCounterCollectionModule": true,
+      "enableQuickPulseMetricStream": true,
+      "enableAdaptiveSampling": true,
+      "addAutoCollectedMetricExtractor": true,
+      "enableAzureInstanceMetadata": true,
+      "enableHeartbeat": true,
+      "heartbeatInterval": "00:15:00"
+    },
+    "logLevel": {
+      "default": "Information",
+      "microsoft": "Warning",
+      "microsoft.Hosting.Lifetime": "Information",
+      "microsoft.AspNetCore": "Warning",
+      "HavilaKystruten.Maritime": "Information",
+      "System": "Warning"
+    },
+    "console": {
+      "includeScopes": true,
+      "timestampFormat": "yyyy-MM-dd HH:mm:ss.fff "
+    },
+    "eventSourceMapping": {
+      "System.Runtime": "Verbose",
+      "Microsoft-System-Net-Http": "Information", 
+      "Microsoft-AspNetCore-Server-Kestrel": "Information"
+    }
+  },
+  "maritimeLogging": {
+    "categories": [
+      {
+        "name": "VesselOperations",
+        "logLevel": "Information",
+        "includeProperties": [
+          "VesselId",
+          "VesselName", 
+          "CurrentLocation",
+          "Speed",
+          "Heading",
+          "FuelConsumption",
+          "CO2Emissions",
+          "BatteryLevel"
+        ],
+        "filters": {
+          "excludeHealthChecks": true,
+          "excludeSystemEvents": false
+        }
+      },
+      {
+        "name": "PassengerServices",
+        "logLevel": "Information",
+        "includeProperties": [
+          "VesselId",
+          "PassengerCount",
+          "NotificationType",
+          "NorthernLightsAlert",
+          "WeatherUpdate"
+        ]
+      },
+      {
+        "name": "EnvironmentalMonitoring",
+        "logLevel": "Information", 
+        "includeProperties": [
+          "VesselId",
+          "EmissionType",
+          "CurrentValue",
+          "ThresholdValue",
+          "ComplianceStatus",
+          "Location"
+        ]
+      },
+      {
+        "name": "RouteOptimization",
+        "logLevel": "Information",
+        "includeProperties": [
+          "VesselId", 
+          "OptimizationType",
+          "FuelSavings",
+          "TimeSavings",
+          "CO2Reduction",
+          "WeatherFactors"
+        ]
+      },
+      {
+        "name": "SafetyIncidents",
+        "logLevel": "Warning",
+        "includeProperties": [
+          "VesselId",
+          "IncidentType",
+          "Severity",
+          "Location",
+          "ResponseTime",
+          "Resolution"
+        ]
+      },
+      {
+        "name": "AISProcessing",
+        "logLevel": "Information",
+        "includeProperties": [
+          "VesselId",
+          "MessageType",
+          "ProcessingTime",
+          "DataQuality"
+        ]
+      }
+    ]
+  },
+  "structuredLogging": {
+    "enableJsonFormatting": true,
+    "enrichers": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithThreadId",
+      "WithCorrelationId"
+    ],
+    "properties": {
+      "Application": "HavilaKystruten.Maritime.Platform",
+      "Environment": "#{ASPNETCORE_ENVIRONMENT}#",
+      "Version": "#{BUILD_BUILDNUMBER}#"
+    },
+    "auditLogging": {
+      "enabled": true,
+      "includeSensitiveData": false,
+      "auditEvents": [
+        "UserLogin",
+        "DataAccess",
+        "ConfigurationChange",
+        "SecurityEvent",
+        "VesselCommand",
+        "EmergencyAlert"
+      ]
+    }
+  },
+  "performanceCounters": [
+    {
+      "categoryName": "Maritime Operations",
+      "counterName": "Vessel Position Updates/sec",
+      "instanceName": "*"
+    },
+    {
+      "categoryName": "Maritime Operations",
+      "counterName": "Fuel Consumption Rate (L/h)",
+      "instanceName": "*"
+    },
+    {
+      "categoryName": "Maritime Operations", 
+      "counterName": "CO2 Emissions Rate (kg/h)",
+      "instanceName": "*"
+    },
+    {
+      "categoryName": "Maritime Operations",
+      "counterName": "Battery Efficiency (%)",
+      "instanceName": "*"
+    },
+    {
+      "categoryName": "Maritime Operations",
+      "counterName": "Passenger Notifications/min",
+      "instanceName": "*"
+    },
+    {
+      "categoryName": ".NET CLR Memory",
+      "counterName": "Gen 0 heap size",
+      "instanceName": "*"
+    },
+    {
+      "categoryName": ".NET CLR Memory",
+      "counterName": "Gen 1 heap size", 
+      "instanceName": "*"
+    },
+    {
+      "categoryName": ".NET CLR Memory",
+      "counterName": "Gen 2 heap size",
+      "instanceName": "*"
+    },
+    {
+      "categoryName": "Process",
+      "counterName": "Private Bytes",
+      "instanceName": "*"
+    },
+    {
+      "categoryName": "Process",
+      "counterName": "% Processor Time",
+      "instanceName": "*"
+    }
+  ],
+  "customDimensions": {
+    "globalDimensions": {
+      "ServiceName": "HavilaKystruten.Maritime.Platform",
+      "Fleet": "Havila",
+      "Region": "Norway",
+      "RouteType": "Coastal"
+    },
+    "vesselDimensions": [
+      "VesselId",
+      "VesselName", 
+      "VesselType",
+      "Route",
+      "Captain",
+      "Capacity"
+    ],
+    "operationalDimensions": [
+      "WeatherConditions",
+      "SeaState",
+      "NorthernLightsIntensity",
+      "PassengerCount",
+      "CrewCount"
+    ]
+  },
+  "sampling": {
+    "adaptive": {
+      "enabled": true,
+      "maxTelemetryItemsPerSecond": 50,
+      "evaluationInterval": "00:00:15",
+      "samplingPercentageIncreaseTimeout": "00:02:00",
+      "samplingPercentageDecreaseTimeout": "00:30:00",
+      "minSamplingPercentage": 0.1,
+      "maxSamplingPercentage": 100.0,
+      "movingAverageRatio": 0.25
+    },
+    "fixed": {
+      "enabled": false,
+      "samplingPercentage": 10.0
+    },
+    "excludedTypes": [
+      "Dependency",
+      "PageView",
+      "Event"
+    ],
+    "includedTypes": [
+      "Request",
+      "Exception", 
+      "Trace",
+      "CustomEvent",
+      "CustomMetric"
+    ]
+  }
+}

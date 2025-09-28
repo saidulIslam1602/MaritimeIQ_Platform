@@ -1,19 +1,93 @@
-# .NET Core build outputs
-bin/
-obj/
+# Build results  
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
 out/
 
-# User-specific files
-*.rsuser
-*.suo
+# Visual Studio files
+.vs/
+.vscode/settings.json
 *.user
+*.suo
 *.userosscache
 *.sln.docstates
+*.userprefs
+*.rsuser
 
-# Visual Studio temp files
-.vs/
+# NuGet
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+
+# Node.js dependencies (for maritime-dashboard)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js build output
+.next/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# IDE files
+*.swp
+*.swo
+
+# Azure Functions
+local.settings.json
+
+# Temporary files
 *.tmp
 *.temp
+
+# Log files
+*.log
+
+# Published output
+publish/
+
+# Test scripts
+test-paths.sh
+
+# Package lock files (keep package.json but ignore lock files for now)
+package-lock.json
+yarn.lock
 
 # Docker
 .dockerignore

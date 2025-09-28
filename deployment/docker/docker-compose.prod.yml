@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  havila-maritime-api:
+    image: havilamaritimeacr.azurecr.io/havila-maritime-api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=${SQL_CONNECTION_STRING}
+      - AzureStorage__ConnectionString=${STORAGE_CONNECTION_STRING}
+      - ServiceBus__ConnectionString=${SERVICEBUS_CONNECTION_STRING}
+      - EventHubs__ConnectionString=${EVENTHUBS_CONNECTION_STRING}
+      - KeyVault__VaultUri=${KEYVAULT_URI}
+      - ApplicationInsights__ConnectionString=${APPINSIGHTS_CONNECTION_STRING}
+    depends_on:
+      - redis
+    networks:
+      - havila-network
+
+  havila-vessel-tracking:
+    image: havilamaritimeacr.azurecr.io/havila-vessel-tracking:latest
+    build:
+      context: ./VesselTracking
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - EventHubs__AisDataStream=${EVENTHUBS_AIS_CONNECTION}
+      - ServiceBus__VesselDataQueue=${SERVICEBUS_VESSEL_QUEUE}
+    networks:
+      - havila-network
+
+  havila-environmental-monitoring:
+    image: havilamaritimeacr.azurecr.io/havila-environmental-monitoring:latest
+    build:
+      context: ./EnvironmentalMonitoring
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - EventHubs__EnvironmentalSensors=${EVENTHUBS_ENV_CONNECTION}
+      - ServiceBus__EnvironmentalQueue=${SERVICEBUS_ENV_QUEUE}
+    networks:
+      - havila-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - havila-network
+
+networks:
+  havila-network:
+    driver: bridge

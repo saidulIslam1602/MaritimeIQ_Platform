@@ -1,0 +1,261 @@
+{
+  "name": "maritime-data-transformation-pipeline",
+  "properties": {
+    "description": "Havila Maritime Data Transformation - Route Optimization and Predictive Analytics",
+    "activities": [
+      {
+        "name": "Route_Optimization_Analysis",
+        "type": "DatabricksNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebookPath": "/Maritime/RouteOptimization",
+          "baseParameters": {
+            "processing_date": "@pipeline().parameters.ProcessingDate",
+            "vessel_ids": "@pipeline().parameters.VesselIds",
+            "weather_api_key": "@pipeline().parameters.WeatherAPIKey"
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeDatabricks",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Fuel_Efficiency_Prediction",
+        "type": "AzureMLExecutePipeline",
+        "dependsOn": [
+          {
+            "activity": "Route_Optimization_Analysis",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "mlPipelineId": "maritime-fuel-efficiency-model",
+          "mlPipelineParameters": {
+            "vessel_data_path": "@activity('Route_Optimization_Analysis').output.vessel_data_path",
+            "weather_data_path": "@activity('Route_Optimization_Analysis').output.weather_data_path",
+            "prediction_horizon_hours": 24
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeAzureML",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Environmental_Impact_Analysis",
+        "type": "DataFlow",
+        "dependsOn": [
+          {
+            "activity": "Fuel_Efficiency_Prediction",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "dataflow": {
+            "referenceName": "EnvironmentalImpactDataFlow",
+            "type": "DataFlowReference",
+            "parameters": {
+              "processing_date": "@pipeline().parameters.ProcessingDate",
+              "emission_threshold_co2": 50.0,
+              "emission_threshold_nox": 9.0,
+              "emission_threshold_sox": 0.5
+            }
+          },
+          "compute": {
+            "coreCount": 8,
+            "computeType": "General"
+          },
+          "traceLevel": "Fine"
+        }
+      },
+      {
+        "name": "Passenger_Experience_Analytics",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          {
+            "activity": "Environmental_Impact_Analysis",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "storedProcedureName": "sp_AnalyzePassengerExperience",
+          "storedProcedureParameters": {
+            "AnalysisDate": {
+              "value": "@pipeline().parameters.ProcessingDate",
+              "type": "DateTime"
+            },
+            "IncludeNorthernLightsData": {
+              "value": true,
+              "type": "Boolean"
+            },
+            "WeatherImpactThreshold": {
+              "value": 3.0,
+              "type": "Double"
+            }
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeAzureSqlDatabase",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Safety_Risk_Assessment",
+        "type": "AzureMLBatchExecution",
+        "dependsOn": [
+          {
+            "activity": "Passenger_Experience_Analytics",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "webServiceInputs": {
+            "vessel_telemetry_data": {
+              "connectionString": "@linkedService().connectionString",
+              "relativePath": "vessel-telemetry/@{formatDateTime(pipeline().parameters.ProcessingDate, 'yyyy/MM/dd')}/",
+              "fileFormat": "parquet"
+            },
+            "weather_conditions": {
+              "connectionString": "@linkedService().connectionString",
+              "relativePath": "weather-data/@{formatDateTime(pipeline().parameters.ProcessingDate, 'yyyy/MM/dd')}/",
+              "fileFormat": "json"
+            }
+          },
+          "webServiceOutputs": {
+            "safety_risk_scores": {
+              "connectionString": "@linkedService().connectionString",
+              "relativePath": "safety-analytics/@{formatDateTime(pipeline().parameters.ProcessingDate, 'yyyy/MM/dd')}/risk-scores.parquet",
+              "fileFormat": "parquet"
+            }
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeAzureML",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Update_Real_Time_Dashboards",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "Safety_Risk_Assessment",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "url": "@pipeline().parameters.PowerBIRefreshEndpoint",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "@concat('Bearer ', pipeline().parameters.PowerBIAccessToken)"
+          },
+          "body": {
+            "notifyOption": "MailOnCompletion",
+            "datasets": [
+              "maritime-fleet-analytics",
+              "environmental-compliance",
+              "passenger-experience",
+              "safety-analytics"
+            ]
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "ProcessingDate": {
+        "type": "String",
+        "defaultValue": "@utcnow()"
+      },
+      "VesselIds": {
+        "type": "Array",
+        "defaultValue": [
+          "havila-capella",
+          "havila-castor",
+          "havila-polaris",
+          "havila-pollux"
+        ]
+      },
+      "WeatherAPIKey": {
+        "type": "String",
+        "defaultValue": "@linkedService().secretValue"
+      },
+      "PowerBIRefreshEndpoint": {
+        "type": "String",
+        "defaultValue": "https://api.powerbi.com/v1.0/myorg/groups/@{pipeline().globalParameters.PowerBIWorkspaceId}/datasets/refreshes"
+      },
+      "PowerBIAccessToken": {
+        "type": "String",
+        "defaultValue": "@linkedService().accessToken"
+      }
+    },
+    "annotations": [
+      "Maritime",
+      "Analytics",
+      "ML",
+      "Transformation"
+    ],
+    "folder": {
+      "name": "Maritime Analytics Pipelines"
+    }
+  }
+}

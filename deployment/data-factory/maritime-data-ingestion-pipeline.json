@@ -1,0 +1,367 @@
+{
+  "name": "maritime-data-ingestion-pipeline",
+  "properties": {
+    "description": "Havila Kystruten Maritime Data Ingestion Pipeline - AIS, Vessel Telemetry, and Environmental Data",
+    "activities": [
+      {
+        "name": "Copy_AIS_Data",
+        "type": "Copy",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "EventHubSource",
+            "eventHubConfiguration": {
+              "eventHubName": "ais-data-stream",
+              "consumerGroupName": "$Default"
+            }
+          },
+          "sink": {
+            "type": "AzureSqlSink",
+            "writeBehavior": "insert",
+            "sqlWriterUseTableLock": false,
+            "tableOption": "autoCreate",
+            "disableMetricsCollection": false
+          },
+          "enableStaging": false,
+          "translator": {
+            "type": "TabularTranslator",
+            "mappings": [
+              {
+                "source": {
+                  "name": "vesselId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "vessel_id",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "name": "timestamp",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "timestamp",
+                  "type": "DateTime"
+                }
+              },
+              {
+                "source": {
+                  "name": "latitude",
+                  "type": "Double"
+                },
+                "sink": {
+                  "name": "latitude",
+                  "type": "Decimal"
+                }
+              },
+              {
+                "source": {
+                  "name": "longitude",
+                  "type": "Double"
+                },
+                "sink": {
+                  "name": "longitude",
+                  "type": "Decimal"
+                }
+              },
+              {
+                "source": {
+                  "name": "speed",
+                  "type": "Double"
+                },
+                "sink": {
+                  "name": "speed_knots",
+                  "type": "Decimal"
+                }
+              },
+              {
+                "source": {
+                  "name": "heading",
+                  "type": "Integer"
+                },
+                "sink": {
+                  "name": "heading",
+                  "type": "Integer"
+                }
+              }
+            ]
+          }
+        },
+        "inputs": [
+          {
+            "referenceName": "AISDataEventHub",
+            "type": "DatasetReference"
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "AISDataTable",
+            "type": "DatasetReference"
+          }
+        ]
+      },
+      {
+        "name": "Copy_Environmental_Data",
+        "type": "Copy",
+        "dependsOn": [
+          {
+            "activity": "Copy_AIS_Data",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "EventHubSource",
+            "eventHubConfiguration": {
+              "eventHubName": "environmental-data",
+              "consumerGroupName": "$Default"
+            }
+          },
+          "sink": {
+            "type": "AzureSqlSink",
+            "writeBehavior": "insert",
+            "sqlWriterUseTableLock": false,
+            "tableOption": "autoCreate",
+            "disableMetricsCollection": false
+          },
+          "enableStaging": false,
+          "translator": {
+            "type": "TabularTranslator",
+            "mappings": [
+              {
+                "source": {
+                  "name": "vesselId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "vessel_id",
+                  "type": "String"
+                }
+              },
+              {
+                "source": {
+                  "name": "co2Level",
+                  "type": "Double"
+                },
+                "sink": {
+                  "name": "co2_emissions_kg_h",
+                  "type": "Decimal"
+                }
+              },
+              {
+                "source": {
+                  "name": "noxLevel",
+                  "type": "Double"
+                },
+                "sink": {
+                  "name": "nox_emissions_kg_h",
+                  "type": "Decimal"
+                }
+              },
+              {
+                "source": {
+                  "name": "soxLevel",
+                  "type": "Double"
+                },
+                "sink": {
+                  "name": "sox_emissions_kg_h",
+                  "type": "Decimal"
+                }
+              },
+              {
+                "source": {
+                  "name": "batteryLevel",
+                  "type": "Integer"
+                },
+                "sink": {
+                  "name": "battery_charge_percent",
+                  "type": "Decimal"
+                }
+              },
+              {
+                "source": {
+                  "name": "fuelConsumption",
+                  "type": "Double"
+                },
+                "sink": {
+                  "name": "fuel_consumption_lph",
+                  "type": "Decimal"
+                }
+              }
+            ]
+          }
+        },
+        "inputs": [
+          {
+            "referenceName": "EnvironmentalDataEventHub",
+            "type": "DatasetReference"
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "EnvironmentalDataTable",
+            "type": "DatasetReference"
+          }
+        ]
+      },
+      {
+        "name": "Data_Quality_Check",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          {
+            "activity": "Copy_Environmental_Data",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "storedProcedureName": "sp_ValidateMaritimeData",
+          "storedProcedureParameters": {
+            "BatchId": {
+              "value": "@pipeline().RunId",
+              "type": "String"
+            },
+            "ProcessingDate": {
+              "value": "@utcnow()",
+              "type": "DateTime"
+            }
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeAzureSqlDatabase",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Generate_Analytics_Data",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          {
+            "activity": "Data_Quality_Check",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "storedProcedureName": "sp_GenerateFleetAnalytics",
+          "storedProcedureParameters": {
+            "AnalyticsDate": {
+              "value": "@utcnow()",
+              "type": "DateTime"
+            },
+            "BatchId": {
+              "value": "@pipeline().RunId",
+              "type": "String"
+            }
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeAzureSqlDatabase",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Send_to_PowerBI",
+        "type": "Copy",
+        "dependsOn": [
+          {
+            "activity": "Generate_Analytics_Data",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "AzureSqlSource",
+            "sqlReaderQuery": "SELECT * FROM vw_FleetAnalyticsDashboard WHERE processing_date >= DATEADD(day, -1, GETDATE())",
+            "queryTimeout": "02:00:00",
+            "partitionOption": "None"
+          },
+          "sink": {
+            "type": "PowerBISink",
+            "writeBehavior": "insert"
+          },
+          "enableStaging": false
+        },
+        "inputs": [
+          {
+            "referenceName": "FleetAnalyticsView",
+            "type": "DatasetReference"
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "PowerBIFleetDashboard",
+            "type": "DatasetReference"
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "ProcessingDate": {
+        "type": "String",
+        "defaultValue": "@utcnow()"
+      },
+      "EnvironmentName": {
+        "type": "String",
+        "defaultValue": "Production"
+      }
+    },
+    "annotations": [
+      "Maritime",
+      "Havila",
+      "Data Ingestion",
+      "Real-time Processing"
+    ],
+    "folder": {
+      "name": "Maritime Data Pipelines"
+    }
+  }
+}

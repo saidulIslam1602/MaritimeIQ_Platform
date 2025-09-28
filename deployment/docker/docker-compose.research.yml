@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # Maritime Platform Application
+  maritime-platform:
+    build: 
+      context: .
+      dockerfile: Dockerfile.research
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RESEARCH_MODE=true
+      - ConnectionStrings__DefaultConnection=Server=db;Database=MaritimeResearch;User=sa;Password=ResearchPass123!;TrustServerCertificate=true
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    volumes:
+      - ./research-data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - maritime-network
+
+  # SQL Server Database for Research Data
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=ResearchPass123!
+      - MSSQL_DATABASE=MaritimeResearch
+    volumes:
+      - maritime-db-data:/var/opt/mssql
+      - ./sql-scripts:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - maritime-network
+
+  # Redis for Caching and Session Management
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - maritime-network
+
+  # Database Administration Tool
+  adminer:
+    image: adminer
+    ports:
+      - "8081:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=db
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - maritime-network
+
+  # Monitoring Dashboard (Optional)
+  monitoring:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=research123
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring:/etc/grafana/provisioning
+    restart: unless-stopped
+    networks:
+      - maritime-network
+
+  # File Storage for Research Data
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=research
+      - MINIO_ROOT_PASSWORD=research123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+    networks:
+      - maritime-network
+
+# Persistent Data Volumes
+volumes:
+  maritime-db-data:
+    driver: local
+  redis-data:
+    driver: local
+  grafana-data:
+    driver: local
+  minio-data:
+    driver: local
+
+# Network Configuration
+networks:
+  maritime-network:
+    driver: bridge
+
+# Research Group Access URLs:
+# - Maritime Platform: http://localhost:8080
+# - Database Admin: http://localhost:8081
+# - Monitoring: http://localhost:3000 (admin/research123)
+# - File Storage: http://localhost:9001 (research/research123)

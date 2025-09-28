@@ -230,7 +230,7 @@ namespace HavilaKystruten.Maritime.Controllers
                     {
                         SensorType = reading.SensorType,
                         AlertType = "High Temperature",
-                        Value = reading.Value,
+                        Value = (double)reading.Value,
                         Threshold = 90,
                         Severity = AlertSeverity.High
                     });
@@ -298,17 +298,11 @@ namespace HavilaKystruten.Maritime.Controllers
     public class TelemetryData
     {
         public int VesselId { get; set; }
-        public List<SensorReading> SensorReadings { get; set; } = new List<SensorReading>();
+        public List<Models.SensorReading> SensorReadings { get; set; } = new List<Models.SensorReading>();
         public DateTime Timestamp { get; set; }
     }
 
-    public class SensorReading
-    {
-        public string SensorType { get; set; } = string.Empty;
-        public double Value { get; set; }
-        public string Unit { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; }
-    }
+    // SensorReading class is now in MaritimeModels.cs
 
     public class TelemetryResponse
     {

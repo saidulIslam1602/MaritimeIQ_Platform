@@ -1,0 +1,182 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Get_Passenger_Preferences": {
+        "inputs": {
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "method": "GET",
+          "uri": "@{parameters('MaritimeAPIEndpoint')}/api/passengers/@{triggerBody().passengerId}/preferences"
+        },
+        "runAfter": {},
+        "type": "Http"
+      },
+      "Check_Notification_Type": {
+        "actions": {
+          "Northern_Lights_Alert": {
+            "inputs": {
+              "body": {
+                "auroraIntensity": "@{triggerBody().auroraData.intensity}",
+                "message": "🌌 Northern Lights Alert! Excellent viewing conditions expected tonight from @{triggerBody().auroraData.optimalTime}. Head to the upper deck for the best view!",
+                "passengerId": "@{triggerBody().passengerId}",
+                "priority": "medium",
+                "viewingProbability": "@{triggerBody().auroraData.probability}"
+              },
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "method": "POST",
+              "uri": "@{parameters('NotificationServiceEndpoint')}/send-aurora-alert"
+            },
+            "runAfter": {},
+            "type": "Http"
+          }
+        },
+        "case": "northern_lights",
+        "runAfter": {
+          "Get_Passenger_Preferences": [
+            "Succeeded"
+          ]
+        },
+        "type": "Switch",
+        "default": {
+          "actions": {
+            "Send_General_Notification": {
+              "inputs": {
+                "body": {
+                  "message": "@{triggerBody().message}",
+                  "passengerId": "@{triggerBody().passengerId}",
+                  "type": "@{triggerBody().notificationType}"
+                },
+                "headers": {
+                  "Content-Type": "application/json"
+                },
+                "method": "POST",
+                "uri": "@{parameters('NotificationServiceEndpoint')}/send-notification"
+              },
+              "runAfter": {},
+              "type": "Http"
+            }
+          }
+        },
+        "cases": {
+          "boarding": {
+            "actions": {
+              "Send_Boarding_Notification": {
+                "inputs": {
+                  "body": {
+                    "boardingTime": "@{triggerBody().boardingData.time}",
+                    "gate": "@{triggerBody().boardingData.gate}",
+                    "message": "🚢 Boarding begins in @{triggerBody().boardingData.minutesUntilBoarding} minutes at Gate @{triggerBody().boardingData.gate}. Please have your boarding pass ready.",
+                    "passengerId": "@{triggerBody().passengerId}",
+                    "vesselName": "@{triggerBody().boardingData.vesselName}"
+                  },
+                  "headers": {
+                    "Content-Type": "application/json"
+                  },
+                  "method": "POST",
+                  "uri": "@{parameters('NotificationServiceEndpoint')}/send-boarding-notification"
+                },
+                "runAfter": {},
+                "type": "Http"
+              }
+            }
+          },
+          "delay": {
+            "actions": {
+              "Send_Delay_Notification": {
+                "inputs": {
+                  "body": {
+                    "delayMinutes": "@{triggerBody().delayData.minutes}",
+                    "message": "⏱️ Travel Update: Your voyage has been delayed by @{triggerBody().delayData.minutes} minutes due to @{triggerBody().delayData.reason}. New departure time: @{triggerBody().delayData.newDepartureTime}",
+                    "newDepartureTime": "@{triggerBody().delayData.newDepartureTime}",
+                    "passengerId": "@{triggerBody().passengerId}",
+                    "reason": "@{triggerBody().delayData.reason}"
+                  },
+                  "headers": {
+                    "Content-Type": "application/json"
+                  },
+                  "method": "POST",
+                  "uri": "@{parameters('NotificationServiceEndpoint')}/send-delay-notification"
+                },
+                "runAfter": {},
+                "type": "Http"
+              }
+            }
+          },
+          "weather": {
+            "actions": {
+              "Send_Weather_Update": {
+                "inputs": {
+                  "body": {
+                    "conditions": "@{triggerBody().weatherData.conditions}",
+                    "message": "🌤️ Weather Update: @{triggerBody().weatherData.conditions} expected during your voyage. @{triggerBody().weatherData.recommendation}",
+                    "passengerId": "@{triggerBody().passengerId}",
+                    "recommendation": "@{triggerBody().weatherData.recommendation}"
+                  },
+                  "headers": {
+                    "Content-Type": "application/json"
+                  },
+                  "method": "POST",
+                  "uri": "@{parameters('NotificationServiceEndpoint')}/send-weather-update"
+                },
+                "runAfter": {},
+                "type": "Http"
+              }
+            }
+          }
+        },
+        "expression": "@triggerBody().notificationType"
+      },
+      "Log_Notification": {
+        "inputs": {
+          "body": {
+            "notificationType": "@{triggerBody().notificationType}",
+            "passengerId": "@{triggerBody().passengerId}",
+            "sentAt": "@{utcNow()}",
+            "status": "sent"
+          },
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "method": "POST",
+          "uri": "@{parameters('MaritimeAPIEndpoint')}/api/notifications/log"
+        },
+        "runAfter": {
+          "Check_Notification_Type": [
+            "Succeeded"
+          ]
+        },
+        "type": "Http"
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "parameters": {
+      "MaritimeAPIEndpoint": {
+        "defaultValue": "https://havila-maritime-api.azurewebsites.net",
+        "type": "String"
+      },
+      "NotificationServiceEndpoint": {
+        "defaultValue": "https://havila-notifications.azurewebsites.net",
+        "type": "String"
+      }
+    },
+    "triggers": {
+      "When_Passenger_Notification_Requested": {
+        "inputs": {
+          "queueName": "passenger-notifications",
+          "serviceBusConnectionString": "@parameters('ServiceBusConnectionString')"
+        },
+        "recurrence": {
+          "frequency": "Second",
+          "interval": 10
+        },
+        "type": "ServiceBus"
+      }
+    }
+  },
+  "parameters": {}
+}
