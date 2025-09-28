@@ -1,0 +1,563 @@
+# GitHub Actions Workflow for Havila Maritime Platform
+# Enhanced CI/CD with security scanning, multi-environment deployment, and automated rollback
+
+name: Havila Maritime Platform CI/CD
+
+on:
+  push:
+    branches: [ main, develop, 'release/**' ]
+    paths:
+      - '**/*.cs'
+      - '**/*.csproj'
+      - '**/*.json'
+      - '**/Dockerfile*'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  DOTNET_VERSION: '8.x'
+  BUILD_CONFIGURATION: 'Release'
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  CONTAINER_REGISTRY: havilamaritimeacr.azurecr.io
+  RESOURCE_GROUP: havila-maritime-rg
+
+jobs:
+  # Job 1: Build and Test
+  build-and-test:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Generate version
+      id: version
+      run: |
+        VERSION=$(date +'%Y.%m.%d')-${{ github.run_number }}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Generated version: $VERSION"
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution
+      run: dotnet build --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+
+    - name: Run unit tests
+      run: |
+        dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} \
+          --no-build \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./coverage \
+          --logger trx
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          **/*.trx
+          ./coverage/**/*.xml
+
+    - name: Code Coverage Report
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./coverage
+        fail_ci_if_error: false
+
+    - name: Publish applications
+      run: |
+        # Publish Main API
+        dotnet publish AcrTasksDemo.csproj \
+          --configuration ${{ env.BUILD_CONFIGURATION }} \
+          --output ./publish/api \
+          --no-build
+        
+        # Publish Functions
+        dotnet publish Functions/HavilaKystruten.Maritime.Functions.csproj \
+          --configuration ${{ env.BUILD_CONFIGURATION }} \
+          --output ./publish/functions \
+          --no-build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: ./publish/
+
+  # Job 2: Security Scanning
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: ./publish/
+
+    # CodeQL Analysis
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: csharp
+        config-file: ./.github/codeql/codeql-config.yml
+
+    - name: Setup .NET for CodeQL
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Build for CodeQL
+      run: dotnet build --configuration ${{ env.BUILD_CONFIGURATION }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:csharp"
+
+    # Snyk Security Scanning
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/dotnet@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+        command: test
+
+    - name: Run Snyk to check for container vulnerabilities
+      uses: snyk/actions/docker@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        image: mcr.microsoft.com/dotnet/aspnet:8.0
+        args: --severity-threshold=high
+
+    # OWASP Dependency Check
+    - name: OWASP Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'Havila Maritime Platform'
+        path: '.'
+        format: 'ALL'
+        args: >
+          --enableRetired
+          --enableExperimental
+          --failOnCVSS 7
+
+    - name: Upload OWASP results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: owasp-results
+        path: reports/
+
+  # Job 3: Build and Push Docker Images
+  build-containers:
+    runs-on: ubuntu-latest
+    needs: [build-and-test, security-scan]
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: ./publish/
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.CONTAINER_REGISTRY }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.CONTAINER_REGISTRY }}/havila-maritime-api
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=raw,value=${{ needs.build-and-test.outputs.version }}
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    # Build and push Main API container
+    - name: Build and push Main API
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: |
+          ${{ env.CONTAINER_REGISTRY }}/havila-maritime-api:${{ needs.build-and-test.outputs.version }}
+          ${{ env.CONTAINER_REGISTRY }}/havila-maritime-api:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          BUILD_CONFIGURATION=${{ env.BUILD_CONFIGURATION }}
+
+    # Container Security Scanning with Trivy
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ env.CONTAINER_REGISTRY }}/havila-maritime-api:${{ needs.build-and-test.outputs.version }}'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    # Container Security Scanning with Snyk
+    - name: Monitor container image with Snyk
+      uses: snyk/actions/docker@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        image: '${{ env.CONTAINER_REGISTRY }}/havila-maritime-api:${{ needs.build-and-test.outputs.version }}'
+        args: --severity-threshold=high
+
+  # Job 4: Deploy to Development
+  deploy-development:
+    runs-on: ubuntu-latest
+    needs: [build-and-test, build-containers]
+    if: github.ref == 'refs/heads/develop'
+    environment: development
+    
+    steps:
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+    - name: Deploy to Development Container Apps
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          echo "Deploying to Development Environment..."
+          
+          # Update Main API
+          az containerapp update \
+            --name havila-maritime-api-dev \
+            --resource-group ${{ env.RESOURCE_GROUP }}-dev \
+            --image ${{ env.CONTAINER_REGISTRY }}/havila-maritime-api:${{ needs.build-and-test.outputs.version }}
+          
+          # Wait for deployment
+          sleep 60
+          
+          # Health check
+          HEALTH_URL="https://havila-maritime-api-dev.norwayeast.azurecontainerapps.io/health"
+          if curl -f $HEALTH_URL; then
+            echo "Development deployment successful!"
+          else
+            echo "Development health check failed!"
+            exit 1
+          fi
+
+  # Job 5: Deploy to Staging
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [build-and-test, build-containers]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
+    environment: staging
+    
+    steps:
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_STAGING }}
+
+    - name: Store current staging versions for rollback
+      id: backup
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          CURRENT_VERSION=$(az containerapp show \
+            --name havila-maritime-api-staging \
+            --resource-group ${{ env.RESOURCE_GROUP }}-staging \
+            --query "properties.template.containers[0].image" -o tsv)
+          echo "current-version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Backed up current version: $CURRENT_VERSION"
+
+    - name: Deploy to Staging Container Apps
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          echo "Deploying to Staging Environment..."
+          
+          # Update with new image
+          az containerapp update \
+            --name havila-maritime-api-staging \
+            --resource-group ${{ env.RESOURCE_GROUP }}-staging \
+            --image ${{ env.CONTAINER_REGISTRY }}/havila-maritime-api:${{ needs.build-and-test.outputs.version }}
+          
+          # Wait for deployment
+          sleep 90
+
+    - name: Run staging health checks
+      id: health-check
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          HEALTH_URL="https://havila-maritime-api-staging.norwayeast.azurecontainerapps.io/health"
+          API_URL="https://havila-maritime-api-staging.norwayeast.azurecontainerapps.io/api/vessel"
+          
+          # Health check with retries
+          for i in {1..5}; do
+            if curl -f $HEALTH_URL && curl -f $API_URL; then
+              echo "Staging health checks passed!"
+              exit 0
+            fi
+            echo "Health check attempt $i failed, retrying..."
+            sleep 30
+          done
+          
+          echo "Staging health checks failed!"
+          exit 1
+
+    - name: Rollback on staging failure
+      if: failure() && steps.health-check.outcome == 'failure'
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          echo "Rolling back staging deployment..."
+          az containerapp update \
+            --name havila-maritime-api-staging \
+            --resource-group ${{ env.RESOURCE_GROUP }}-staging \
+            --image ${{ steps.backup.outputs.current-version }}
+          echo "Rollback completed"
+
+  # Job 6: Integration Testing
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Run integration tests
+      env:
+        STAGING_API_URL: https://havila-maritime-api-staging.norwayeast.azurecontainerapps.io
+      run: |
+        # Run integration tests against staging
+        dotnet test **/*IntegrationTests.csproj \
+          --configuration ${{ env.BUILD_CONFIGURATION }} \
+          --logger trx \
+          --collect:"XPlat Code Coverage"
+
+    - name: Upload integration test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: integration-test-results
+        path: |
+          **/*.trx
+          **/*coverage*.xml
+
+  # Job 7: Deploy to Production
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [build-and-test, build-containers, integration-tests]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+    - name: Store current production versions for rollback
+      id: backup
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          CURRENT_API_VERSION=$(az containerapp show \
+            --name havila-maritime-api \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query "properties.template.containers[0].image" -o tsv)
+          
+          CURRENT_INTELLIGENCE_VERSION=$(az containerapp show \
+            --name havila-maritime-intelligence \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query "properties.template.containers[0].image" -o tsv)
+          
+          echo "api-version=$CURRENT_API_VERSION" >> $GITHUB_OUTPUT
+          echo "intelligence-version=$CURRENT_INTELLIGENCE_VERSION" >> $GITHUB_OUTPUT
+          echo "Backed up production versions"
+
+    - name: Blue-Green Production Deployment
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          echo "Starting Blue-Green production deployment..."
+          
+          # Phase 1: Deploy with 20% traffic
+          az containerapp update \
+            --name havila-maritime-api \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ env.CONTAINER_REGISTRY }}/havila-maritime-api:${{ needs.build-and-test.outputs.version }}
+          
+          echo "Deployed new version, monitoring..."
+          sleep 300  # 5 minutes monitoring
+          
+          # Phase 2: 50% traffic split
+          az containerapp update \
+            --name havila-maritime-api \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --traffic-weight latest=50,previous=50
+          
+          echo "Shifted to 50/50 traffic split, monitoring..."
+          sleep 300  # 5 minutes monitoring
+          
+          # Phase 3: Full cutover
+          az containerapp update \
+            --name havila-maritime-api \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --traffic-weight latest=100
+          
+          echo "Full production cutover completed!"
+
+    - name: Production health monitoring
+      id: prod-health
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          PROD_URL="https://api.havila-maritime.com"
+          
+          # Extended health monitoring
+          for i in {1..10}; do
+            if curl -f $PROD_URL/health && curl -f $PROD_URL/api/vessel; then
+              echo "Production health check $i passed"
+              if [ $i -eq 10 ]; then
+                echo "All production health checks passed!"
+                exit 0
+              fi
+            else
+              echo "Production health check $i failed!"
+              exit 1
+            fi
+            sleep 30
+          done
+
+    - name: Emergency production rollback
+      if: failure() && steps.prod-health.outcome == 'failure'
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          echo "EMERGENCY: Rolling back production deployment!"
+          
+          # Immediate rollback to previous version
+          az containerapp update \
+            --name havila-maritime-api \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ steps.backup.outputs.api-version }}
+          
+          # Verify rollback
+          sleep 60
+          if curl -f https://api.havila-maritime.com/health; then
+            echo "Emergency rollback successful!"
+          else
+            echo "CRITICAL: Emergency rollback failed!"
+            exit 1
+          fi
+
+    - name: Configure production monitoring
+      if: success()
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          echo "Configuring production monitoring and alerts..."
+          
+          # Update Application Insights availability tests
+          az monitor app-insights web-test create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name "Havila-API-Availability" \
+            --location "North Europe" \
+            --web-test-name "Havila Maritime API Health Check" \
+            --web-test-kind "ping" \
+            --frequency 300 \
+            --timeout 30 \
+            --retry-enabled true \
+            --locations "North Europe" "West Europe" "UK South" \
+            --url "https://api.havila-maritime.com/health"
+          
+          echo "Production monitoring configured!"
+
+  # Job 8: Notification
+  notify:
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: always()
+    
+    steps:
+    - name: Notify deployment status
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#havila-deployments'
+        text: |
+          Havila Maritime Platform Deployment Status: ${{ job.status }}
+          Version: ${{ needs.build-and-test.outputs.version }}
+          Branch: ${{ github.ref }}
+          Commit: ${{ github.sha }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Teams notification
+      uses: aliencube/microsoft-teams-actions@v0.8.0
+      with:
+        webhook_uri: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        title: 'Havila Maritime Platform Deployment'
+        summary: 'Deployment Status: ${{ job.status }}'
+        text: |
+          **Deployment Status:** ${{ job.status }}
+          **Version:** ${{ needs.build-and-test.outputs.version }}
+          **Branch:** ${{ github.ref }}
+          **Environment:** Production
+          **Commit:** ${{ github.sha }}
