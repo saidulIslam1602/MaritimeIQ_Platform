@@ -7,13 +7,13 @@ namespace HavilaKystruten.Maritime.Services
     /// Real-time AIS Processing Service - Processes vessel position data
     /// Handles high-throughput maritime data processing from Event Hubs
     /// </summary>
-    public class AISProcessingService
+    public class AISProcessingService : BaseMaritimeService
     {
-        private readonly ILogger<AISProcessingService> _logger;
+        public override string ServiceName => "AIS Processing Service";
 
-        public AISProcessingService(ILogger<AISProcessingService> logger)
+        public AISProcessingService(ILogger<AISProcessingService> logger, IConfiguration? configuration = null) 
+            : base(logger, configuration)
         {
-            _logger = logger;
         }
 
         /// <summary>
@@ -22,9 +22,9 @@ namespace HavilaKystruten.Maritime.Services
         /// </summary>
         public async Task ProcessAISDataAsync(string[] events)
         {
-            try
+            await ExecuteOperationAsync(async () =>
             {
-                _logger.LogInformation($"Processing {events.Length} AIS data events");
+                LogInformation($"Processing {events.Length} AIS data events", "ProcessAISDataAsync");
 
                 foreach (var eventData in events)
                 {
@@ -37,13 +37,8 @@ namespace HavilaKystruten.Maritime.Services
                     }
                 }
 
-                _logger.LogInformation("AIS data processing completed successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing AIS data");
-                throw;
-            }
+                return true; // Operation completed successfully
+            }, "ProcessAISDataAsync");
         }
 
         /// <summary>

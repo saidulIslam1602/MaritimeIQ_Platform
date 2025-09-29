@@ -1,5 +1,5 @@
 {
-  "$schema": "./schemas/arm-template-slim.json",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "appName": {
@@ -173,27 +173,6 @@
       ]
     },
     {
-      "type": "Microsoft.StreamAnalytics/streamingjobs",
-      "apiVersion": "2020-03-01",
-      "name": "[variables('streamJob')]",
-      "location": "[parameters('location')]",
-      "tags": {
-        "Environment": "Interview",
-        "Project": "MaritimePlatform"
-      },
-      "sku": {
-        "name": "Standard"
-      },
-      "properties": {
-        "outputErrorPolicy": "Stop",
-        "eventsOutOfOrderPolicy": "Adjust",
-        "eventsOutOfOrderMaxDelayInSeconds": 0,
-        "eventsLateArrivalMaxDelayInSeconds": 5,
-        "dataLocale": "en-US",
-        "compatibilityLevel": "1.2"
-      }
-    },
-    {
       "type": "Microsoft.Insights/components",
       "apiVersion": "2020-02-02",
       "name": "[variables('aiName')]",
@@ -310,10 +289,6 @@
     "eventHubNamespace": {
       "type": "string",
       "value": "[variables('ehNs')]"
-    },
-    "streamAnalyticsJobName": {
-      "type": "string",
-      "value": "[variables('streamJob')]"
     },
     "appInsightsName": {
       "type": "string",

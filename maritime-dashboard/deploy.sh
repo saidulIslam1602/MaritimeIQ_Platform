@@ -5,12 +5,9 @@
 
 set -euo pipefail
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+# Source shared utilities (one level up)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../deployment/shared/azure-common.sh"
 
 # Configuration
 STATIC_WEB_APP_NAME="havila-maritime-dashboard"
@@ -20,63 +17,23 @@ SKU="Free"
 RESOURCE_GROUP=""
 LOCATION=""
 
-print_info() {
-    echo -e "${BLUE}ℹ️  $1${NC}"
-}
-
-print_success() {
-    echo -e "${GREEN}✅ $1${NC}"
-}
-
-print_warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}"
-}
-
-print_error() {
-    echo -e "${RED}❌ $1${NC}"
-}
-
 print_info "Deploying Havila Kystruten Maritime Dashboard to Azure Static Web Apps"
 echo
 
-# Check if Azure CLI is installed and authenticated
-print_info "Checking Azure CLI..."
-if ! command -v az >/dev/null 2>&1; then
-    print_error "Azure CLI not found. Please install it from https://aka.ms/azure-cli"
-    exit 1
-fi
-
-if ! az account show >/dev/null 2>&1; then
-    print_warning "Azure CLI not authenticated. Please run 'az login'"
-    exit 1
-fi
+# Use shared Azure setup
+check_prerequisites
+setup_azure_auth
 
 SUBSCRIPTION_NAME=$(az account show --query name -o tsv)
 print_success "Authenticated to Azure subscription: $SUBSCRIPTION_NAME"
 
 # Select resource group (or use preset from deploy-all.sh)
-if [ -n "$PRESET_RESOURCE_GROUP" ] && [ -n "$PRESET_LOCATION" ]; then
+if [ -n "${PRESET_RESOURCE_GROUP:-}" ] && [ -n "${PRESET_LOCATION:-}" ]; then
     RESOURCE_GROUP="$PRESET_RESOURCE_GROUP"
     LOCATION="$PRESET_LOCATION"
     print_success "Using preset resource group: $RESOURCE_GROUP in location: $LOCATION"
 else
-    print_info "Available resource groups:"
-    az group list --query "[].{Name:name, Location:location}" --output table
-
-    echo ""
-    read -p "Enter the name of the existing resource group to use: " RESOURCE_GROUP
-
-    # Validate the resource group exists and get its location
-    print_info "Validating resource group: $RESOURCE_GROUP"
-    LOCATION=$(az group show --name "$RESOURCE_GROUP" --query "location" --output tsv 2>/dev/null)
-
-    if [ -z "$LOCATION" ]; then
-        print_error "Resource group '$RESOURCE_GROUP' not found."
-        echo "Please make sure the resource group exists and you have access to it."
-        exit 1
-    fi
-
-    print_success "Using resource group: $RESOURCE_GROUP in location: $LOCATION"
+    select_resource_group
 fi
 
 # Create Static Web App
