@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
+using MaritimeIQ.Platform.Models.Safety;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -117,7 +118,7 @@ namespace HavilaKystruten.Maritime.Controllers
                 new VesselSafetyData
                 {
                     VesselId = 1,
-                    VesselName = "MS Havila Castor",
+                    VesselName = "MS Arctic Explorer",
                     SafetyLevel = SafetyLevel.Safe,
                     ActiveAlerts = new List<SafetyAlert>(),
                     LastSafetyInspection = DateTime.UtcNow.AddDays(-30),
@@ -140,15 +141,15 @@ namespace HavilaKystruten.Maritime.Controllers
                 new VesselSafetyData
                 {
                     VesselId = 2,
-                    VesselName = "MS Havila Pollux",
+                    VesselName = "MS Nordic Spirit",
                     SafetyLevel = SafetyLevel.Caution,
                     ActiveAlerts = new List<SafetyAlert>
                     {
                         new SafetyAlert
                         {
-                            Id = Guid.NewGuid(),
+                            Id = Guid.NewGuid().ToString(),
                             Type = "Equipment",
-                            Severity = AlertSeverity.Medium,
+                            Severity = AlertSeverity.Medium.ToString(),
                             Message = "Port lifeboat winch requires maintenance",
                             Timestamp = DateTime.UtcNow.AddHours(-2)
                         }
@@ -243,22 +244,6 @@ namespace HavilaKystruten.Maritime.Controllers
         Critical
     }
 
-    public class SafetyAlert
-    {
-        public Guid Id { get; set; }
-        public string Type { get; set; } = string.Empty;
-        public AlertSeverity Severity { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; }
-    }
-
-    public enum AlertSeverity
-    {
-        Low,
-        Medium,
-        High,
-        Critical
-    }
 
     public class FleetSafetyStatus
     {

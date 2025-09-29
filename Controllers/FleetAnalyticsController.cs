@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Models;
-using HavilaKystruten.Maritime.Data;
+using MaritimeIQ.Platform.Models;
+using MaritimeIQ.Platform.Data;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
     /// Fleet Analytics Service - Provides comprehensive analytics, reporting, 
@@ -28,10 +28,10 @@ namespace HavilaKystruten.Maritime.Controllers
         {
             _logger.LogInformation("Generating fleet analytics dashboard data");
 
-            var fleet = HavilaFleetData.GetHavilaFleet();
-            var positions = HavilaFleetData.GetCurrentVesselPositions();
-            var environmental = HavilaFleetData.GetSampleEnvironmentalData();
-            var voyages = HavilaFleetData.GetSampleVoyages();
+        var fleet = MaritimeFleetData.GetMaritimeFleet();
+        var positions = MaritimeFleetData.GetCurrentVesselPositions();
+        var environmental = MaritimeFleetData.GetSampleEnvironmentalData();
+        var voyages = MaritimeFleetData.GetSampleVoyages();
 
             var dashboard = new
             {
@@ -42,9 +42,9 @@ namespace HavilaKystruten.Maritime.Controllers
                     TotalVessels = fleet.Count(),
                     VesselsInService = fleet.Count(v => v.Status == VesselStatus.InService),
                     TotalPassengerCapacity = fleet.Sum(v => v.PassengerCapacity),
-                    FleetUtilization = "89.3%",
-                    AverageVesselAge = 2.5, // New fleet (2021-2022)
-                    FleetValue = "€450 million"
+                FleetUtilization = CalculateFleetUtilization(voyages, fleet),
+                AverageVesselAge = CalculateAverageVesselAge(fleet),
+                FleetValue = CalculateFleetValue(fleet)
                 },
                 OperationalMetrics = new
                 {
@@ -91,7 +91,7 @@ namespace HavilaKystruten.Maritime.Controllers
                         AverageConsumption = $"{environmental.Average(e => e.FuelConsumptionLiters):F1} L/hour",
                         EfficiencyImprovement = "15% better than previous fleet",
                         HybridUtilization = $"{environmental.Average(e => e.BatteryStateOfCharge):F1}% battery SOC",
-                        BestPerformingVessel = "Havila Pollux (19% above target)"
+                        BestPerformingVessel = "MS Nordic Spirit (19% above target)"
                     },
                     SustainabilityScore = new
                     {
@@ -182,8 +182,9 @@ namespace HavilaKystruten.Maritime.Controllers
         {
             _logger.LogInformation("Generating vessel performance comparison");
 
-            var fleet = HavilaFleetData.GetHavilaFleet();
-            var environmental = HavilaFleetData.GetSampleEnvironmentalData();
+        var fleet = MaritimeFleetData.GetMaritimeFleet();
+        var environmental = MaritimeFleetData.GetSampleEnvironmentalData();
+        var voyages = MaritimeFleetData.GetSampleVoyages();
 
             var comparison = fleet.Select(vessel => new
             {
@@ -195,22 +196,22 @@ namespace HavilaKystruten.Maritime.Controllers
                     FuelEfficiency = $"{environmental.Where(e => e.VesselId == vessel.Id).Average(e => e.FuelConsumptionLiters):F1} L/h",
                     CO2Emissions = $"{environmental.Where(e => e.VesselId == vessel.Id).Average(e => e.CO2EmissionKg):F1} kg/h",
                     BatteryUsage = $"{environmental.Where(e => e.VesselId == vessel.Id).Average(e => e.BatteryStateOfCharge):F1}%",
-                    OperationalHours = new Random().Next(6500, 7200), // Annual hours
-                    MaintenanceScore = new Random().Next(85, 98) + "%"
+                    OperationalHours = CalculateOperationalHours(vessel.Id, voyages),
+                    MaintenanceScore = CalculateMaintenanceScore(vessel.Id, environmental) + "%"
                 },
                 Utilization = new
                 {
-                    Occupancy = new Random().Next(70, 88) + "%",
-                    RevenuePerDay = "€" + new Random().Next(35000, 42000).ToString("N0"),
-                    SailingDays = new Random().Next(320, 340),
-                    PortDays = new Random().Next(25, 45)
+                    Occupancy = CalculateOccupancyRate(vessel.Id, voyages) + "%",
+                    RevenuePerDay = "€" + CalculateDailyRevenue(vessel.Id, voyages).ToString("N0"),
+                    SailingDays = CalculateSailingDays(vessel.Id, voyages),
+                    PortDays = CalculatePortDays(vessel.Id, voyages)
                 },
                 CustomerSatisfaction = new
                 {
-                    Rating = Math.Round(4.4 + new Random().NextDouble() * 0.6, 1),
-                    NorthernLightsViewing = Math.Round(4.5 + new Random().NextDouble() * 0.5, 1),
-                    ServiceQuality = Math.Round(4.3 + new Random().NextDouble() * 0.7, 1),
-                    CabinComfort = Math.Round(4.2 + new Random().NextDouble() * 0.8, 1)
+                    Rating = CalculateCustomerRating(vessel.Id, voyages),
+                    WeatherViewing = CalculateWeatherViewingRating(vessel.Id, voyages),
+                    ServiceQuality = CalculateServiceQuality(vessel.Id, voyages),
+                    CabinComfort = CalculateCabinComfortRating(vessel.Id)
                 }
             }).ToList();
 
@@ -243,7 +244,7 @@ namespace HavilaKystruten.Maritime.Controllers
         {
             _logger.LogInformation("Generating environmental compliance report");
 
-            var environmental = HavilaFleetData.GetSampleEnvironmentalData();
+            var environmental = MaritimeFleetData.GetSampleEnvironmentalData();
             
             var report = new
             {
@@ -351,8 +352,8 @@ namespace HavilaKystruten.Maritime.Controllers
         {
             _logger.LogInformation("Fetching real-time fleet performance metrics");
 
-            var positions = HavilaFleetData.GetCurrentVesselPositions();
-            var environmental = HavilaFleetData.GetSampleEnvironmentalData()
+        var positions = MaritimeFleetData.GetCurrentVesselPositions();
+        var environmental = MaritimeFleetData.GetSampleEnvironmentalData()
                                               .Where(e => e.MeasurementTime > DateTime.UtcNow.AddHours(-1));
 
             var metrics = new
@@ -477,9 +478,9 @@ namespace HavilaKystruten.Maritime.Controllers
                 {
                     MaintenanceScheduling = new[]
                     {
-                        new { Vessel = "Havila Capella", NextMaintenance = "2024-01-15", Type = "Engine overhaul", Duration = "3 days" },
-                        new { Vessel = "Havila Castor", NextMaintenance = "2024-01-28", Type = "Battery service", Duration = "1 day" },
-                        new { Vessel = "Havila Polaris", NextMaintenance = "2024-02-05", Type = "Hull inspection", Duration = "2 days" }
+                        new { Vessel = "MS Nordic Aurora", NextMaintenance = "2024-01-15", Type = "Engine overhaul", Duration = "3 days" },
+                        new { Vessel = "MS Arctic Explorer", NextMaintenance = "2024-01-28", Type = "Battery service", Duration = "1 day" },
+                        new { Vessel = "MS Coastal Voyager", NextMaintenance = "2024-02-05", Type = "Hull inspection", Duration = "2 days" }
                     },
                     FuelCosts = new
                     {
@@ -549,5 +550,152 @@ namespace HavilaKystruten.Maritime.Controllers
 
             return Ok(analytics);
         }
+
+        #region Calculation Helper Methods
+
+        private string CalculateFleetUtilization(IReadOnlyList<Voyage> voyages, IReadOnlyList<Vessel> fleet)
+        {
+            if (!voyages.Any() || !fleet.Any()) return "0%";
+            
+            var activeVoyages = voyages.Count(v => v.Status == VoyageStatus.InProgress || v.Status == VoyageStatus.Scheduled);
+            var totalCapacity = fleet.Sum(f => f.PassengerCapacity);
+            var utilizationRate = (double)activeVoyages / totalCapacity * 100;
+            
+            return $"{utilizationRate:F1}%";
+        }
+
+        private double CalculateAverageVesselAge(IReadOnlyList<Vessel> fleet)
+        {
+            // Assuming vessels are modern hybrid vessels built around 2021-2022
+            var currentYear = DateTime.UtcNow.Year;
+            var averageConstructionYear = 2021.5; // Midpoint
+            return Math.Round(currentYear - averageConstructionYear, 1);
+        }
+
+        private string CalculateFleetValue(IReadOnlyList<Vessel> fleet)
+        {
+            // Estimate based on modern hybrid ferry values (~€112M per vessel)
+            var estimatedValuePerVessel = 112_000_000;
+            var totalValue = fleet.Count * estimatedValuePerVessel;
+            return $"€{totalValue / 1_000_000}M";
+        }
+
+        private int CalculateOperationalHours(int vesselId, IReadOnlyList<Voyage> voyages)
+        {
+            var vesselVoyages = voyages.Where(v => v.VesselId == vesselId);
+            var totalHours = vesselVoyages.Sum(v => ((v.ArrivalTime ?? v.DepartureTime.AddDays(1)) - v.DepartureTime).TotalHours);
+            
+            // Estimate annual hours based on current data, with minimum baseline
+            var annualEstimate = Math.Max(totalHours * (365.0 / 30.0), 6500); // Extrapolate monthly to yearly
+            return (int)Math.Round(annualEstimate);
+        }
+
+        private int CalculateMaintenanceScore(int vesselId, IReadOnlyList<EnvironmentalData> environmental)
+        {
+            var vesselData = environmental.Where(e => e.VesselId == vesselId);
+            if (!vesselData.Any()) return 90; // Default good score
+
+            // Calculate based on environmental performance as proxy for maintenance
+            var avgBatteryHealth = vesselData.Average(e => (double)e.BatteryStateOfCharge);
+            var avgEfficiency = vesselData.Average(e => Math.Max(0, 100 - (double)e.FuelConsumptionLiters * 2)); // Inverse of fuel consumption
+            
+            return (int)Math.Round((avgBatteryHealth * 0.4 + avgEfficiency * 0.6));
+        }
+
+        private int CalculateOccupancyRate(int vesselId, IReadOnlyList<Voyage> voyages)
+        {
+            var vesselVoyages = voyages.Where(v => v.VesselId == vesselId);
+            if (!vesselVoyages.Any()) return 75; // Default
+
+            var avgOccupancy = vesselVoyages.Average(v => (double)(v.PassengerCount));
+            var vessel = MaritimeFleetData.GetMaritimeFleet().FirstOrDefault(f => f.Id == vesselId);
+            if (vessel == null) return 75;
+
+            var occupancyRate = (avgOccupancy / vessel.PassengerCapacity) * 100;
+            return Math.Max(60, Math.Min(95, (int)Math.Round(occupancyRate)));
+        }
+
+        private decimal CalculateDailyRevenue(int vesselId, IReadOnlyList<Voyage> voyages)
+        {
+            var vesselVoyages = voyages.Where(v => v.VesselId == vesselId);
+            if (!vesselVoyages.Any()) return 38000; // Default
+
+            // Estimate based on passenger count and average ticket price
+            var avgPassengers = vesselVoyages.Average(v => (double)v.PassengerCount);
+            var estimatedTicketPrice = 450; // Average coastal voyage ticket
+            
+            return (decimal)(avgPassengers * estimatedTicketPrice);
+        }
+
+        private int CalculateSailingDays(int vesselId, IReadOnlyList<Voyage> voyages)
+        {
+            var vesselVoyages = voyages.Where(v => v.VesselId == vesselId && 
+                                              (v.Status == VoyageStatus.Completed || v.Status == VoyageStatus.InProgress));
+            
+            // Estimate annual sailing days
+            var totalVoyageDays = vesselVoyages.Sum(v => ((v.ArrivalTime ?? v.DepartureTime.AddDays(1)) - v.DepartureTime).TotalDays);
+            var annualEstimate = totalVoyageDays * (365.0 / 30.0); // Extrapolate to year
+            
+            return Math.Max(300, Math.Min(350, (int)Math.Round(annualEstimate)));
+        }
+
+        private int CalculatePortDays(int vesselId, IReadOnlyList<Voyage> voyages)
+        {
+            return 365 - CalculateSailingDays(vesselId, voyages);
+        }
+
+        private double CalculateCustomerRating(int vesselId, IReadOnlyList<Voyage> voyages)
+        {
+            // Base rating with variation based on vessel performance
+            var baseRating = 4.5;
+            var vesselVoyages = voyages.Where(v => v.VesselId == vesselId);
+            
+            if (vesselVoyages.Any())
+            {
+                var onTimePerformance = vesselVoyages.Count(v => v.Status == VoyageStatus.Completed) / (double)vesselVoyages.Count();
+                var ratingModifier = (onTimePerformance - 0.8) * 0.5; // Adjust based on performance
+                baseRating += ratingModifier;
+            }
+            
+            return Math.Max(4.0, Math.Min(5.0, Math.Round(baseRating, 1)));
+        }
+
+        private double CalculateWeatherViewingRating(int vesselId, IReadOnlyList<Voyage> voyages)
+        {
+            // Weather viewing depends on routes and seasonal factors
+            var currentMonth = DateTime.UtcNow.Month;
+            var seasonalFactor = currentMonth >= 10 || currentMonth <= 3 ? 4.7 : 4.2; // Winter months better for aurora viewing
+            
+            return Math.Round(seasonalFactor, 1);
+        }
+
+        private double CalculateServiceQuality(int vesselId, IReadOnlyList<Voyage> voyages)
+        {
+            // Service quality based on vessel operational performance
+            var vesselVoyages = voyages.Where(v => v.VesselId == vesselId);
+            var baseQuality = 4.4;
+            
+            if (vesselVoyages.Any())
+            {
+                var completedVoyages = vesselVoyages.Count(v => v.Status == VoyageStatus.Completed);
+                var totalVoyages = vesselVoyages.Count();
+                var reliabilityFactor = totalVoyages > 0 ? (double)completedVoyages / totalVoyages : 0.9;
+                baseQuality += (reliabilityFactor - 0.9) * 0.4;
+            }
+            
+            return Math.Max(4.0, Math.Min(5.0, Math.Round(baseQuality, 1)));
+        }
+
+        private double CalculateCabinComfortRating(int vesselId)
+        {
+            // Modern hybrid vessels have high comfort ratings
+            // Slight variation based on vessel ID to simulate differences
+            var baseComfort = 4.3;
+            var vesselVariation = (vesselId % 4) * 0.1; // Small variation between vessels
+            
+            return Math.Round(baseComfort + vesselVariation, 1);
+        }
+
+        #endregion
     }
 }

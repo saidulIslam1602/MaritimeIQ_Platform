@@ -1,4 +1,4 @@
-namespace HavilaKystruten.Maritime.Models;
+namespace MaritimeIQ.Platform.Models;
 
 /// <summary>
 /// High-level operational snapshot for the Havila maritime platform.
@@ -90,6 +90,6 @@ public record MaritimeAiModelSummary(
     bool IsActive
 )
 {
-    public static MaritimeAiModelSummary From(HavilaKystruten.Maritime.Models.AIModel model) =>
+    public static MaritimeAiModelSummary From(MaritimeIQ.Platform.Models.AIModel model) =>
         new(model.ModelName, model.ModelType, model.Version, model.Accuracy, model.IsActive);
 }

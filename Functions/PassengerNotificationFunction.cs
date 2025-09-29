@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Functions.Worker.Http;
 using System.Net;
 using System.Text.Json;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
 
-namespace HavilaKystruten.Maritime.Functions
+namespace MaritimeIQ.Platform.Functions
 {
     /// <summary>
     /// Passenger Notification Functions - Handles boarding notifications, delays,
@@ -278,7 +278,7 @@ namespace HavilaKystruten.Maritime.Functions
                 { 
                     VoyageId = "HAV-001", 
                     VesselId = 1, 
-                    VesselName = "Havila Capella", 
+                    VesselName = "MS Nordic Aurora", 
                     Route = "Bergen-Kirkenes",
                     CurrentPosition = new VoyagePosition { Latitude = 67.28m, Longitude = 14.40m, NearestPort = "Bodø" },
                     PassengerCount = 487,
@@ -288,7 +288,7 @@ namespace HavilaKystruten.Maritime.Functions
                 { 
                     VoyageId = "HAV-002", 
                     VesselId = 2, 
-                    VesselName = "Havila Castor", 
+                    VesselName = "MS Arctic Explorer", 
                     Route = "Kirkenes-Bergen",
                     CurrentPosition = new VoyagePosition { Latitude = 69.65m, Longitude = 18.96m, NearestPort = "Tromsø" },
                     PassengerCount = 521,
@@ -378,7 +378,7 @@ namespace HavilaKystruten.Maritime.Functions
                 ContactInfo = new
                 {
                     GuestServices = "+47 810 30 000",
-                    Email = "guestservices@havila.no",
+                    Email = "guestservices@maritimeiq.com",
                     OnboardAssistance = "Visit Guest Services Desk on Deck 5"
                 }
             };
@@ -441,7 +441,7 @@ namespace HavilaKystruten.Maritime.Functions
 
         private async Task<object> CreateDailyUpdate(VoyageInfo voyage)
         {
-            var weather = await GetCurrentWeather(voyage.CurrentPosition);
+            var weather = await GetCurrentWeather(voyage.CurrentPosition ?? throw new ArgumentNullException(nameof(voyage.CurrentPosition))); // Ensure position is not null
             var todaysPorts = await getTodaysPortSchedule(voyage.VoyageId);
             var activities = await getTodaysActivities(voyage.VoyageId);
             var auroraForecast = await GetAuroraForecast();
@@ -560,7 +560,7 @@ namespace HavilaKystruten.Maritime.Functions
             var facts = new[]
             {
                 "The Norwegian coastal route covers 2,500 kilometers and visits 34 ports in 11 days.",
-                "Havila's hybrid vessels can run on battery power alone for up to 4 hours.",
+                "MaritimeIQ's hybrid vessels can run on battery power alone for up to 4 hours.",
                 "The Northern Lights are visible up to 200 nights per year in Northern Norway.",
                 "Norwegian coastal vessels have been operating this route for over 125 years.",
                 "The midnight sun is visible for 76 consecutive days in Kirkenes during summer."
@@ -575,10 +575,10 @@ namespace HavilaKystruten.Maritime.Functions
             
             return vesselId switch
             {
-                1 => new VesselInfo { Name = "Havila Capella", Capacity = 640, CrewCount = 55 },
-                2 => new VesselInfo { Name = "Havila Castor", Capacity = 640, CrewCount = 55 },
-                3 => new VesselInfo { Name = "Havila Polaris", Capacity = 640, CrewCount = 55 },
-                4 => new VesselInfo { Name = "Havila Pollux", Capacity = 640, CrewCount = 55 },
+                1 => new VesselInfo { Name = "MS Nordic Aurora", Capacity = 640, CrewCount = 55 },
+                2 => new VesselInfo { Name = "MS Arctic Explorer", Capacity = 640, CrewCount = 55 },
+                3 => new VesselInfo { Name = "MS Coastal Voyager", Capacity = 640, CrewCount = 55 },
+                4 => new VesselInfo { Name = "MS Nordic Spirit", Capacity = 640, CrewCount = 55 },
                 _ => new VesselInfo { Name = "Unknown Vessel", Capacity = 0, CrewCount = 0 }
             };
         }
@@ -662,7 +662,7 @@ namespace HavilaKystruten.Maritime.Functions
                     "Previous voyage preferences considered"
                 },
                 CallToAction = request.CallToAction,
-                Signature = "The Havila Kystruten Team"
+                Signature = "The MaritimeIQ Platform Team"
             };
         }
 

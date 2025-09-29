@@ -1,6 +1,6 @@
 using System;
 
-namespace HavilaKystruten.Maritime.Functions
+namespace MaritimeIQ.Platform.Functions
 {
     // Shared models for Azure Functions to avoid duplicates
 

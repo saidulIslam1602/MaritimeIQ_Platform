@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.Json;
 using Message = Microsoft.Azure.Devices.Client.Message;
 
-namespace HavilaKystruten.Maritime.Services
+namespace MaritimeIQ.Platform.Services
 {
     public class IoTHubConfiguration
     {
@@ -195,10 +195,10 @@ namespace HavilaKystruten.Maritime.Services
             // Simulate telemetry from Havila's 4 vessels
             var vessels = new[]
             {
-                new { Id = "HAVILA_CASTOR", Name = "Havila Castor" },
-                new { Id = "HAVILA_POLLUX", Name = "Havila Pollux" },
-                new { Id = "HAVILA_CAPELLA", Name = "Havila Capella" },
-                new { Id = "HAVILA_POLARIS", Name = "Havila Polaris" }
+                new { Id = "HAVILA_CASTOR", Name = "MS Arctic Explorer" },
+                new { Id = "HAVILA_POLLUX", Name = "MS Nordic Spirit" },
+                new { Id = "HAVILA_CAPELLA", Name = "MS Nordic Aurora" },
+                new { Id = "HAVILA_POLARIS", Name = "MS Coastal Voyager" }
             };
 
             foreach (var vessel in vessels)

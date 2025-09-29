@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
     /// Base controller for all Maritime API controllers

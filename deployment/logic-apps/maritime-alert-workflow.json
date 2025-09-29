@@ -125,7 +125,7 @@
         "type": "Object"
       },
       "EmergencyEmailList": {
-        "defaultValue": "emergency@havila.no,operations@havila.no",
+        "defaultValue": "emergency@maritimeiq.com,operations@maritimeiq.com",
         "type": "String"
       },
       "EmergencyPhoneNumber": {
@@ -133,19 +133,19 @@
         "type": "String"
       },
       "MaritimeAPIEndpoint": {
-        "defaultValue": "https://havila-maritime-api.azurewebsites.net",
+        "defaultValue": "https://maritimeiq-platform-api.azurewebsites.net",
         "type": "String"
       },
       "NotificationServiceEndpoint": {
-        "defaultValue": "https://havila-notifications.azurewebsites.net",
+        "defaultValue": "https://maritimeiq-notifications.azurewebsites.net",
         "type": "String"
       },
       "OperationsTeamEmail": {
-        "defaultValue": "operations@havila.no",
+        "defaultValue": "operations@maritimeiq.com",
         "type": "String"
       },
       "SMSServiceEndpoint": {
-        "defaultValue": "https://havila-sms.azurewebsites.net",
+        "defaultValue": "https://maritimeiq-sms.azurewebsites.net",
         "type": "String"
       }
     },
@@ -167,12 +167,12 @@
     "$connections": {
       "value": {
         "office365": {
-          "connectionId": "/subscriptions/{subscription-id}/resourceGroups/havila-maritime-rg/providers/Microsoft.Web/connections/office365",
+          "connectionId": "/subscriptions/{subscription-id}/resourceGroups/maritimeiq-platform-rg/providers/Microsoft.Web/connections/office365",
           "connectionName": "office365",
           "id": "/subscriptions/{subscription-id}/providers/Microsoft.Web/locations/westeurope/managedApis/office365"
         },
         "servicebus": {
-          "connectionId": "/subscriptions/{subscription-id}/resourceGroups/havila-maritime-rg/providers/Microsoft.Web/connections/servicebus",
+          "connectionId": "/subscriptions/{subscription-id}/resourceGroups/maritimeiq-platform-rg/providers/Microsoft.Web/connections/servicebus",
           "connectionName": "servicebus",
           "id": "/subscriptions/{subscription-id}/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
         }

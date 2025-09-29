@@ -3,7 +3,7 @@ using Azure.AI.Vision.ImageAnalysis;
 using Azure;
 using System.Text.Json;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -649,6 +649,8 @@ namespace HavilaKystruten.Maritime.Controllers
 
     public class DetectedObject
     {
+        public string Type { get; set; } = string.Empty;
+        public string Label { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public double Confidence { get; set; }
         public BoundingBox BoundingBox { get; set; } = new();

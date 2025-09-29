@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Services;
+using MaritimeIQ.Platform.Services;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
     /// Environmental Monitoring Controller - Provides REST API endpoints for
@@ -85,7 +85,7 @@ namespace HavilaKystruten.Maritime.Controllers
                 new EnvironmentalReading
                 {
                     VesselId = "HK-001",
-                    VesselName = "MS Havila Castor",
+                    VesselName = "MS Arctic Explorer",
                     CO2Level = 45.2,
                     NOxLevel = 8.1,
                     SOxLevel = 0.3,
@@ -96,7 +96,7 @@ namespace HavilaKystruten.Maritime.Controllers
                 new EnvironmentalReading
                 {
                     VesselId = "HK-002",
-                    VesselName = "MS Havila Capella",
+                    VesselName = "MS Nordic Aurora",
                     CO2Level = 48.3,
                     NOxLevel = 8.4,
                     SOxLevel = 0.4,
@@ -125,7 +125,7 @@ namespace HavilaKystruten.Maritime.Controllers
                 {
                     new EnvironmentalAlert
                     {
-                        VesselName = "MS Havila Castor",
+                        VesselName = "MS Arctic Explorer",
                         AlertType = "Battery Low",
                         Severity = "Medium",
                         CurrentValue = 18,

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
 
-namespace HavilaKystruten.Maritime.Services
+namespace MaritimeIQ.Platform.Services
 {
     /// <summary>
     /// Route Optimization Service - Advanced AI-driven route planning considering
@@ -129,7 +129,7 @@ namespace HavilaKystruten.Maritime.Services
                     new ActiveRoute
                     {
                         VoyageId = "HK-2024-001",
-                        VesselName = "MS Havila Castor",
+                        VesselName = "MS Arctic Explorer",
                         Route = "Bergen - Kirkenes",
                         CurrentStatus = "Optimized",
                         FuelSavings = 12.3,
@@ -140,7 +140,7 @@ namespace HavilaKystruten.Maritime.Services
                     new ActiveRoute
                     {
                         VoyageId = "HK-2024-002",
-                        VesselName = "MS Havila Capella",
+                        VesselName = "MS Nordic Aurora",
                         Route = "Kirkenes - Bergen",
                         CurrentStatus = "Under Review",
                         FuelSavings = 5.8,
@@ -224,7 +224,7 @@ namespace HavilaKystruten.Maritime.Services
                 {
                     VoyageId = "HK-2024-001",
                     VesselId = 101,
-                    VesselName = "MS Havila Castor",
+                    VesselName = "MS Arctic Explorer",
                     CurrentPosition = new VoyagePosition
                     {
                         Latitude = 69.6492m,
@@ -239,7 +239,7 @@ namespace HavilaKystruten.Maritime.Services
                 {
                     VoyageId = "HK-2024-002",
                     VesselId = 102,
-                    VesselName = "MS Havila Capella",
+                    VesselName = "MS Nordic Aurora",
                     CurrentPosition = new VoyagePosition
                     {
                         Latitude = 70.2143m,
@@ -284,7 +284,7 @@ namespace HavilaKystruten.Maritime.Services
             {
                 VoyageId = voyageId,
                 VesselId = 101,
-                VesselName = "MS Havila Castor",
+                VesselName = "MS Arctic Explorer",
                 CurrentPosition = new VoyagePosition
                 {
                     Latitude = 69.6492m,

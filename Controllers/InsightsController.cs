@@ -1,9 +1,9 @@
-using HavilaKystruten.Maritime.Models;
-using HavilaKystruten.Maritime.Services;
+using MaritimeIQ.Platform.Models;
+using MaritimeIQ.Platform.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace HavilaKystruten.Maritime.Controllers;
+namespace MaritimeIQ.Platform.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

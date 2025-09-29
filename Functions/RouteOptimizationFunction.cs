@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Functions.Worker.Http;
 using System.Net;
 using System.Text.Json;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
 
-namespace HavilaKystruten.Maritime.Functions
+namespace MaritimeIQ.Platform.Functions
 {
     /// <summary>
     /// Route Optimization Functions - Advanced AI-driven route planning considering
@@ -419,7 +419,7 @@ namespace HavilaKystruten.Maritime.Functions
                     {
                         VoyageId = "HAV-001",
                         VesselId = 1,
-                        VesselName = "Havila Capella",
+                        VesselName = "MS Nordic Aurora",
                         Route = "Bergen-Kirkenes",
                         CurrentPosition = new VoyagePosition { Latitude = 67.28m, Longitude = 14.40m, NearestPort = "Bodø" },
                         PassengerCount = 487,
@@ -429,7 +429,7 @@ namespace HavilaKystruten.Maritime.Functions
                     {
                         VoyageId = "HAV-002",
                         VesselId = 2,
-                        VesselName = "Havila Castor",
+                        VesselName = "MS Arctic Explorer",
                         Route = "Kirkenes-Bergen",
                         CurrentPosition = new VoyagePosition { Latitude = 69.65m, Longitude = 18.96m, NearestPort = "Tromsø" },
                         PassengerCount = 521,
@@ -639,7 +639,7 @@ namespace HavilaKystruten.Maritime.Functions
                 new VoyageInfo
                 {
                     VoyageId = "HAV-AREA-001",
-                    VesselName = "Havila Capella",
+                    VesselName = "MS Nordic Aurora",
                     CurrentPosition = new VoyagePosition { Latitude = lat, Longitude = lng, NearestPort = "Unknown" }
                 }
             };

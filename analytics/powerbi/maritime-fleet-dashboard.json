@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "name": "Havila Maritime Fleet Operations Dashboard",
-  "description": "Real-time fleet operations, vessel tracking, and performance analytics for Havila Kystruten",
+  "name": "MaritimeIQ Fleet Operations Dashboard",
+  "description": "Real-time fleet operations, vessel tracking, and performance analytics for MaritimeIQ Platform",
   "dataModel": {
     "tables": [
       {
@@ -213,19 +213,19 @@
     {
       "name": "High CO2 Emissions Alert",
       "condition": "avg_co2_emissions > 50",
-      "recipients": ["operations@havila.no", "environmental@havila.no"],
+      "recipients": ["operations@maritimeiq.com", "environmental@maritimeiq.com"],
       "frequency": "Immediate"
     },
     {
       "name": "Northern Lights High Probability",
       "condition": "aurora_probability > 80",
-      "recipients": ["passenger-services@havila.no"],
+      "recipients": ["passenger-services@maritimeiq.com"],
       "frequency": "Daily at 18:00"
     },
     {
       "name": "Low Battery Alert",
       "condition": "battery_charge_percent < 20",
-      "recipients": ["technical@havila.no", "bridge@havila.no"],
+      "recipients": ["technical@maritimeiq.com", "bridge@maritimeiq.com"],
       "frequency": "Immediate"
     }
   ],
@@ -258,7 +258,7 @@
     },
     "embedding": {
       "enabled": true,
-      "allowedDomains": ["havila.no", "havilakystruten.com"],
+      "allowedDomains": ["maritimeiq.com", "maritimeiq.platform"],
       "authentication": "AAD"
     }
   }

@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
 
-namespace HavilaKystruten.Maritime.Services
+namespace MaritimeIQ.Platform.Services
 {
     public class CognitiveServicesConfiguration
     {
@@ -136,6 +136,8 @@ namespace HavilaKystruten.Maritime.Services
                     }).ToList() ?? new List<ImageTag>(),
                     Objects = analysis.Objects?.Values?.Select(o => new DetectedObject
                     {
+                        Type = o.Tags?.FirstOrDefault()?.Name ?? "Unknown",
+                        Label = o.Tags?.FirstOrDefault()?.Name ?? "Unknown",
                         ObjectType = o.Tags?.FirstOrDefault()?.Name ?? "Unknown",
                         Confidence = o.Tags?.FirstOrDefault()?.Confidence ?? 0.0,
                         BoundingBox = $"{o.BoundingBox.X},{o.BoundingBox.Y},{o.BoundingBox.Width},{o.BoundingBox.Height}"
@@ -625,6 +627,8 @@ namespace HavilaKystruten.Maritime.Services
 
     public class DetectedObject
     {
+        public string Type { get; set; } = string.Empty;
+        public string Label { get; set; } = string.Empty;
         public string ObjectType { get; set; } = string.Empty;
         public double Confidence { get; set; }
         public string BoundingBox { get; set; } = string.Empty;

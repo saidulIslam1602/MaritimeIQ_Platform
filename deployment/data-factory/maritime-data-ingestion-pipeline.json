@@ -1,7 +1,7 @@
 {
   "name": "maritime-data-ingestion-pipeline",
   "properties": {
-    "description": "Havila Kystruten Maritime Data Ingestion Pipeline - AIS, Vessel Telemetry, and Environmental Data",
+    "description": "MaritimeIQ Platform Data Ingestion Pipeline - AIS, Vessel Telemetry, and Environmental Data with Advanced Quality Controls",
     "activities": [
       {
         "name": "Copy_AIS_Data",

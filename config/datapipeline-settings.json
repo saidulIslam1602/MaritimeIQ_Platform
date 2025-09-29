@@ -1,0 +1,146 @@
+{
+  "DataPipelines": {
+    "CircuitBreaker": {
+      "FailureThreshold": 5,
+      "RecoveryTimeoutMinutes": 2
+    }
+  },
+  "ETL": {
+    "MaxConcurrency": 4,
+    "BatchSize": 1000,
+    "IntervalSeconds": 30,
+    "EnableParallelProcessing": true,
+    "MaxRetries": 3,
+    "BackoffMultiplier": 2.0,
+    "InitialDelaySeconds": 30
+  },
+  "Streaming": {
+    "MaxConcurrentProcessing": 50,
+    "ProcessingTimeoutMinutes": 5,
+    "CheckpointIntervalSeconds": 30,
+    "EnableAutomaticCheckpointing": true,
+    "BackpressureThreshold": 10000,
+    "AnomalyDetection": {
+      "Enabled": true,
+      "ZScoreThreshold": 2.5,
+      "HistoryWindowHours": 24
+    }
+  },
+  "DataQuality": {
+    "ProfilingIntervalMinutes": 5,
+    "Thresholds": {
+      "Completeness": 0.95,
+      "Accuracy": 0.98,
+      "Timeliness": 0.90,
+      "Consistency": 0.95,
+      "Validity": 0.98
+    },
+    "Rules": [
+      {
+        "RuleName": "vessel_position_bounds",
+        "RuleType": "GeographicBounds",
+        "Parameters": {
+          "minLatitude": 58.0,
+          "maxLatitude": 71.0,
+          "minLongitude": 4.0,
+          "maxLongitude": 31.0
+        },
+        "Enabled": true
+      },
+      {
+        "RuleName": "vessel_speed_limits",
+        "RuleType": "NumericRange",
+        "Parameters": {
+          "fieldName": "Speed",
+          "minValue": 0.0,
+          "maxValue": 40.0
+        },
+        "Enabled": true
+      },
+      {
+        "RuleName": "environmental_co2_limits",
+        "RuleType": "NumericRange",
+        "Parameters": {
+          "fieldName": "CO2EmissionKg",
+          "minValue": 0.0,
+          "maxValue": 100.0
+        },
+        "Enabled": true
+      },
+      {
+        "RuleName": "data_freshness",
+        "RuleType": "Timeliness",
+        "Parameters": {
+          "maxAgeMinutes": 10
+        },
+        "Enabled": true
+      }
+    ],
+    "Alerts": {
+      "CriticalQualityThreshold": 0.80,
+      "WarningQualityThreshold": 0.90,
+      "MaxAnomaliesPerHour": 10,
+      "MaxErrorRatePercent": 5.0
+    }
+  },
+  "Orchestration": {
+    "MaxConcurrentPipelines": 3,
+    "DefaultTimeoutHours": 2,
+    "SchedulingEnabled": true,
+    "AutoRetryEnabled": true,
+    "PipelineDefinitions": {
+      "MaritimeRealTimeProcessing": {
+        "Schedule": "0 */5 * * * *",
+        "Description": "Real-time maritime data processing every 5 minutes",
+        "MaxExecutionTimeMinutes": 10,
+        "RetryPolicy": {
+          "MaxRetries": 3,
+          "BackoffMultiplier": 2.0
+        }
+      },
+      "MaritimeDailyAnalytics": {
+        "Schedule": "0 0 2 * * *",
+        "Description": "Daily maritime analytics aggregation at 2 AM",
+        "MaxExecutionTimeHours": 2,
+        "RetryPolicy": {
+          "MaxRetries": 2,
+          "BackoffMultiplier": 1.5
+        }
+      }
+    }
+  },
+  "Monitoring": {
+    "HealthCheckIntervalMinutes": 1,
+    "SLAMonitoringIntervalMinutes": 5,
+    "AlertProcessingIntervalSeconds": 15,
+    "SLATargets": {
+      "RealTimeStreaming": {
+        "MaxLatencyMs": 5000,
+        "MinAvailabilityPercent": 99.9,
+        "MaxErrorRatePercent": 0.1
+      },
+      "ETLProcessing": {
+        "MaxLatencyMs": 300000,
+        "MinAvailabilityPercent": 99.5,
+        "MaxErrorRatePercent": 1.0
+      },
+      "DataQuality": {
+        "MaxLatencyMs": 120000,
+        "MinAvailabilityPercent": 99.0,
+        "MaxErrorRatePercent": 2.0
+      }
+    },
+    "PerformanceCounters": {
+      "Enabled": true,
+      "CollectionIntervalSeconds": 30,
+      "RetentionDays": 30
+    }
+  },
+  "FeatureFlags": {
+    "EnableAdvancedAnomalyDetection": true,
+    "EnableAutomaticRemediation": true,
+    "EnablePredictiveAnalytics": true,
+    "EnableRealTimeAlerts": true,
+    "EnablePerformanceOptimization": true
+  }
+}

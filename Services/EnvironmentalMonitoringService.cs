@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace HavilaKystruten.Maritime.Services
+namespace MaritimeIQ.Platform.Services
 {
     /// <summary>
     /// Environmental Monitoring Service - Real-time CO2 thresholds, emission alerts,
@@ -96,7 +96,7 @@ namespace HavilaKystruten.Maritime.Services
                 {
                     new VesselEnvironmentalStatus
                     {
-                        VesselName = "MS Havila Castor",
+                        VesselName = "MS Arctic Explorer",
                         CO2Level = 42.1,
                         NOxLevel = 7.8,
                         SOxLevel = 0.2,
@@ -106,7 +106,7 @@ namespace HavilaKystruten.Maritime.Services
                     },
                     new VesselEnvironmentalStatus
                     {
-                        VesselName = "MS Havila Capella",
+                        VesselName = "MS Nordic Aurora",
                         CO2Level = 48.3,
                         NOxLevel = 8.4,
                         SOxLevel = 0.4,

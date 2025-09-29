@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Services;
+using MaritimeIQ.Platform.Services;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     [Route("api/[controller]")]
     public class AISController : BaseMaritimeController

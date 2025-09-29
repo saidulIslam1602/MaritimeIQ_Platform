@@ -1,4 +1,4 @@
-namespace HavilaKystruten.Maritime.Models;
+namespace MaritimeIQ.Platform.Models;
 
 public record VesselStatusUpdateRequest
 {

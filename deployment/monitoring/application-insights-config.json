@@ -172,7 +172,7 @@
   "dashboards": [
     {
       "name": "Maritime Operations Dashboard",
-      "description": "Real-time monitoring of Havila maritime operations",
+      "description": "Real-time monitoring of MaritimeIQ Platform operations",
       "tiles": [
         {
           "name": "Request Volume",
@@ -258,7 +258,7 @@
       "receivers": [
         {
           "type": "email",
-          "emailAddress": "operations@havila.no"
+          "emailAddress": "operations@maritimeiq.com"
         },
         {
           "type": "sms",
@@ -272,7 +272,7 @@
       "receivers": [
         {
           "type": "email",
-          "emailAddress": "technical@havila.no"
+          "emailAddress": "technical@maritimeiq.com"
         }
       ]
     },
@@ -282,7 +282,7 @@
       "receivers": [
         {
           "type": "email",
-          "emailAddress": "environmental@havila.no"
+          "emailAddress": "environmental@maritimeiq.com"
         }
       ]
     },
@@ -292,7 +292,7 @@
       "receivers": [
         {
           "type": "email",
-          "emailAddress": "emergency@havila.no"
+          "emailAddress": "emergency@maritimeiq.com"
         },
         {
           "type": "sms", 
@@ -300,7 +300,7 @@
         },
         {
           "type": "webhook",
-          "serviceUri": "https://havila-emergency-response.azurewebsites.net/webhook"
+          "serviceUri": "https://maritimeiq-emergency-response.azurewebsites.net/webhook"
         }
       ]
     },
@@ -310,7 +310,7 @@
       "receivers": [
         {
           "type": "email",
-          "emailAddress": "passenger-services@havila.no"
+          "emailAddress": "passenger-services@maritimeiq.com"
         }
       ]
     },
@@ -320,7 +320,7 @@
       "receivers": [
         {
           "type": "email",
-          "emailAddress": "management@havila.no"
+          "emailAddress": "management@maritimeiq.com"
         }
       ]
     }

@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
+using MaritimeIQ.Platform.Models.Safety;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -111,7 +112,7 @@ namespace HavilaKystruten.Maritime.Controllers
                 BerthAvailability = new List<BerthStatus>
                 {
                     new BerthStatus { BerthNumber = "A1", IsAvailable = true, VesselName = null },
-                    new BerthStatus { BerthNumber = "A2", IsAvailable = false, VesselName = "MS Havila Castor" },
+                    new BerthStatus { BerthNumber = "A2", IsAvailable = false, VesselName = "MS Arctic Explorer" },
                     new BerthStatus { BerthNumber = "B1", IsAvailable = true, VesselName = null }
                 },
                 TideInfo = new TideInfo

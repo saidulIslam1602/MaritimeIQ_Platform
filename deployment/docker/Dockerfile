@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for Havila Maritime API
+# Multi-stage Dockerfile for MaritimeIQ Platform API
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
@@ -7,21 +7,21 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy project files
-COPY ["AcrTasksDemo.csproj", "."]
-COPY ["Functions/HavilaKystruten.Maritime.Functions.csproj", "Functions/"]
+COPY ["MaritimeIQ.Platform.csproj", "."]
+COPY ["Functions/MaritimeIQ.Platform.Functions.csproj", "Functions/"]
 
 # Restore dependencies
-RUN dotnet restore "AcrTasksDemo.csproj"
+RUN dotnet restore "MaritimeIQ.Platform.csproj"
 
 # Copy source code
 COPY . .
 
 # Build the application
 WORKDIR "/src"
-RUN dotnet build "AcrTasksDemo.csproj" -c Release -o /app/build
+RUN dotnet build "MaritimeIQ.Platform.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "AcrTasksDemo.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "MaritimeIQ.Platform.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
@@ -51,4 +51,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 
-ENTRYPOINT ["dotnet", "AcrTasksDemo.dll"]
+ENTRYPOINT ["dotnet", "MaritimeIQ.Platform.dll"]

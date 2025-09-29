@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Ship, MapPin, Activity, AlertTriangle, CheckCircle, TrendingUp, Waves, Wind, Thermometer, Zap } from 'lucide-react'
-import FleetDashboard from '../components/FleetDashboard'
-import SystemHealth from '../components/SystemHealth'
-import EnvironmentalMonitoring from '../components/EnvironmentalMonitoring'
-import RouteOptimization from '../components/RouteOptimization'
-import RealTimeVisualization from '../components/RealTimeVisualization'
+import FleetDashboard from '../src/components/fleet/FleetDashboard'
+import SystemHealth from '../src/components/system/SystemHealth'
+import EnvironmentalMonitoring from '../src/components/environmental/EnvironmentalMonitoring'
+import RouteOptimization from '../src/components/optimization/RouteOptimization'
+import RealTimeVisualization from '../src/components/analytics/RealTimeVisualization'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('fleet')
@@ -19,9 +19,8 @@ export default function Home() {
 
   const fetchSystemStatus = async () => {
     try {
-      const API_URL = typeof window !== 'undefined' 
-        ? 'https://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io'
-        : process.env.NEXT_PUBLIC_MARITIME_API_URL || 'https://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io'
+      const API_URL = process.env.NEXT_PUBLIC_MARITIME_API_URL || 
+        'https://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io'
       const response = await fetch(`${API_URL}/api/monitoring/health`)
       const data = await response.json()
       setSystemStatus(data)

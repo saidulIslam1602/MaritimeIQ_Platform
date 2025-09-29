@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace HavilaKystruten.Maritime.Services
+namespace MaritimeIQ.Platform.Services
 {
     public class ServiceBusConfiguration
     {

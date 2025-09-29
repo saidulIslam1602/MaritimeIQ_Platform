@@ -135,3 +135,12 @@ pids
 # Temporary files
 *.tmp
 *.tempSECRETS-LOCAL-ONLY.txt
+
+# Build artifacts (added by cleanup script)
+bin/
+obj/
+publish/
+Functions/bin/
+Functions/obj/
+maritime-dashboard/.next/
+maritime-dashboard/out/

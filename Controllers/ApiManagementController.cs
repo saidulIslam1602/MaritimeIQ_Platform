@@ -1,921 +1,612 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System.Text.Json;
+using MaritimeIQ.Platform.Services;
+using MaritimeIQ.Platform.Models.ApiManagement;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
+    /// <summary>
+    /// API Management controller for managing API definitions, subscriptions, policies, and analytics
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ApiManagementController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        private readonly IApiManagementService _apiManagementService;
         private readonly ILogger<ApiManagementController> _logger;
 
         public ApiManagementController(
-            IConfiguration configuration,
+            IApiManagementService apiManagementService,
             ILogger<ApiManagementController> logger)
         {
-            _configuration = configuration;
+            _apiManagementService = apiManagementService;
             _logger = logger;
         }
 
-        [HttpGet("api-definitions")]
-        public IActionResult GetApiDefinitions()
-        {
-            var apiDefinitions = new ApiManagementDefinition
-            {
-                BaseUrl = _configuration["ApiManagement:BaseUrl"] ?? "https://havila-maritime-apim.azure-api.net",
-                Version = "v1",
-                Title = "Havila Kystruten Maritime Platform API",
-                Description = "Comprehensive API for maritime operations, vessel tracking, and passenger services",
-                ApiGroups = new List<ApiGroup>
-                {
-                    new ApiGroup
-                    {
-                        Name = "Vessel Operations",
-                        Description = "APIs for vessel tracking, fleet management, and operational data",
-                        Apis = new List<ApiDefinition>
-                        {
-                            new ApiDefinition
-                            {
-                                Name = "Vessel Tracking",
-                                Path = "/api/vessel",
-                                Methods = new[] { "GET", "POST", "PUT" },
-                                Description = "Real-time vessel position tracking and fleet status",
-                                RequiresSubscription = true,
-                                RateLimit = "100 calls per minute",
-                                Scopes = new[] { "vessel:read", "vessel:write" }
-                            },
-                            new ApiDefinition
-                            {
-                                Name = "Fleet Analytics",
-                                Path = "/api/fleet-analytics",
-                                Methods = new[] { "GET" },
-                                Description = "Comprehensive fleet performance and analytics data",
-                                RequiresSubscription = true,
-                                RateLimit = "50 calls per minute",
-                                Scopes = new[] { "analytics:read" }
-                            },
-                            new ApiDefinition
-                            {
-                                Name = "Route Optimization",
-                                Path = "/api/route",
-                                Methods = new[] { "GET", "POST" },
-                                Description = "AI-powered route planning and optimization",
-                                RequiresSubscription = true,
-                                RateLimit = "20 calls per minute",
-                                Scopes = new[] { "route:read", "route:optimize" }
-                            }
-                        }
-                    },
-                    new ApiGroup
-                    {
-                        Name = "Maritime Intelligence",
-                        Description = "AI-powered document processing and intelligent analytics",
-                        Apis = new List<ApiDefinition>
-                        {
-                            new ApiDefinition
-                            {
-                                Name = "Document Analysis",
-                                Path = "/api/maritime-intelligence",
-                                Methods = new[] { "POST" },
-                                Description = "AI-powered maritime document processing and analysis",
-                                RequiresSubscription = true,
-                                RateLimit = "30 calls per minute",
-                                Scopes = new[] { "intelligence:analyze" }
-                            },
-                            new ApiDefinition
-                            {
-                                Name = "Maritime Vision",
-                                Path = "/api/maritime-vision",
-                                Methods = new[] { "POST" },
-                                Description = "Computer vision analysis for vessels and maritime conditions",
-                                RequiresSubscription = true,
-                                RateLimit = "25 calls per minute",
-                                Scopes = new[] { "vision:analyze" }
-                            },
-                            new ApiDefinition
-                            {
-                                Name = "Maritime Search",
-                                Path = "/api/maritime-search",
-                                Methods = new[] { "GET", "POST" },
-                                Description = "Intelligent search across maritime knowledge base",
-                                RequiresSubscription = false,
-                                RateLimit = "200 calls per minute",
-                                Scopes = new[] { "search:read" }
-                            }
-                        }
-                    },
-                    new ApiGroup
-                    {
-                        Name = "Passenger Services",
-                        Description = "APIs for passenger information, bookings, and service requests",
-                        Apis = new List<ApiDefinition>
-                        {
-                            new ApiDefinition
-                            {
-                                Name = "Maritime Chat",
-                                Path = "/api/maritime-chat",
-                                Methods = new[] { "POST" },
-                                Description = "AI-powered customer service chat for maritime inquiries",
-                                RequiresSubscription = false,
-                                RateLimit = "50 calls per minute",
-                                Scopes = new[] { "chat:use" }
-                            },
-                            new ApiDefinition
-                            {
-                                Name = "Northern Lights Information",
-                                Path = "/api/maritime-search/northern-lights-info",
-                                Methods = new[] { "GET" },
-                                Description = "Real-time Northern Lights viewing information and forecasts",
-                                RequiresSubscription = false,
-                                RateLimit = "100 calls per minute",
-                                Scopes = new[] { "info:read" }
-                            }
-                        }
-                    },
-                    new ApiGroup
-                    {
-                        Name = "IoT and Monitoring",
-                        Description = "APIs for IoT sensor data and real-time monitoring",
-                        Apis = new List<ApiDefinition>
-                        {
-                            new ApiDefinition
-                            {
-                                Name = "IoT Data Ingestion",
-                                Path = "/api/iot",
-                                Methods = new[] { "POST" },
-                                Description = "IoT sensor data collection and processing",
-                                RequiresSubscription = true,
-                                RateLimit = "1000 calls per minute",
-                                Scopes = new[] { "iot:write" }
-                            },
-                            new ApiDefinition
-                            {
-                                Name = "Safety Monitoring",
-                                Path = "/api/safety",
-                                Methods = new[] { "GET", "POST" },
-                                Description = "Safety equipment monitoring and emergency procedures",
-                                RequiresSubscription = true,
-                                RateLimit = "100 calls per minute",
-                                Scopes = new[] { "safety:read", "safety:monitor" }
-                            },
-                            new ApiDefinition
-                            {
-                                Name = "Environmental Monitoring",
-                                Path = "/api/vessel-data-ingestion/environmental",
-                                Methods = new[] { "GET", "POST" },
-                                Description = "Environmental compliance monitoring and reporting",
-                                RequiresSubscription = true,
-                                RateLimit = "200 calls per minute",
-                                Scopes = new[] { "environmental:read", "environmental:monitor" }
-                            }
-                        }
-                    }
-                },
-                SecuritySchemes = new Dictionary<string, SecurityScheme>
-                {
-                    ["ApiKey"] = new SecurityScheme
-                    {
-                        Type = "apiKey",
-                        Name = "Ocp-Apim-Subscription-Key",
-                        In = "header",
-                        Description = "API Management subscription key"
-                    },
-                    ["OAuth2"] = new SecurityScheme
-                    {
-                        Type = "oauth2",
-                        Description = "Azure AD OAuth2 authentication",
-                        Flows = new OAuthFlows
-                        {
-                            AuthorizationCode = new OAuthFlow
-                            {
-                                AuthorizationUrl = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-                                TokenUrl = "https://login.microsoftonline.com/common/oauth2/v2.0/token",
-                                Scopes = new Dictionary<string, string>
-                                {
-                                    ["vessel:read"] = "Read vessel information",
-                                    ["vessel:write"] = "Modify vessel data",
-                                    ["analytics:read"] = "Access analytics data",
-                                    ["route:read"] = "Read route information",
-                                    ["route:optimize"] = "Perform route optimization",
-                                    ["intelligence:analyze"] = "Use AI analysis services",
-                                    ["vision:analyze"] = "Use computer vision services",
-                                    ["search:read"] = "Search maritime knowledge base",
-                                    ["chat:use"] = "Use maritime chat service",
-                                    ["info:read"] = "Access general information",
-                                    ["iot:write"] = "Submit IoT sensor data",
-                                    ["safety:read"] = "Read safety information",
-                                    ["safety:monitor"] = "Access safety monitoring",
-                                    ["environmental:read"] = "Read environmental data",
-                                    ["environmental:monitor"] = "Access environmental monitoring"
-                                }
-                            }
-                        }
-                    }
-                },
-                Policies = new List<ApiPolicy>
-                {
-                    new ApiPolicy
-                    {
-                        Name = "Rate Limiting",
-                        Type = "rate-limit",
-                        Configuration = new Dictionary<string, object>
-                        {
-                            ["calls"] = 1000,
-                            ["renewal-period"] = 3600,
-                            ["counter-key"] = "@(context.Subscription?.Key ?? context.Request.IpAddress)"
-                        }
-                    },
-                    new ApiPolicy
-                    {
-                        Name = "IP Filtering",
-                        Type = "ip-filter",
-                        Configuration = new Dictionary<string, object>
-                        {
-                            ["action"] = "allow",
-                            ["addresses"] = new[] { "0.0.0.0/0" } // Allow all IPs - configure as needed
-                        }
-                    },
-                    new ApiPolicy
-                    {
-                        Name = "CORS",
-                        Type = "cors",
-                        Configuration = new Dictionary<string, object>
-                        {
-                            ["allowed-origins"] = new[] { "*" },
-                            ["allowed-methods"] = new[] { "GET", "POST", "PUT", "DELETE", "OPTIONS" },
-                            ["allowed-headers"] = new[] { "*" }
-                        }
-                    },
-                    new ApiPolicy
-                    {
-                        Name = "Request Validation",
-                        Type = "validate-content",
-                        Configuration = new Dictionary<string, object>
-                        {
-                            ["validate-as-json"] = true,
-                            ["max-size"] = 10485760 // 10MB
-                        }
-                    },
-                    new ApiPolicy
-                    {
-                        Name = "Response Transformation",
-                        Type = "set-header",
-                        Configuration = new Dictionary<string, object>
-                        {
-                            ["name"] = "X-Powered-By",
-                            ["value"] = "Havila-Maritime-Platform",
-                            ["action"] = "override"
-                        }
-                    }
-                }
-            };
+        #region API Definitions
 
-            return Ok(apiDefinitions);
-        }
-
-        [HttpGet("subscription-tiers")]
-        public IActionResult GetSubscriptionTiers()
-        {
-            var subscriptionTiers = new List<SubscriptionTier>
-            {
-                new SubscriptionTier
-                {
-                    Name = "Basic",
-                    Description = "Basic access to maritime information and search",
-                    PricePerMonth = 0,
-                    Features = new[]
-                    {
-                        "Maritime Search API",
-                        "Northern Lights Information",
-                        "Basic Chat Support",
-                        "Public Vessel Information"
-                    },
-                    RateLimits = new Dictionary<string, string>
-                    {
-                        ["search"] = "100 calls/hour",
-                        ["chat"] = "20 calls/hour",
-                        ["info"] = "50 calls/hour"
-                    },
-                    SlaLevel = "Best Effort"
-                },
-                new SubscriptionTier
-                {
-                    Name = "Professional",
-                    Description = "Advanced maritime operations and analytics access",
-                    PricePerMonth = 299,
-                    Features = new[]
-                    {
-                        "All Basic features",
-                        "Vessel Tracking API",
-                        "Fleet Analytics",
-                        "Route Information",
-                        "Document Analysis (100/month)",
-                        "Computer Vision Analysis (50/month)",
-                        "Priority Support"
-                    },
-                    RateLimits = new Dictionary<string, string>
-                    {
-                        ["vessel"] = "500 calls/hour",
-                        ["analytics"] = "200 calls/hour",
-                        ["intelligence"] = "100 calls/hour",
-                        ["vision"] = "50 calls/hour"
-                    },
-                    SlaLevel = "99.5% uptime"
-                },
-                new SubscriptionTier
-                {
-                    Name = "Enterprise",
-                    Description = "Full maritime platform access with unlimited usage",
-                    PricePerMonth = 1999,
-                    Features = new[]
-                    {
-                        "All Professional features",
-                        "Unlimited API calls",
-                        "Route Optimization",
-                        "IoT Data Ingestion",
-                        "Custom AI Models",
-                        "Real-time Monitoring",
-                        "24/7 Premium Support",
-                        "Custom Integrations",
-                        "Dedicated Account Manager"
-                    },
-                    RateLimits = new Dictionary<string, string>
-                    {
-                        ["all"] = "Unlimited"
-                    },
-                    SlaLevel = "99.9% uptime with 4-hour response time"
-                },
-                new SubscriptionTier
-                {
-                    Name = "Partner",
-                    Description = "Special pricing for maritime industry partners",
-                    PricePerMonth = 999,
-                    Features = new[]
-                    {
-                        "All Enterprise features",
-                        "White-label options",
-                        "Revenue sharing programs",
-                        "Co-marketing opportunities",
-                        "Priority feature requests",
-                        "Beta access to new features"
-                    },
-                    RateLimits = new Dictionary<string, string>
-                    {
-                        ["all"] = "Unlimited with burst capacity"
-                    },
-                    SlaLevel = "99.95% uptime with 2-hour response time"
-                }
-            };
-
-            return Ok(subscriptionTiers);
-        }
-
-        [HttpGet("health-status")]
-        public IActionResult GetApiHealthStatus()
-        {
-            var healthStatus = new ApiHealthStatus
-            {
-                OverallStatus = "Healthy",
-                LastChecked = DateTime.UtcNow,
-                Services = new List<ServiceHealth>
-                {
-                    new ServiceHealth
-                    {
-                        ServiceName = "Vessel Tracking API",
-                        Status = "Healthy",
-                        ResponseTime = TimeSpan.FromMilliseconds(45),
-                        LastChecked = DateTime.UtcNow.AddMinutes(-1),
-                        Dependencies = new[] { "Azure SQL", "Redis Cache" }
-                    },
-                    new ServiceHealth
-                    {
-                        ServiceName = "Maritime Intelligence API",
-                        Status = "Healthy",
-                        ResponseTime = TimeSpan.FromMilliseconds(120),
-                        LastChecked = DateTime.UtcNow.AddMinutes(-2),
-                        Dependencies = new[] { "Form Recognizer", "Text Analytics", "Azure OpenAI" }
-                    },
-                    new ServiceHealth
-                    {
-                        ServiceName = "Maritime Vision API",
-                        Status = "Healthy",
-                        ResponseTime = TimeSpan.FromMilliseconds(200),
-                        LastChecked = DateTime.UtcNow.AddMinutes(-1),
-                        Dependencies = new[] { "Computer Vision API", "Blob Storage" }
-                    },
-                    new ServiceHealth
-                    {
-                        ServiceName = "Maritime Search API",
-                        Status = "Healthy",
-                        ResponseTime = TimeSpan.FromMilliseconds(30),
-                        LastChecked = DateTime.UtcNow.AddMinutes(-1),
-                        Dependencies = new[] { "Cognitive Search", "Search Index" }
-                    },
-                    new ServiceHealth
-                    {
-                        ServiceName = "Fleet Analytics API",
-                        Status = "Healthy",
-                        ResponseTime = TimeSpan.FromMilliseconds(85),
-                        LastChecked = DateTime.UtcNow.AddMinutes(-3),
-                        Dependencies = new[] { "Azure SQL", "Power BI", "Application Insights" }
-                    },
-                    new ServiceHealth
-                    {
-                        ServiceName = "Route Optimization API",
-                        Status = "Warning",
-                        ResponseTime = TimeSpan.FromMilliseconds(350),
-                        LastChecked = DateTime.UtcNow.AddMinutes(-1),
-                        Dependencies = new[] { "Weather API", "AI Route Optimizer", "Azure Functions" },
-                        Issues = new[] { "Elevated response times due to complex route calculations" }
-                    }
-                },
-                Metrics = new HealthMetrics
-                {
-                    TotalRequests24h = 145632,
-                    SuccessRate = 99.7,
-                    AverageResponseTime = TimeSpan.FromMilliseconds(95),
-                    ErrorRate = 0.3,
-                    TopErrors = new[]
-                    {
-                        "Rate limit exceeded (0.2%)",
-                        "Authentication failed (0.1%)"
-                    }
-                }
-            };
-
-            return Ok(healthStatus);
-        }
-
-        [HttpGet("usage-analytics")]
-        public IActionResult GetUsageAnalytics([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
-        {
-            var start = startDate ?? DateTime.UtcNow.AddDays(-30);
-            var end = endDate ?? DateTime.UtcNow;
-
-            var usageAnalytics = new UsageAnalytics
-            {
-                Period = new DatePeriod { StartDate = start, EndDate = end },
-                TotalApiCalls = 2_847_592,
-                UniqueUsers = 1_247,
-                TopApis = new List<ApiUsage>
-                {
-                    new ApiUsage
-                    {
-                        ApiName = "Maritime Search",
-                        Calls = 1_234_567,
-                        Percentage = 43.3,
-                        AverageResponseTime = TimeSpan.FromMilliseconds(25),
-                        SuccessRate = 99.8
-                    },
-                    new ApiUsage
-                    {
-                        ApiName = "Vessel Tracking",
-                        Calls = 876_543,
-                        Percentage = 30.8,
-                        AverageResponseTime = TimeSpan.FromMilliseconds(45),
-                        SuccessRate = 99.9
-                    },
-                    new ApiUsage
-                    {
-                        ApiName = "Fleet Analytics",
-                        Calls = 345_678,
-                        Percentage = 12.1,
-                        AverageResponseTime = TimeSpan.FromMilliseconds(85),
-                        SuccessRate = 99.5
-                    },
-                    new ApiUsage
-                    {
-                        ApiName = "Maritime Intelligence",
-                        Calls = 234_567,
-                        Percentage = 8.2,
-                        AverageResponseTime = TimeSpan.FromMilliseconds(150),
-                        SuccessRate = 98.9
-                    },
-                    new ApiUsage
-                    {
-                        ApiName = "Maritime Vision",
-                        Calls = 156_237,
-                        Percentage = 5.5,
-                        AverageResponseTime = TimeSpan.FromMilliseconds(220),
-                        SuccessRate = 99.1
-                    }
-                },
-                GeographicDistribution = new List<GeographicUsage>
-                {
-                    new GeographicUsage { Country = "Norway", Percentage = 35.2, Calls = 1_002_876 },
-                    new GeographicUsage { Country = "Denmark", Percentage = 18.7, Calls = 532_539 },
-                    new GeographicUsage { Country = "Sweden", Percentage = 15.3, Calls = 435_682 },
-                    new GeographicUsage { Country = "Germany", Percentage = 10.8, Calls = 307_540 },
-                    new GeographicUsage { Country = "United Kingdom", Percentage = 8.9, Calls = 253_436 },
-                    new GeographicUsage { Country = "Netherlands", Percentage = 6.2, Calls = 176550 },
-                    new GeographicUsage { Country = "Other", Percentage = 4.9, Calls = 139_469 }
-                },
-                SubscriptionTierUsage = new List<TierUsage>
-                {
-                    new TierUsage { TierName = "Basic", Users = 892, CallsPercentage = 25.4 },
-                    new TierUsage { TierName = "Professional", Users = 287, CallsPercentage = 45.8 },
-                    new TierUsage { TierName = "Enterprise", Users = 52, CallsPercentage = 23.1 },
-                    new TierUsage { TierName = "Partner", Users = 16, CallsPercentage = 5.7 }
-                }
-            };
-
-            return Ok(usageAnalytics);
-        }
-
-        [HttpPost("generate-api-key")]
-        public IActionResult GenerateApiKey([FromBody] ApiKeyRequest request)
+        /// <summary>
+        /// Get all API definitions
+        /// </summary>
+        [HttpGet("definitions")]
+        public async Task<IActionResult> GetApiDefinitions()
         {
             try
             {
-                // Simulate API key generation
-                var apiKey = GenerateSecureApiKey();
-                
-                var response = new ApiKeyResponse
-                {
-                    ApiKey = apiKey,
-                    SubscriptionId = Guid.NewGuid().ToString(),
-                    TierName = request.TierName,
-                    ExpirationDate = DateTime.UtcNow.AddYears(1),
-                    RateLimits = GetRateLimitsForTier(request.TierName),
-                    Scopes = GetScopesForTier(request.TierName),
-                    CreatedAt = DateTime.UtcNow,
-                    Status = "Active"
-                };
-
-                _logger.LogInformation($"Generated API key for tier: {request.TierName}");
-                return Ok(response);
+                var definitions = await _apiManagementService.GetApiDefinitionsAsync();
+                return Ok(definitions);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating API key");
-                return StatusCode(500, "Error generating API key");
+                _logger.LogError(ex, "Error retrieving API definitions");
+                return StatusCode(500, new { error = "Failed to retrieve API definitions", details = ex.Message });
             }
         }
 
-        [HttpGet("swagger-config")]
-        public IActionResult GetSwaggerConfiguration()
+        /// <summary>
+        /// Get API definition by ID
+        /// </summary>
+        [HttpGet("definitions/{apiId}")]
+        public async Task<IActionResult> GetApiDefinition(string apiId)
         {
-            var swaggerConfig = new SwaggerConfiguration
+            try
             {
-                OpenApiVersion = "3.0.1",
-                Info = new SwaggerInfo
+                var definition = await _apiManagementService.GetApiDefinitionByIdAsync(apiId);
+                return Ok(definition);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving API definition for ID: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to retrieve API definition", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Create new API definition
+        /// </summary>
+        [HttpPost("definitions")]
+        public async Task<IActionResult> CreateApiDefinition([FromBody] ApiDefinition apiDefinition)
+        {
+            try
+            {
+                if (apiDefinition == null)
                 {
-                    Title = "Havila Kystruten Maritime Platform API",
-                    Version = "v1",
-                    Description = @"
-                        Comprehensive Maritime Platform API for Havila Kystruten's coastal operations.
-                        
-                        This API provides access to:
-                        - Real-time vessel tracking and fleet management
-                        - AI-powered maritime intelligence and document processing
-                        - Computer vision analysis for vessels and environmental conditions
-                        - Intelligent search across maritime knowledge base
-                        - Route optimization and planning
-                        - IoT sensor data ingestion and monitoring
-                        - Northern Lights information and passenger services
-                        
-                        For support: api-support@havila.no
-                    ",
-                    Contact = new SwaggerContact
-                    {
-                        Name = "Havila Maritime API Support",
-                        Email = "api-support@havila.no",
-                        Url = "https://havila.no/support"
-                    },
-                    License = new SwaggerLicense
-                    {
-                        Name = "Havila API License",
-                        Url = "https://havila.no/api-license"
-                    }
-                },
-                Servers = new List<SwaggerServer>
-                {
-                    new SwaggerServer
-                    {
-                        Url = "https://havila-maritime-apim.azure-api.net/v1",
-                        Description = "Production API Management Gateway"
-                    },
-                    new SwaggerServer
-                    {
-                        Url = "https://havila-maritime-apim-staging.azure-api.net/v1",
-                        Description = "Staging Environment"
-                    }
-                },
-                Components = new SwaggerComponents
-                {
-                    SecuritySchemes = new Dictionary<string, SwaggerSecurityScheme>
-                    {
-                        ["ApiKeyAuth"] = new SwaggerSecurityScheme
-                        {
-                            Type = "apiKey",
-                            In = "header",
-                            Name = "Ocp-Apim-Subscription-Key",
-                            Description = "API Management subscription key required for authenticated endpoints"
-                        },
-                        ["BearerAuth"] = new SwaggerSecurityScheme
-                        {
-                            Type = "http",
-                            Scheme = "bearer",
-                            BearerFormat = "JWT",
-                            Description = "Azure AD JWT token for OAuth2 authentication"
-                        }
-                    }
-                },
-                Tags = new List<SwaggerTag>
-                {
-                    new SwaggerTag { Name = "Vessel Operations", Description = "Vessel tracking and fleet management" },
-                    new SwaggerTag { Name = "Maritime Intelligence", Description = "AI-powered document and data analysis" },
-                    new SwaggerTag { Name = "Maritime Vision", Description = "Computer vision for maritime operations" },
-                    new SwaggerTag { Name = "Maritime Search", Description = "Intelligent search and knowledge base" },
-                    new SwaggerTag { Name = "Passenger Services", Description = "Customer service and information APIs" },
-                    new SwaggerTag { Name = "IoT & Monitoring", Description = "Sensor data and real-time monitoring" }
+                    return BadRequest(new { error = "API definition is required" });
                 }
-            };
 
-            return Ok(swaggerConfig);
-        }
-
-        // Private helper methods
-        private string GenerateSecureApiKey()
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var random = new Random();
-            var keyLength = 32;
-            
-            return new string(Enumerable.Repeat(chars, keyLength)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
-        private Dictionary<string, string> GetRateLimitsForTier(string tierName)
-        {
-            return tierName.ToLower() switch
+                var createdDefinition = await _apiManagementService.CreateApiDefinitionAsync(apiDefinition);
+                return CreatedAtAction(nameof(GetApiDefinition), new { apiId = createdDefinition.Id }, createdDefinition);
+            }
+            catch (Exception ex)
             {
-                "basic" => new Dictionary<string, string>
-                {
-                    ["search"] = "100 calls/hour",
-                    ["chat"] = "20 calls/hour",
-                    ["info"] = "50 calls/hour"
-                },
-                "professional" => new Dictionary<string, string>
-                {
-                    ["vessel"] = "500 calls/hour",
-                    ["analytics"] = "200 calls/hour",
-                    ["intelligence"] = "100 calls/hour",
-                    ["vision"] = "50 calls/hour"
-                },
-                "enterprise" => new Dictionary<string, string>
-                {
-                    ["all"] = "Unlimited"
-                },
-                "partner" => new Dictionary<string, string>
-                {
-                    ["all"] = "Unlimited with burst capacity"
-                },
-                _ => new Dictionary<string, string>()
-            };
+                _logger.LogError(ex, "Error creating API definition: {ApiName}", apiDefinition?.Name);
+                return StatusCode(500, new { error = "Failed to create API definition", details = ex.Message });
+            }
         }
 
-        private List<string> GetScopesForTier(string tierName)
+        /// <summary>
+        /// Update API definition
+        /// </summary>
+        [HttpPut("definitions/{apiId}")]
+        public async Task<IActionResult> UpdateApiDefinition(string apiId, [FromBody] ApiDefinition apiDefinition)
         {
-            return tierName.ToLower() switch
+            try
             {
-                "basic" => new List<string> { "search:read", "info:read", "chat:use" },
-                "professional" => new List<string> 
-                { 
-                    "search:read", "info:read", "chat:use", "vessel:read", 
-                    "analytics:read", "intelligence:analyze", "vision:analyze" 
-                },
-                "enterprise" => new List<string> 
-                { 
-                    "vessel:read", "vessel:write", "analytics:read", "route:read", 
-                    "route:optimize", "intelligence:analyze", "vision:analyze", 
-                    "search:read", "chat:use", "info:read", "iot:write", 
-                    "safety:read", "safety:monitor", "environmental:read", "environmental:monitor" 
-                },
-                "partner" => new List<string> 
-                { 
-                    "vessel:read", "vessel:write", "analytics:read", "route:read", 
-                    "route:optimize", "intelligence:analyze", "vision:analyze", 
-                    "search:read", "chat:use", "info:read", "iot:write", 
-                    "safety:read", "safety:monitor", "environmental:read", "environmental:monitor",
-                    "admin:manage", "partner:access" 
-                },
-                _ => new List<string>()
-            };
+                if (apiDefinition == null)
+                {
+                    return BadRequest(new { error = "API definition is required" });
+                }
+
+                var updatedDefinition = await _apiManagementService.UpdateApiDefinitionAsync(apiId, apiDefinition);
+                return Ok(updatedDefinition);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating API definition: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to update API definition", details = ex.Message });
+            }
         }
+
+        /// <summary>
+        /// Delete API definition
+        /// </summary>
+        [HttpDelete("definitions/{apiId}")]
+        public async Task<IActionResult> DeleteApiDefinition(string apiId)
+        {
+            try
+            {
+                var success = await _apiManagementService.DeleteApiDefinitionAsync(apiId);
+                if (success)
+                {
+                    return NoContent();
+                }
+                return NotFound(new { error = "API definition not found" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting API definition: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to delete API definition", details = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region API Policies
+
+        /// <summary>
+        /// Get policies for an API
+        /// </summary>
+        [HttpGet("definitions/{apiId}/policies")]
+        public async Task<IActionResult> GetApiPolicies(string apiId)
+        {
+            try
+            {
+                var policies = await _apiManagementService.GetApiPoliciesAsync(apiId);
+                return Ok(policies);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving policies for API: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to retrieve API policies", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Create new API policy
+        /// </summary>
+        [HttpPost("definitions/{apiId}/policies")]
+        public async Task<IActionResult> CreateApiPolicy(string apiId, [FromBody] ApiPolicy policy)
+        {
+            try
+            {
+                if (policy == null)
+                {
+                    return BadRequest(new { error = "Policy is required" });
+                }
+
+                var createdPolicy = await _apiManagementService.CreateApiPolicyAsync(apiId, policy);
+                return CreatedAtAction(nameof(GetApiPolicies), new { apiId }, createdPolicy);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating policy for API: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to create API policy", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Update API policy
+        /// </summary>
+        [HttpPut("definitions/{apiId}/policies/{policyId}")]
+        public async Task<IActionResult> UpdateApiPolicy(string apiId, string policyId, [FromBody] ApiPolicy policy)
+        {
+            try
+            {
+                if (policy == null)
+                {
+                    return BadRequest(new { error = "Policy is required" });
+                }
+
+                var updatedPolicy = await _apiManagementService.UpdateApiPolicyAsync(apiId, policyId, policy);
+                return Ok(updatedPolicy);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating policy {PolicyId} for API: {ApiId}", policyId, apiId);
+                return StatusCode(500, new { error = "Failed to update API policy", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Delete API policy
+        /// </summary>
+        [HttpDelete("definitions/{apiId}/policies/{policyId}")]
+        public async Task<IActionResult> DeleteApiPolicy(string apiId, string policyId)
+        {
+            try
+            {
+                var success = await _apiManagementService.DeleteApiPolicyAsync(apiId, policyId);
+                if (success)
+                {
+                    return NoContent();
+                }
+                return NotFound(new { error = "Policy not found" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting policy {PolicyId} for API: {ApiId}", policyId, apiId);
+                return StatusCode(500, new { error = "Failed to delete API policy", details = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region Subscriptions
+
+        /// <summary>
+        /// Get all subscriptions
+        /// </summary>
+        [HttpGet("subscriptions")]
+        public async Task<IActionResult> GetSubscriptions()
+        {
+            try
+            {
+                var subscriptions = await _apiManagementService.GetSubscriptionsAsync();
+                return Ok(subscriptions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving subscriptions");
+                return StatusCode(500, new { error = "Failed to retrieve subscriptions", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get subscriptions by API
+        /// </summary>
+        [HttpGet("definitions/{apiId}/subscriptions")]
+        public async Task<IActionResult> GetSubscriptionsByApi(string apiId)
+        {
+            try
+            {
+                var subscriptions = await _apiManagementService.GetSubscriptionsByApiAsync(apiId);
+                return Ok(subscriptions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving subscriptions for API: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to retrieve API subscriptions", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Create new subscription
+        /// </summary>
+        [HttpPost("subscriptions")]
+        public async Task<IActionResult> CreateSubscription([FromBody] ApiSubscription subscription)
+        {
+            try
+            {
+                if (subscription == null)
+                {
+                    return BadRequest(new { error = "Subscription is required" });
+                }
+
+                var createdSubscription = await _apiManagementService.CreateSubscriptionAsync(subscription);
+                return CreatedAtAction(nameof(GetSubscriptions), createdSubscription);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating subscription: {SubscriptionName}", subscription?.Name);
+                return StatusCode(500, new { error = "Failed to create subscription", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Generate new subscription key
+        /// </summary>
+        [HttpPost("subscriptions/{subscriptionId}/keys")]
+        public async Task<IActionResult> GenerateSubscriptionKey(string subscriptionId)
+        {
+            try
+            {
+                var key = await _apiManagementService.GenerateSubscriptionKeyAsync(subscriptionId);
+                return Ok(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating key for subscription: {SubscriptionId}", subscriptionId);
+                return StatusCode(500, new { error = "Failed to generate subscription key", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Regenerate subscription key
+        /// </summary>
+        [HttpPost("subscriptions/{subscriptionId}/keys/{keyType}/regenerate")]
+        public async Task<IActionResult> RegenerateSubscriptionKey(string subscriptionId, string keyType)
+        {
+            try
+            {
+                var key = await _apiManagementService.RegenerateSubscriptionKeyAsync(subscriptionId, keyType);
+                return Ok(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error regenerating {KeyType} key for subscription: {SubscriptionId}", keyType, subscriptionId);
+                return StatusCode(500, new { error = "Failed to regenerate subscription key", details = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region Analytics and Usage
+
+        /// <summary>
+        /// Get API usage metrics
+        /// </summary>
+        [HttpGet("definitions/{apiId}/usage")]
+        public async Task<IActionResult> GetApiUsage(string apiId, [FromQuery] string timeframe = "24h")
+        {
+            try
+            {
+                var usage = await _apiManagementService.GetApiUsageMetricsAsync(apiId, timeframe);
+                return Ok(usage);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving usage for API: {ApiId}, timeframe: {Timeframe}", apiId, timeframe);
+                return StatusCode(500, new { error = "Failed to retrieve API usage", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get subscription usage metrics
+        /// </summary>
+        [HttpGet("subscriptions/{subscriptionId}/usage")]
+        public async Task<IActionResult> GetSubscriptionUsage(string subscriptionId, [FromQuery] string timeframe = "24h")
+        {
+            try
+            {
+                var usage = await _apiManagementService.GetSubscriptionUsageMetricsAsync(subscriptionId, timeframe);
+                return Ok(usage);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving usage for subscription: {SubscriptionId}, timeframe: {Timeframe}", subscriptionId, timeframe);
+                return StatusCode(500, new { error = "Failed to retrieve subscription usage", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get comprehensive API analytics
+        /// </summary>
+        [HttpGet("definitions/{apiId}/analytics")]
+        public async Task<IActionResult> GetApiAnalytics(string apiId, [FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
+        {
+            try
+            {
+                var start = startDate ?? DateTime.UtcNow.AddDays(-7);
+                var end = endDate ?? DateTime.UtcNow;
+
+                var analytics = await _apiManagementService.GetApiAnalyticsAsync(apiId, start, end);
+                return Ok(analytics);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving analytics for API: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to retrieve API analytics", details = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region Products
+
+        /// <summary>
+        /// Get all API products
+        /// </summary>
+        [HttpGet("products")]
+        public async Task<IActionResult> GetProducts()
+        {
+            try
+            {
+                var products = await _apiManagementService.GetProductsAsync();
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving API products");
+                return StatusCode(500, new { error = "Failed to retrieve API products", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Create new API product
+        /// </summary>
+        [HttpPost("products")]
+        public async Task<IActionResult> CreateProduct([FromBody] ApiProduct product)
+        {
+            try
+            {
+                if (product == null)
+                {
+                    return BadRequest(new { error = "Product is required" });
+                }
+
+                var createdProduct = await _apiManagementService.CreateProductAsync(product);
+                return CreatedAtAction(nameof(GetProducts), createdProduct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating API product: {ProductName}", product?.Name);
+                return StatusCode(500, new { error = "Failed to create API product", details = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region Developers
+
+        /// <summary>
+        /// Get all developer accounts
+        /// </summary>
+        [HttpGet("developers")]
+        public async Task<IActionResult> GetDevelopers()
+        {
+            try
+            {
+                var developers = await _apiManagementService.GetDevelopersAsync();
+                return Ok(developers);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving developer accounts");
+                return StatusCode(500, new { error = "Failed to retrieve developer accounts", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Create new developer account
+        /// </summary>
+        [HttpPost("developers")]
+        public async Task<IActionResult> CreateDeveloper([FromBody] DeveloperAccount developer)
+        {
+            try
+            {
+                if (developer == null)
+                {
+                    return BadRequest(new { error = "Developer account is required" });
+                }
+
+                var createdDeveloper = await _apiManagementService.CreateDeveloperAccountAsync(developer);
+                return CreatedAtAction(nameof(GetDevelopers), createdDeveloper);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating developer account: {Email}", developer?.Email);
+                return StatusCode(500, new { error = "Failed to create developer account", details = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region Validation and Testing
+
+        /// <summary>
+        /// Validate API definition
+        /// </summary>
+        [HttpPost("definitions/validate")]
+        public async Task<IActionResult> ValidateApiDefinition([FromBody] ApiDefinition apiDefinition)
+        {
+            try
+            {
+                if (apiDefinition == null)
+                {
+                    return BadRequest(new { error = "API definition is required" });
+                }
+
+                var validationResult = await _apiManagementService.ValidateApiDefinitionAsync(apiDefinition);
+                return Ok(validationResult);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validating API definition");
+                return StatusCode(500, new { error = "Failed to validate API definition", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Test API endpoint
+        /// </summary>
+        [HttpPost("definitions/{apiId}/test")]
+        public async Task<IActionResult> TestApiEndpoint(string apiId, [FromBody] ApiTestRequest testRequest)
+        {
+            try
+            {
+                if (testRequest == null || string.IsNullOrEmpty(testRequest.Endpoint))
+                {
+                    return BadRequest(new { error = "Test request with endpoint is required" });
+                }
+
+                var testResult = await _apiManagementService.TestApiEndpointAsync(apiId, testRequest.Endpoint, testRequest);
+                return Ok(testResult);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error testing API endpoint for API: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to test API endpoint", details = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region Documentation
+
+        /// <summary>
+        /// Get API documentation
+        /// </summary>
+        [HttpGet("definitions/{apiId}/documentation")]
+        public async Task<IActionResult> GetApiDocumentation(string apiId)
+        {
+            try
+            {
+                var documentation = await _apiManagementService.GetApiDocumentationAsync(apiId);
+                return Ok(documentation);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving documentation for API: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to retrieve API documentation", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get OpenAPI schema
+        /// </summary>
+        [HttpGet("definitions/{apiId}/schema")]
+        public async Task<IActionResult> GetOpenApiSchema(string apiId)
+        {
+            try
+            {
+                var schema = await _apiManagementService.GetOpenApiSchemaAsync(apiId);
+                return Ok(schema);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving OpenAPI schema for API: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to retrieve OpenAPI schema", details = ex.Message });
+            }
+        }
+
+        #endregion
+
+        #region Dashboard
+
+        /// <summary>
+        /// Get API management dashboard data
+        /// </summary>
+        [HttpGet("dashboard")]
+        public async Task<IActionResult> GetDashboard()
+        {
+            try
+            {
+                var dashboardData = await _apiManagementService.GetDashboardDataAsync();
+                return Ok(dashboardData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving API management dashboard");
+                return StatusCode(500, new { error = "Failed to retrieve dashboard data", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get API overview
+        /// </summary>
+        [HttpGet("definitions/{apiId}/overview")]
+        public async Task<IActionResult> GetApiOverview(string apiId)
+        {
+            try
+            {
+                var overview = await _apiManagementService.GetApiOverviewAsync(apiId);
+                return Ok(overview);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving overview for API: {ApiId}", apiId);
+                return StatusCode(500, new { error = "Failed to retrieve API overview", details = ex.Message });
+            }
+        }
+
+        #endregion
     }
 
-    // Data models for API Management
-    public class ApiManagementDefinition
-    {
-        public string BaseUrl { get; set; } = string.Empty;
-        public string Version { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public List<ApiGroup> ApiGroups { get; set; } = new();
-        public Dictionary<string, SecurityScheme> SecuritySchemes { get; set; } = new();
-        public List<ApiPolicy> Policies { get; set; } = new();
-    }
-
-    public class ApiGroup
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public List<ApiDefinition> Apis { get; set; } = new();
-    }
-
-    public class ApiDefinition
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Path { get; set; } = string.Empty;
-        public string[] Methods { get; set; } = Array.Empty<string>();
-        public string Description { get; set; } = string.Empty;
-        public bool RequiresSubscription { get; set; }
-        public string RateLimit { get; set; } = string.Empty;
-        public string[] Scopes { get; set; } = Array.Empty<string>();
-    }
-
-    public class SecurityScheme
-    {
-        public string Type { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public string In { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public OAuthFlows? Flows { get; set; }
-    }
-
-    public class OAuthFlows
-    {
-        public OAuthFlow? AuthorizationCode { get; set; }
-    }
-
-    public class OAuthFlow
-    {
-        public string AuthorizationUrl { get; set; } = string.Empty;
-        public string TokenUrl { get; set; } = string.Empty;
-        public Dictionary<string, string> Scopes { get; set; } = new();
-    }
-
-    public class ApiPolicy
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
-        public Dictionary<string, object> Configuration { get; set; } = new();
-    }
-
-    public class SubscriptionTier
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public decimal PricePerMonth { get; set; }
-        public string[] Features { get; set; } = Array.Empty<string>();
-        public Dictionary<string, string> RateLimits { get; set; } = new();
-        public string SlaLevel { get; set; } = string.Empty;
-    }
-
-    public class ApiHealthStatus
-    {
-        public string OverallStatus { get; set; } = string.Empty;
-        public DateTime LastChecked { get; set; }
-        public List<ServiceHealth> Services { get; set; } = new();
-        public HealthMetrics Metrics { get; set; } = new();
-    }
-
-    public class ServiceHealth
-    {
-        public string ServiceName { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
-        public TimeSpan ResponseTime { get; set; }
-        public DateTime LastChecked { get; set; }
-        public string[] Dependencies { get; set; } = Array.Empty<string>();
-        public string[] Issues { get; set; } = Array.Empty<string>();
-    }
-
-    public class HealthMetrics
-    {
-        public long TotalRequests24h { get; set; }
-        public double SuccessRate { get; set; }
-        public TimeSpan AverageResponseTime { get; set; }
-        public double ErrorRate { get; set; }
-        public string[] TopErrors { get; set; } = Array.Empty<string>();
-    }
-
-    public class UsageAnalytics
-    {
-        public DatePeriod Period { get; set; } = new();
-        public long TotalApiCalls { get; set; }
-        public int UniqueUsers { get; set; }
-        public List<ApiUsage> TopApis { get; set; } = new();
-        public List<GeographicUsage> GeographicDistribution { get; set; } = new();
-        public List<TierUsage> SubscriptionTierUsage { get; set; } = new();
-    }
-
-    public class DatePeriod
-    {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-    }
-
-    public class ApiUsage
-    {
-        public string ApiName { get; set; } = string.Empty;
-        public long Calls { get; set; }
-        public double Percentage { get; set; }
-        public TimeSpan AverageResponseTime { get; set; }
-        public double SuccessRate { get; set; }
-    }
-
-    public class GeographicUsage
-    {
-        public string Country { get; set; } = string.Empty;
-        public double Percentage { get; set; }
-        public long Calls { get; set; }
-    }
-
-    public class TierUsage
-    {
-        public string TierName { get; set; } = string.Empty;
-        public int Users { get; set; }
-        public double CallsPercentage { get; set; }
-    }
-
-    public class ApiKeyRequest
-    {
-        public string TierName { get; set; } = string.Empty;
-        public string CompanyName { get; set; } = string.Empty;
-        public string ContactEmail { get; set; } = string.Empty;
-        public string Purpose { get; set; } = string.Empty;
-    }
-
-    public class ApiKeyResponse
-    {
-        public string ApiKey { get; set; } = string.Empty;
-        public string SubscriptionId { get; set; } = string.Empty;
-        public string TierName { get; set; } = string.Empty;
-        public DateTime ExpirationDate { get; set; }
-        public Dictionary<string, string> RateLimits { get; set; } = new();
-        public List<string> Scopes { get; set; } = new();
-        public DateTime CreatedAt { get; set; }
-        public string Status { get; set; } = string.Empty;
-    }
-
-    public class SwaggerConfiguration
-    {
-        public string OpenApiVersion { get; set; } = string.Empty;
-        public SwaggerInfo Info { get; set; } = new();
-        public List<SwaggerServer> Servers { get; set; } = new();
-        public SwaggerComponents Components { get; set; } = new();
-        public List<SwaggerTag> Tags { get; set; } = new();
-    }
-
-    public class SwaggerInfo
-    {
-        public string Title { get; set; } = string.Empty;
-        public string Version { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public SwaggerContact Contact { get; set; } = new();
-        public SwaggerLicense License { get; set; } = new();
-    }
-
-    public class SwaggerContact
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Url { get; set; } = string.Empty;
-    }
-
-    public class SwaggerLicense
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Url { get; set; } = string.Empty;
-    }
-
-    public class SwaggerServer
-    {
-        public string Url { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-    }
-
-    public class SwaggerComponents
-    {
-        public Dictionary<string, SwaggerSecurityScheme> SecuritySchemes { get; set; } = new();
-    }
-
-    public class SwaggerSecurityScheme
-    {
-        public string Type { get; set; } = string.Empty;
-        public string In { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public string Scheme { get; set; } = string.Empty;
-        public string BearerFormat { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-    }
-
-    public class SwaggerTag
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-    }
 }

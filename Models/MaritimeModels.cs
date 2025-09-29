@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HavilaKystruten.Maritime.Models
+namespace MaritimeIQ.Platform.Models
 {
     // Chat models for maritime communication
     public class ChatRequest

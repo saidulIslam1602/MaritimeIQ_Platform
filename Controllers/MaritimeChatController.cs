@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

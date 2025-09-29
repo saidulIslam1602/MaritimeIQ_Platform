@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Services;
-using HavilaKystruten.Maritime.Models;
-using ServiceWeatherForecast = HavilaKystruten.Maritime.Services.WeatherForecast;
-using ServiceAuroraForecast = HavilaKystruten.Maritime.Services.AuroraForecast;
+using MaritimeIQ.Platform.Services;
+using MaritimeIQ.Platform.Models;
+using ServiceWeatherForecast = MaritimeIQ.Platform.Services.WeatherForecast;
+using ServiceAuroraForecast = MaritimeIQ.Platform.Services.AuroraForecast;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
     /// Route Optimization Controller - Provides REST API endpoints for
@@ -129,7 +129,7 @@ namespace HavilaKystruten.Maritime.Controllers
                 new VoyageInfo
                 {
                     VoyageId = "HK-2024-001",
-                    VesselName = "MS Havila Castor",
+                    VesselName = "MS Arctic Explorer",
                     CurrentPosition = new VoyagePosition { Latitude = 69.6492m, Longitude = 18.9553m, NearestPort = "Tromsø" },
                     Destination = "Kirkenes",
                     EstimatedArrival = DateTime.UtcNow.AddHours(8),
@@ -138,7 +138,7 @@ namespace HavilaKystruten.Maritime.Controllers
                 new VoyageInfo
                 {
                     VoyageId = "HK-2024-002",
-                    VesselName = "MS Havila Capella",
+                    VesselName = "MS Nordic Aurora",
                     CurrentPosition = new VoyagePosition { Latitude = 70.2143m, Longitude = 19.7621m, NearestPort = "Bodø" },
                     Destination = "Bergen",
                     EstimatedArrival = DateTime.UtcNow.AddHours(12),
@@ -147,7 +147,7 @@ namespace HavilaKystruten.Maritime.Controllers
                 new VoyageInfo
                 {
                     VoyageId = "HK-2024-003",
-                    VesselName = "MS Havila Polaris",
+                    VesselName = "MS Coastal Voyager",
                     CurrentPosition = new VoyagePosition { Latitude = 68.7964m, Longitude = 16.0471m, NearestPort = "Narvik" },
                     Destination = "Tromsø",
                     EstimatedArrival = DateTime.UtcNow.AddHours(6),

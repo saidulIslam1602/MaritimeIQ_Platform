@@ -17,7 +17,7 @@
       "microsoft": "Warning",
       "microsoft.Hosting.Lifetime": "Information",
       "microsoft.AspNetCore": "Warning",
-      "HavilaKystruten.Maritime": "Information",
+      "MaritimeIQ.Platform": "Information",
       "System": "Warning"
     },
     "console": {
@@ -118,7 +118,7 @@
       "WithCorrelationId"
     ],
     "properties": {
-      "Application": "HavilaKystruten.Maritime.Platform",
+      "Application": "MaritimeIQ.Platform",
       "Environment": "#{ASPNETCORE_ENVIRONMENT}#",
       "Version": "#{BUILD_BUILDNUMBER}#"
     },
@@ -189,8 +189,8 @@
   ],
   "customDimensions": {
     "globalDimensions": {
-      "ServiceName": "HavilaKystruten.Maritime.Platform",
-      "Fleet": "Havila",
+      "ServiceName": "MaritimeIQ.Platform",
+      "Fleet": "MaritimeIQ",
       "Region": "Norway",
       "RouteType": "Coastal"
     },

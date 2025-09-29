@@ -1,7 +1,7 @@
 {
-  "name": "havila-maritime-dashboard",
+  "name": "maritime-intelligence-dashboard",
   "version": "1.0.0",
-  "description": "Havila Kystruten Maritime Operations Dashboard",
+  "description": "Maritime Intelligence Operations Dashboard",
   "private": true,
   "scripts": {
     "dev": "next dev",

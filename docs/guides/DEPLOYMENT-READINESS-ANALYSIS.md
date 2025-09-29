@@ -17,11 +17,11 @@ Based on my comprehensive analysis of your Havila Kystruten Maritime Platform, h
 ## ⚠️ **POTENTIAL DEPLOYMENT ISSUES TO ADDRESS**
 
 ### 1. **Namespace Inconsistency** (CRITICAL)
-**Issue**: Service registration uses `AcrTasksDemo.Services.*` but actual services are in `HavilaKystruten.Maritime.Services.*`
+**Issue**: Service registration uses `MaritimeIQ.Platform.Services.*` but actual services are in `MaritimeIQ.Platform.Services.*`
 
 **Location**: `Program.cs` lines 14-17
 ```csharp
-builder.Services.AddScoped<AcrTasksDemo.Services.AISProcessingService>();
+builder.Services.AddScoped<MaritimeIQ.Platform.Services.AISProcessingService>();
 // But actual services are in: HavilaKystruten.Maritime.Services.AISProcessingService
 ```
 
@@ -80,10 +80,10 @@ builder.Services.AddScoped<AcrTasksDemo.Services.AISProcessingService>();
 ### Fix 1: Update Service Registrations
 ```csharp
 // In Program.cs, replace:
-builder.Services.AddScoped<AcrTasksDemo.Services.AISProcessingService>();
-builder.Services.AddScoped<AcrTasksDemo.Services.EnvironmentalMonitoringService>();
-builder.Services.AddScoped<AcrTasksDemo.Services.PassengerNotificationService>();
-builder.Services.AddScoped<AcrTasksDemo.Services.RouteOptimizationService>();
+builder.Services.AddScoped<MaritimeIQ.Platform.Services.AISProcessingService>();
+builder.Services.AddScoped<MaritimeIQ.Platform.Services.EnvironmentalMonitoringService>();
+builder.Services.AddScoped<MaritimeIQ.Platform.Services.PassengerNotificationService>();
+builder.Services.AddScoped<MaritimeIQ.Platform.Services.RouteOptimizationService>();
 
 // With:
 builder.Services.AddScoped<HavilaKystruten.Maritime.Services.AISProcessingService>();

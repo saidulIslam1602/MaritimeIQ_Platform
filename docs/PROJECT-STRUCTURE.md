@@ -69,7 +69,7 @@ This document describes the organized folder structure of the Havila Maritime Pl
 
 ## 🔧 Build Configuration
 
-The project file (`AcrTasksDemo.csproj`) has been updated to:
+The project file (`MaritimeIQ.Platform.csproj`) has been updated to:
 - Copy configuration files from `/config/` to output directory
 - Exclude the `/Functions/` folder from compilation
 - Maintain compatibility with the organized structure

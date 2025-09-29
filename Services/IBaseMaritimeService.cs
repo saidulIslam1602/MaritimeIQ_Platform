@@ -1,4 +1,4 @@
-namespace HavilaKystruten.Maritime.Services
+namespace MaritimeIQ.Platform.Services
 {
     /// <summary>
     /// Base interface for all Maritime services

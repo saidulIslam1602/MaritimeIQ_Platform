@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   # Main Maritime API Service
-  havila-maritime-api:
+  maritimeiq-platform-api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -10,7 +10,7 @@ services:
       - "5000:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sql-server;Database=HavilaMaritimeDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true;
+      - ConnectionStrings__DefaultConnection=Server=sql-server;Database=MaritimeIQDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true;
       - Redis__ConnectionString=redis:6379
       - ApplicationInsights__ConnectionString=InstrumentationKey=your-dev-key
     depends_on:
@@ -19,7 +19,7 @@ services:
       - maritime-intelligence
       - fleet-analytics
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
     volumes:
       - ./logs:/app/logs
 
@@ -43,7 +43,7 @@ services:
       - CognitiveSearch__Endpoint=https://your-search.search.windows.net
       - CognitiveSearch__ApiKey=your-search-key
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
     volumes:
       - ./intelligence-logs:/app/logs
 
@@ -56,7 +56,7 @@ services:
       - "5002:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sql-server;Database=HavilaMaritimeDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true;
+      - ConnectionStrings__DefaultConnection=Server=sql-server;Database=MaritimeIQDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true;
       - Redis__ConnectionString=redis:6379
       - PowerBI__WorkspaceId=your-powerbi-workspace-id
       - PowerBI__ClientId=your-powerbi-client-id
@@ -65,7 +65,7 @@ services:
       - sql-server
       - redis
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
     volumes:
       - ./analytics-logs:/app/logs
 
@@ -83,7 +83,7 @@ services:
       - CosmosDB__ConnectionString=AccountEndpoint=https://your-cosmos.documents.azure.com:443/;AccountKey=your-cosmos-key;
       - Storage__ConnectionString=DefaultEndpointsProtocol=https;AccountName=yourstorage;AccountKey=your-storage-key;EndpointSuffix=core.windows.net
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
     volumes:
       - ./iot-logs:/app/logs
 
@@ -100,7 +100,7 @@ services:
       - sql-data:/var/opt/mssql
       - ./database-init:/docker-entrypoint-initdb.d
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
 
   # Redis Cache
   redis:
@@ -111,7 +111,7 @@ services:
     volumes:
       - redis-data:/data
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
 
   # Azure Functions Local Runtime (for development)
   azure-functions:
@@ -128,7 +128,7 @@ services:
     depends_on:
       - azurite
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
 
   # Azurite (Azure Storage Emulator)
   azurite:
@@ -140,7 +140,7 @@ services:
     volumes:
       - azurite-data:/data
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
 
   # Elasticsearch (for local search development)
   elasticsearch:
@@ -154,7 +154,7 @@ services:
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
 
   # NGINX Load Balancer
   nginx:
@@ -166,12 +166,12 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./ssl:/etc/nginx/ssl
     depends_on:
-      - havila-maritime-api
+      - maritimeiq-platform-api
       - maritime-intelligence
       - fleet-analytics
       - iot-ingestion
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
 
   # Prometheus (Monitoring)
   prometheus:
@@ -182,7 +182,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
 
   # Grafana (Dashboards)
   grafana:
@@ -198,7 +198,7 @@ services:
     depends_on:
       - prometheus
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
 
   # Jaeger (Distributed Tracing)
   jaeger:
@@ -209,7 +209,7 @@ services:
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     networks:
-      - havila-maritime-network
+      - maritimeiq-platform-network
 
 volumes:
   sql-data:
@@ -220,7 +220,7 @@ volumes:
   grafana-data:
 
 networks:
-  havila-maritime-network:
+  maritimeiq-platform-network:
     driver: bridge
     ipam:
       config:

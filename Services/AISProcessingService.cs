@@ -1,7 +1,8 @@
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using MaritimeIQ.Platform.Models.Safety;
 
-namespace HavilaKystruten.Maritime.Services
+namespace MaritimeIQ.Platform.Services
 {
     /// <summary>
     /// Real-time AIS Processing Service - Processes vessel position data
@@ -97,8 +98,8 @@ namespace HavilaKystruten.Maritime.Services
                 {
                     new SafetyAlert
                     {
-                        VesselName = "MS Havila Castor",
-                        AlertType = "Speed Deviation",
+                        VesselName = "MS Arctic Explorer",
+                        Type = "Speed Deviation",
                         Severity = "Medium",
                         Timestamp = DateTime.UtcNow.AddMinutes(-15),
                         Description = "Vessel speed 5 knots below optimal for current conditions"
@@ -108,7 +109,7 @@ namespace HavilaKystruten.Maritime.Services
                 {
                     new AisVesselPosition
                     {
-                        VesselName = "MS Havila Castor",
+                        VesselName = "MS Arctic Explorer",
                         MMSI = "257012340",
                         Latitude = 69.6492,
                         Longitude = 18.9553,
@@ -118,7 +119,7 @@ namespace HavilaKystruten.Maritime.Services
                     },
                     new AisVesselPosition
                     {
-                        VesselName = "MS Havila Capella",
+                        VesselName = "MS Nordic Aurora",
                         MMSI = "257012350",
                         Latitude = 70.2143,
                         Longitude = 19.7621,
@@ -155,14 +156,6 @@ namespace HavilaKystruten.Maritime.Services
         public List<AisVesselPosition> FleetPositions { get; set; } = new();
     }
 
-    public class SafetyAlert
-    {
-        public string VesselName { get; set; } = "";
-        public string AlertType { get; set; } = "";
-        public string Severity { get; set; } = "";
-        public DateTime Timestamp { get; set; }
-        public string Description { get; set; } = "";
-    }
 
     public class AisVesselPosition
     {

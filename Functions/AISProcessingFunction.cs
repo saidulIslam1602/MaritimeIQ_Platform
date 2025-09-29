@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using System.Net;
 using System.Text.Json;
 
-namespace HavilaKystruten.Maritime.Functions
+namespace MaritimeIQ.Platform.Functions
 {
     /// <summary>
     /// Real-time AIS Processing Function - Processes vessel position data every 30 seconds
@@ -206,10 +206,10 @@ namespace HavilaKystruten.Maritime.Functions
         {
             return mmsi switch
             {
-                "257123456" => "Havila Capella",
-                "257123457" => "Havila Castor",
-                "257123458" => "Havila Polaris", 
-                "257123459" => "Havila Pollux",
+                "257123456" => "MS Nordic Aurora",
+                "257123457" => "MS Arctic Explorer",
+                "257123458" => "MS Coastal Voyager", 
+                "257123459" => "MS Nordic Spirit",
                 _ => $"Unknown Vessel (MMSI: {mmsi})"
             };
         }
@@ -322,7 +322,7 @@ namespace HavilaKystruten.Maritime.Functions
 
         private double EstimateFuelConsumption(decimal speed, double timeHours)
         {
-            // Fuel consumption curve for Havila vessels
+            // Fuel consumption curve for MaritimeIQ vessels
             var baseFuelRate = speed switch
             {
                 <= 8 => 800,   // Battery/low consumption

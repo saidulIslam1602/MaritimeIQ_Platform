@@ -156,11 +156,11 @@
     "outputs": {},
     "parameters": {
       "MaritimeAPIEndpoint": {
-        "defaultValue": "https://havila-maritime-api.azurewebsites.net",
+        "defaultValue": "https://maritimeiq-platform-api.azurewebsites.net",
         "type": "String"
       },
       "NotificationServiceEndpoint": {
-        "defaultValue": "https://havila-notifications.azurewebsites.net",
+        "defaultValue": "https://maritimeiq-notifications.azurewebsites.net",
         "type": "String"
       }
     },

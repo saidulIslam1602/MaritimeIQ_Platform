@@ -7,9 +7,9 @@ using Azure.Search.Documents.Models;
 using Azure.AI.OpenAI;
 using Azure;
 using System.Text.Json;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

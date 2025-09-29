@@ -1,4 +1,4 @@
-namespace HavilaKystruten.Maritime.Services
+namespace MaritimeIQ.Platform.Services
 {
     /// <summary>
     /// Base service class for all Maritime services
@@ -81,7 +81,7 @@ namespace HavilaKystruten.Maritime.Services
         }
 
         /// <summary>
-        /// Standard async operation wrapper with error handling
+        /// Execute an async operation with consistent error handling and logging
         /// </summary>
         /// <typeparam name="T">Return type</typeparam>
         /// <param name="operation">The async operation to execute</param>
@@ -97,6 +97,28 @@ namespace HavilaKystruten.Maritime.Services
                 var result = await operation();
                 LogInformation("Operation completed successfully", operationName);
                 return result;
+            }
+            catch (Exception ex)
+            {
+                LogError(ex, operationName);
+                throw; // Re-throw to allow caller to handle
+            }
+        }
+
+        /// <summary>
+        /// Execute an async operation with consistent error handling and logging (void return)
+        /// </summary>
+        /// <param name="operation">The async operation to execute</param>
+        /// <param name="operationName">Name for logging purposes</param>
+        protected async Task ExecuteOperationAsync(
+            Func<Task> operation, 
+            string operationName)
+        {
+            try
+            {
+                LogInformation("Starting operation", operationName);
+                await operation();
+                LogInformation("Operation completed successfully", operationName);
             }
             catch (Exception ex)
             {

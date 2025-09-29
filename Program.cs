@@ -3,10 +3,12 @@ using Azure.Identity;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
-using HavilaKystruten.Maritime.Models;
-using HavilaKystruten.Maritime.Controllers;
+using MaritimeIQ.Platform.Models;
+using MaritimeIQ.Platform.Controllers;
 using Microsoft.ApplicationInsights;
-using HavilaKystruten.Maritime.Services;
+using MaritimeIQ.Platform.Services;
+using MaritimeIQ.Platform.Services.Interfaces;
+using MaritimeIQ.Platform.DataPipelines;
 using System.Text.Json.Serialization;
 
 static TokenCredential ResolveKeyVaultCredential(IConfiguration configuration)
@@ -52,6 +54,30 @@ builder.Services.AddScoped<PassengerNotificationService>();
 builder.Services.AddScoped<RouteOptimizationService>();
 builder.Services.AddSingleton<IMaritimeDataService, MaritimeDataService>();
 
+// Register new architecture services
+builder.Services.AddScoped<IMonitoringService, MonitoringService>();
+builder.Services.AddScoped<IApiManagementService, ApiManagementService>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
+
+// Register core services that are properly implemented  
+builder.Services.AddScoped<ISafetyService, SafetyService>();
+
+// Core data service for controllers
+builder.Services.AddScoped<IMaritimeDataService, MaritimeDataService>();
+
+// Register enterprise data pipeline services for real-time data ingestion
+builder.Services.AddMaritimeDataPipelines(builder.Configuration);
+builder.Services.ConfigureDataPipelineOptions(builder.Configuration);
+
+// Note: Additional services can be registered when their interfaces are properly defined
+// builder.Services.AddScoped<IMaritimeVisionService, MaritimeVisionService>();
+// builder.Services.AddScoped<IVesselDataIngestionService, VesselDataIngestionService>();
+// builder.Services.AddScoped<IMaritimeSearchService, MaritimeSearchService>();
+// builder.Services.AddScoped<IMaritimeIntelligenceService, MaritimeIntelligenceService>();
+// builder.Services.AddScoped<IMaritimeAIService, MaritimeAIService>();
+// builder.Services.AddScoped<IVesselService, VesselService>();
+// builder.Services.AddScoped<IIoTService, IoTService>();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -69,39 +95,39 @@ builder.Services.AddHttpClient();
 builder.Services.AddApplicationInsightsTelemetry();
 
 // Configure Azure service options
-builder.Services.Configure<HavilaKystruten.Maritime.Services.IoTHubConfiguration>(builder.Configuration.GetSection("IoTHub"));
-builder.Services.Configure<HavilaKystruten.Maritime.Services.ServiceBusConfiguration>(builder.Configuration.GetSection("ServiceBus"));
-builder.Services.Configure<HavilaKystruten.Maritime.Services.EventHubConfiguration>(builder.Configuration.GetSection("EventHub"));
-builder.Services.Configure<HavilaKystruten.Maritime.Services.CognitiveServicesConfiguration>(builder.Configuration.GetSection("CognitiveServices"));
+builder.Services.Configure<MaritimeIQ.Platform.Services.IoTHubConfiguration>(builder.Configuration.GetSection("IoTHub"));
+builder.Services.Configure<MaritimeIQ.Platform.Services.ServiceBusConfiguration>(builder.Configuration.GetSection("ServiceBus"));
+builder.Services.Configure<MaritimeIQ.Platform.Services.EventHubConfiguration>(builder.Configuration.GetSection("EventHub"));
+builder.Services.Configure<MaritimeIQ.Platform.Services.CognitiveServicesConfiguration>(builder.Configuration.GetSection("CognitiveServices"));
 
 // Register Azure services
-builder.Services.AddScoped<HavilaKystruten.Maritime.Services.IIoTHubService>(serviceProvider =>
+builder.Services.AddScoped<MaritimeIQ.Platform.Services.IIoTHubService>(serviceProvider =>
 {
-    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<HavilaKystruten.Maritime.Services.IoTHubConfiguration>>().Value;
-    var logger = serviceProvider.GetRequiredService<ILogger<HavilaKystruten.Maritime.Services.IoTHubService>>();
-    return new HavilaKystruten.Maritime.Services.IoTHubService(config, logger);
+    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.IoTHubConfiguration>>().Value;
+    var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.IoTHubService>>();
+    return new MaritimeIQ.Platform.Services.IoTHubService(config, logger);
 });
 
-builder.Services.AddScoped<HavilaKystruten.Maritime.Services.IEventHubService>(serviceProvider =>
+builder.Services.AddScoped<MaritimeIQ.Platform.Services.IEventHubService>(serviceProvider =>
 {
-    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<HavilaKystruten.Maritime.Services.EventHubConfiguration>>().Value;
-    var logger = serviceProvider.GetRequiredService<ILogger<HavilaKystruten.Maritime.Services.EventHubService>>();
-    return new HavilaKystruten.Maritime.Services.EventHubService(config, logger);
+    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.EventHubConfiguration>>().Value;
+    var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.EventHubService>>();
+    return new MaritimeIQ.Platform.Services.EventHubService(config, logger);
 });
 
-builder.Services.AddScoped<HavilaKystruten.Maritime.Services.IServiceBusService>(serviceProvider =>
+builder.Services.AddScoped<MaritimeIQ.Platform.Services.IServiceBusService>(serviceProvider =>
 {
-    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<HavilaKystruten.Maritime.Services.ServiceBusConfiguration>>().Value;
-    var logger = serviceProvider.GetRequiredService<ILogger<HavilaKystruten.Maritime.Services.ServiceBusService>>();
+    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.ServiceBusConfiguration>>().Value;
+    var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.ServiceBusService>>();
     var client = new Azure.Messaging.ServiceBus.ServiceBusClient(config.ConnectionString);
-    return new HavilaKystruten.Maritime.Services.ServiceBusService(client, config, logger);
+    return new MaritimeIQ.Platform.Services.ServiceBusService(client, config, logger);
 });
 
-builder.Services.AddScoped<HavilaKystruten.Maritime.Services.ICognitiveServicesService>(serviceProvider =>
+builder.Services.AddScoped<MaritimeIQ.Platform.Services.ICognitiveServicesService>(serviceProvider =>
 {
-    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<HavilaKystruten.Maritime.Services.CognitiveServicesConfiguration>>().Value;
-    var logger = serviceProvider.GetRequiredService<ILogger<HavilaKystruten.Maritime.Services.CognitiveServicesService>>();
-    return new HavilaKystruten.Maritime.Services.CognitiveServicesService(config, logger);
+    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.CognitiveServicesConfiguration>>().Value;
+    var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.CognitiveServicesService>>();
+    return new MaritimeIQ.Platform.Services.CognitiveServicesService(config, logger);
 });
 
 // Platform integrations

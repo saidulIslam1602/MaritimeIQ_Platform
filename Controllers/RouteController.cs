@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -232,7 +232,7 @@ namespace HavilaKystruten.Maritime.Controllers
             {
                 new Departure
                 {
-                    VesselName = "MS Havila Castor",
+                    VesselName = "MS Arctic Explorer",
                     Destination = "Kirkenes",
                     DepartureTime = DateTime.UtcNow.AddHours(2),
                     EstimatedArrival = DateTime.UtcNow.AddDays(6)

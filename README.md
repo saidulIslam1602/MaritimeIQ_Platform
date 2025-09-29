@@ -1,6 +1,6 @@
-# Havila Kystruten Maritime Platform
+# MaritimeIQ Platform
 
-A comprehensive, unified maritime operations platform for Havila Kystruten's coastal fleet operations, featuring real-time vessel tracking, environmental compliance monitoring, passenger communications, and AI-driven route optimization.
+A comprehensive, unified maritime operations platform for coastal fleet operations, featuring real-time vessel tracking, environmental compliance monitoring, passenger communications, and AI-driven route optimization.
 
 ## 🚢 Platform Overview
 
@@ -64,8 +64,8 @@ dotnet run
 ### Using Docker
 ```bash
 # Build and run with Docker
-docker build -f deployment/docker/Dockerfile -t havila-maritime-platform .
-docker run -p 5000:8080 havila-maritime-platform
+docker build -f deployment/docker/Dockerfile -t maritime-platform .
+docker run -p 5000:8080 maritime-platform
 
 # Or use Docker Compose for development environment
 cd deployment/docker && docker-compose up -d
@@ -118,9 +118,9 @@ cd deployment/docker && docker-compose up -d
 
 ## 🌊 Maritime Features
 
-- **Real-time vessel tracking** for 12-vessel Havila fleet
+- **Real-time vessel tracking** for maritime fleet operations
 - **Environmental compliance** monitoring (CO2, NOx, SOx)
-- **Northern Lights alerts** for passenger experience
+- **Weather-based alerts** for enhanced passenger experience
 - **AI route optimization** with weather integration
 - **Hybrid propulsion** monitoring and battery optimization
 
@@ -133,7 +133,7 @@ The platform includes comprehensive deployment automation:
 - Environment-specific configuration management
 
 ---
-*Consolidated maritime platform for Havila Kystruten's digital fleet operations*
+*Consolidated maritime platform for digital fleet operations*
 ```
 
 ## Production Considerations
@@ -143,4 +143,4 @@ The platform includes comprehensive deployment automation:
 - Integration with maritime IoT sensors
 
 ---
-*Built for Havila Kystruten's digital transformation of maritime operations*
+*Built for digital transformation of maritime operations*

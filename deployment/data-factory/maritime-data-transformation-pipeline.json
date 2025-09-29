@@ -1,7 +1,7 @@
 {
   "name": "maritime-data-transformation-pipeline",
   "properties": {
-    "description": "Havila Maritime Data Transformation - Route Optimization and Predictive Analytics",
+    "description": "MaritimeIQ Platform Data Transformation - Advanced ML/AI Route Optimization and Predictive Analytics",
     "activities": [
       {
         "name": "Route_Optimization_Analysis",

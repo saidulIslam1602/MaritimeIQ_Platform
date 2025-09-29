@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace HavilaKystruten.Maritime.Services
+namespace MaritimeIQ.Platform.Services
 {
     /// <summary>
     /// Passenger Notification Service - Handles boarding notifications, delays,
@@ -85,7 +85,7 @@ namespace HavilaKystruten.Maritime.Services
                         Coordinates = new Coordinates { Latitude = 69.6500, Longitude = 18.9560 }
                     }
                 },
-                VesselsWithOptimalViewing = new List<string> { "MS Havila Castor", "MS Havila Capella" },
+                VesselsWithOptimalViewing = new List<string> { "MS Arctic Explorer", "MS Nordic Aurora" },
                 AlertGenerated = DateTime.UtcNow,
                 ValidUntil = DateTime.UtcNow.AddHours(4)
             };
@@ -144,7 +144,7 @@ namespace HavilaKystruten.Maritime.Services
                     new RecentNotification
                     {
                         Type = "Boarding",
-                        Message = "Boarding for MS Havila Castor will begin in 30 minutes at Gate A",
+                        Message = "Boarding for MS Arctic Explorer will begin in 30 minutes at Gate A",
                         SentAt = DateTime.UtcNow.AddMinutes(-5),
                         Recipients = 324,
                         Status = "Delivered"

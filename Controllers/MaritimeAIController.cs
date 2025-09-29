@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Models;
-using HavilaKystruten.Maritime.Data;
+using MaritimeIQ.Platform.Models;
+using MaritimeIQ.Platform.Data;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
     /// Maritime AI Processing Service - Handles intelligent route optimization, 
@@ -29,7 +29,7 @@ namespace HavilaKystruten.Maritime.Controllers
             _logger.LogInformation($"Processing route optimization for vessel {request.VesselId}");
 
             // Simulate AI model processing
-            var model = HavilaFleetData.GetMaritimeAIModels().First(m => m.ModelType == "RouteOptimization");
+            var model = MaritimeFleetData.GetMaritimeAIModels().First(m => m.ModelType == "RouteOptimization");
             
             var optimization = new
             {
@@ -83,7 +83,7 @@ namespace HavilaKystruten.Maritime.Controllers
         {
             _logger.LogInformation($"Generating weather prediction for {location}");
 
-            var model = HavilaFleetData.GetMaritimeAIModels().First(m => m.ModelType == "WeatherPrediction");
+            var model = MaritimeFleetData.GetMaritimeAIModels().First(m => m.ModelType == "WeatherPrediction");
             
             var prediction = new
             {
@@ -148,8 +148,8 @@ namespace HavilaKystruten.Maritime.Controllers
         {
             _logger.LogInformation($"Processing fuel optimization for vessel {request.VesselId}");
 
-            var model = HavilaFleetData.GetMaritimeAIModels().First(m => m.ModelType == "FuelOptimization");
-            var environmentalData = HavilaFleetData.GetSampleEnvironmentalData()
+            var model = MaritimeFleetData.GetMaritimeAIModels().First(m => m.ModelType == "FuelOptimization");
+            var environmentalData = MaritimeFleetData.GetSampleEnvironmentalData()
                                                   .Where(e => e.VesselId == request.VesselId)
                                                   .OrderByDescending(e => e.MeasurementTime)
                                                   .Take(24);
@@ -232,7 +232,7 @@ namespace HavilaKystruten.Maritime.Controllers
                 },
                 ExtractedData = new
                 {
-                    VesselName = "Havila Capella",
+                    VesselName = "MS Nordic Aurora",
                     PortOfCall = "Tromsø",
                     PassengerCount = 487,
                     CargoManifest = new[] { "Passenger vehicles: 85", "Commercial cargo: 12 tons", "Mail and packages: 150 items" },

@@ -5,9 +5,9 @@ using Azure.Search.Documents.Indexes.Models;
 using Azure.Search.Documents.Models;
 using Azure;
 using System.Text.Json;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Models;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -395,8 +395,8 @@ namespace HavilaKystruten.Maritime.Controllers
                 new MaritimeSearchDocument
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Title = "MS Havila Capella - Hybrid Cruise Ferry",
-                    Content = "MS Havila Capella is one of Havila Kystruten's modern hybrid vessels operating on the Bergen-Kirkenes route. Features advanced environmental technology, luxury accommodations, and excellent Northern Lights viewing facilities. Built in 2021 with focus on sustainability and passenger comfort.",
+                    Title = "MS Nordic Aurora - Hybrid Cruise Ferry",
+                    Content = "MS Nordic Aurora is one of Havila Kystruten's modern hybrid vessels operating on the Bergen-Kirkenes route. Features advanced environmental technology, luxury accommodations, and excellent Northern Lights viewing facilities. Built in 2021 with focus on sustainability and passenger comfort.",
                     Category = "Vessel Information",
                     Source = "Havila Fleet Database",
                     VesselType = "Hybrid Cruise Ferry",
@@ -408,8 +408,8 @@ namespace HavilaKystruten.Maritime.Controllers
                 new MaritimeSearchDocument
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Title = "MS Havila Castor - Hybrid Coastal Vessel",
-                    Content = "MS Havila Castor operates the beautiful Norwegian coastal route with state-of-the-art environmental systems. Features panoramic windows, premium dining options, and dedicated Northern Lights observation decks. Battery power enables silent operation in sensitive areas.",
+                    Title = "MS Arctic Explorer - Hybrid Coastal Vessel",
+                    Content = "MS Arctic Explorer operates the beautiful Norwegian coastal route with state-of-the-art environmental systems. Features panoramic windows, premium dining options, and dedicated Northern Lights observation decks. Battery power enables silent operation in sensitive areas.",
                     Category = "Vessel Information",
                     Source = "Havila Fleet Database",
                     VesselType = "Hybrid Cruise Ferry",

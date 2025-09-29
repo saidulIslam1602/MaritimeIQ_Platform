@@ -4,11 +4,11 @@ using Microsoft.Azure.Functions.Worker.Http;
 using System.Net;
 using System.Text.Json;
 
-namespace HavilaKystruten.Maritime.Functions
+namespace MaritimeIQ.Platform.Functions
 {
     /// <summary>
     /// Environmental Monitoring Functions - Real-time CO2 thresholds, emission alerts,
-    /// and environmental compliance monitoring for Havila's hybrid fleet
+    /// and environmental compliance monitoring for MaritimeIQ's hybrid fleet
     /// </summary>
     public class EnvironmentalMonitoringFunction
     {
@@ -142,7 +142,7 @@ namespace HavilaKystruten.Maritime.Functions
                 ReportDate = yesterday.ToString("yyyy-MM-dd"),
                 GeneratedAt = DateTime.UtcNow,
                 ReportType = "Daily Environmental Compliance",
-                Operator = "Havila Kystruten AS",
+                Operator = "MaritimeIQ Platform AS",
                 
                 FleetSummary = new
                 {
@@ -374,10 +374,10 @@ namespace HavilaKystruten.Maritime.Functions
                 LastUpdate = DateTime.UtcNow,
                 VesselBreakdown = new[]
                 {
-                    new { VesselId = 1, Name = "Havila Capella", CO2Rate = 165.2, Status = "OPTIMAL" },
-                    new { VesselId = 2, Name = "Havila Castor", CO2Rate = 172.8, Status = "GOOD" },
-                    new { VesselId = 3, Name = "Havila Polaris", CO2Rate = 168.1, Status = "OPTIMAL" },
-                    new { VesselId = 4, Name = "Havila Pollux", CO2Rate = 174.4, Status = "GOOD" }
+                    new { VesselId = 1, Name = "MS Nordic Aurora", CO2Rate = 165.2, Status = "OPTIMAL" },
+                    new { VesselId = 2, Name = "MS Arctic Explorer", CO2Rate = 172.8, Status = "GOOD" },
+                    new { VesselId = 3, Name = "MS Coastal Voyager", CO2Rate = 168.1, Status = "OPTIMAL" },
+                    new { VesselId = 4, Name = "MS Nordic Spirit", CO2Rate = 174.4, Status = "GOOD" }
                 }
             };
         }

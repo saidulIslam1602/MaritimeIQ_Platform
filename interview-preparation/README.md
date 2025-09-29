@@ -1,4 +1,4 @@
-# Maritime Data Engineering Platform - Complete Interview Preparation Guide
+# MaritimeIQ Platform - Complete Interview Preparation Guide
 
 ## Table of Contents
 

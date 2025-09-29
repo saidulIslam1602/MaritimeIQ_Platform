@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Services;
+using MaritimeIQ.Platform.Services;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
     /// Passenger Notification Controller - Provides REST API endpoints for
@@ -133,21 +133,21 @@ namespace HavilaKystruten.Maritime.Controllers
             {
                 new BoardingNotification
                 {
-                    VesselName = "MS Havila Castor",
+                    VesselName = "MS Arctic Explorer",
                     BoardingTime = DateTime.UtcNow.AddMinutes(30),
                     Gate = "A1",
                     PassengerIds = new List<string> { "P001", "P002", "P003" },
                     NotificationType = "Boarding",
-                    Message = "Boarding for MS Havila Castor will begin in 30 minutes at Gate A1"
+                    Message = "Boarding for MS Arctic Explorer will begin in 30 minutes at Gate A1"
                 },
                 new BoardingNotification
                 {
-                    VesselName = "MS Havila Capella",
+                    VesselName = "MS Nordic Aurora",
                     BoardingTime = DateTime.UtcNow.AddHours(2),
                     Gate = "B2",
                     PassengerIds = new List<string> { "P004", "P005", "P006" },
                     NotificationType = "Pre-boarding",
-                    Message = "Pre-boarding information for MS Havila Capella departure"
+                    Message = "Pre-boarding information for MS Nordic Aurora departure"
                 }
             };
 
@@ -164,7 +164,7 @@ namespace HavilaKystruten.Maritime.Controllers
         {
             var sampleDelay = new DelayNotification
             {
-                VesselName = "MS Havila Castor",
+                VesselName = "MS Arctic Explorer",
                 DelayMinutes = 45,
                 Reason = "Weather conditions - strong winds",
                 AffectedPassengerIds = new List<string> { "P001", "P002", "P003", "P004", "P005" }

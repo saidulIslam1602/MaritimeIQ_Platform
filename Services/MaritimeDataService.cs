@@ -1,10 +1,10 @@
-using HavilaKystruten.Maritime.Data;
-using HavilaKystruten.Maritime.Models;
+using MaritimeIQ.Platform.Data;
+using MaritimeIQ.Platform.Models;
 using Microsoft.Extensions.Logging;
 using System.Linq;
-using EnvironmentalDataModel = HavilaKystruten.Maritime.Models.EnvironmentalData;
+using EnvironmentalDataModel = MaritimeIQ.Platform.Models.EnvironmentalData;
 
-namespace HavilaKystruten.Maritime.Services;
+namespace MaritimeIQ.Platform.Services;
 
 public interface IMaritimeDataService
 {
@@ -35,11 +35,11 @@ public class MaritimeDataService : IMaritimeDataService
     {
         _logger = logger;
 
-        _fleet = HavilaFleetData.GetHavilaFleet();
-        _positions = HavilaFleetData.GetCurrentVesselPositions();
-        _voyages = HavilaFleetData.GetSampleVoyages();
-    _environmental = HavilaFleetData.GetSampleEnvironmentalData();
-        _aiModels = HavilaFleetData.GetMaritimeAIModels();
+        _fleet = MaritimeFleetData.GetMaritimeFleet();
+        _positions = MaritimeFleetData.GetCurrentVesselPositions();
+        _voyages = MaritimeFleetData.GetSampleVoyages();
+        _environmental = MaritimeFleetData.GetSampleEnvironmentalData();
+        _aiModels = MaritimeFleetData.GetMaritimeAIModels();
 
         _logger.LogInformation("Maritime data service initialised with {FleetCount} vessels and {VoyageCount} voyages", _fleet.Count, _voyages.Count);
     }

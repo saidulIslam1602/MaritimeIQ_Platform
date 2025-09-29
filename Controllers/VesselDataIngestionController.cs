@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using HavilaKystruten.Maritime.Models;
-using HavilaKystruten.Maritime.Data;
+using MaritimeIQ.Platform.Models;
+using MaritimeIQ.Platform.Data;
 
-namespace HavilaKystruten.Maritime.Controllers
+namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
     /// Vessel Data Ingestion Service - Handles real-time AIS data, sensor readings,
@@ -455,17 +455,17 @@ namespace HavilaKystruten.Maritime.Controllers
         {
             return mmsi switch
             {
-                "257123456" => "Havila Capella",
-                "257123457" => "Havila Castor", 
-                "257123458" => "Havila Polaris",
-                "257123459" => "Havila Pollux",
+                "257123456" => "MS Nordic Aurora",
+                "257123457" => "MS Arctic Explorer", 
+                "257123458" => "MS Coastal Voyager",
+                "257123459" => "MS Nordic Spirit",
                 _ => $"Unknown Vessel (MMSI: {mmsi})"
             };
         }
 
         private string GetVesselName(int vesselId)
         {
-            var fleet = HavilaFleetData.GetHavilaFleet();
+            var fleet = MaritimeFleetData.GetMaritimeFleet();
             return fleet.FirstOrDefault(v => v.Id == vesselId)?.Name ?? $"Vessel {vesselId}";
         }
 

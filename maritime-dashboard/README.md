@@ -1,6 +1,6 @@
-# 🚢 Havila Kystruten Maritime Platform - Visualization Dashboard
+# 🚢 MaritimeIQ Platform - Intelligence Dashboard
 
-A comprehensive, real-time maritime operations dashboard for the Havila Kystruten coastal fleet, showcasing the full capabilities of your Azure-based maritime platform.
+A comprehensive, real-time maritime operations dashboard showcasing the full capabilities of your Azure-based maritime intelligence platform.
 
 ## 📊 Dashboard Overview
 
