@@ -1,0 +1,310 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appName": {
+      "type": "string",
+      "defaultValue": "maritime-platform",
+      "metadata": {
+        "description": "Name of the application"
+      }
+    },
+    "uniqueId": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique identifier for resources"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "sqlAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "SQL Server admin password"
+      }
+    }
+  },
+  "variables": {
+    "sanitizedAppName": "[toLower(replace(parameters('appName'), '-', ''))]",
+    "shortAppNameLength": "[if(greater(length(variables('sanitizedAppName')), 12), 12, length(variables('sanitizedAppName')))]",
+    "shortAppName": "[substring(variables('sanitizedAppName'), 0, variables('shortAppNameLength'))]",
+    "lowerUniqueId": "[toLower(parameters('uniqueId'))]",
+    "sanitizedUniqueId": "[replace(replace(variables('lowerUniqueId'), '-', ''), '_', '')]",
+    "sqlName": "[concat('sql-', variables('shortAppName'), '-', variables('lowerUniqueId'))]",
+    "sqlDb": "[concat(variables('shortAppName'), '-db')]",
+    "saName": "[concat('st', variables('shortAppName'), variables('sanitizedUniqueId'))]",
+    "ehNs": "[concat('ehns-', variables('shortAppName'), '-', variables('lowerUniqueId'))]",
+    "streamJob": "[concat('sa-', variables('shortAppName'), '-', variables('lowerUniqueId'))]",
+    "aiName": "[concat(variables('shortAppName'), '-insights')]",
+    "kvName": "[concat('kv-', variables('shortAppName'), '-', variables('lowerUniqueId'))]",
+    "sbNs": "[concat('sb-', variables('shortAppName'), '-', variables('lowerUniqueId'))]",
+    "csName": "[concat('cs', variables('shortAppName'), variables('sanitizedUniqueId'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2021-11-01",
+      "name": "[variables('sqlName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Environment": "Interview",
+        "Project": "MaritimePlatform"
+      },
+      "properties": {
+        "administratorLogin": "maritime-admin",
+        "administratorLoginPassword": "[parameters('sqlAdminPassword')]",
+        "version": "12.0",
+        "publicNetworkAccess": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2021-11-01",
+      "name": "[concat(variables('sqlName'), '/', variables('sqlDb'))]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlName'))]"
+      ],
+      "sku": {
+        "name": "Basic",
+        "tier": "Basic",
+        "capacity": 5
+      },
+      "properties": {
+        "collation": "SQL_Latin1_General_CP1_CI_AS",
+        "maxSizeBytes": "2147483648",
+        "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+        "zoneRedundant": false,
+        "readScale": "Disabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "apiVersion": "2021-11-01",
+      "name": "[concat(variables('sqlName'), '/AllowAzureServices')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlName'))]"
+      ],
+      "properties": {
+        "startIpAddress": "0.0.0.0",
+        "endIpAddress": "0.0.0.0"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "apiVersion": "2021-11-01",
+      "name": "[concat(variables('sqlName'), '/AllowAllWindowsAzureIps')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlName'))]"
+      ],
+      "properties": {
+        "startIpAddress": "0.0.0.0",
+        "endIpAddress": "255.255.255.255"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-09-01",
+      "name": "[variables('saName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Environment": "Interview",
+        "Project": "MaritimePlatform"
+      },
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "accessTier": "Hot",
+        "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "TLS1_2"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces",
+      "apiVersion": "2021-11-01",
+      "name": "[variables('ehNs')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Environment": "Interview",
+        "Project": "MaritimePlatform"
+      },
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard",
+        "capacity": 2
+      },
+      "properties": {
+        "zoneRedundant": false,
+        "isAutoInflateEnabled": true,
+        "maximumThroughputUnits": 10
+      },
+      "resources": [
+        {
+          "type": "eventhubs",
+          "apiVersion": "2021-11-01",
+          "name": "maritime-data",
+          "dependsOn": [
+            "[resourceId('Microsoft.EventHub/namespaces', variables('ehNs'))]"
+          ],
+          "properties": {
+            "messageRetentionInDays": 3,
+            "partitionCount": 4
+          }
+        },
+        {
+          "type": "eventhubs",
+          "apiVersion": "2021-11-01",
+          "name": "vessel-tracking",
+          "dependsOn": [
+            "[resourceId('Microsoft.EventHub/namespaces', variables('ehNs'))]"
+          ],
+          "properties": {
+            "messageRetentionInDays": 1,
+            "partitionCount": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('aiName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Environment": "Interview",
+        "Project": "MaritimePlatform"
+      },
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "RetentionInDays": 90,
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2022-07-01",
+      "name": "[variables('kvName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Environment": "Interview",
+        "Project": "MaritimePlatform"
+      },
+      "properties": {
+        "sku": {
+          "family": "A",
+          "name": "standard"
+        },
+        "tenantId": "[subscription().tenantId]",
+        "accessPolicies": [],
+        "enabledForDeployment": false,
+        "enabledForDiskEncryption": false,
+        "enabledForTemplateDeployment": false,
+        "softDeleteRetentionInDays": 90,
+        "enableRbacAuthorization": true,
+        "publicNetworkAccess": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces",
+      "apiVersion": "2021-11-01",
+      "name": "[variables('sbNs')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Environment": "Interview",
+        "Project": "MaritimePlatform"
+      },
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard"
+      },
+      "properties": {
+        "publicNetworkAccess": "Enabled",
+        "minimumTlsVersion": "1.2"
+      },
+      "resources": [
+        {
+          "type": "queues",
+          "apiVersion": "2021-11-01",
+          "name": "maritime-alerts",
+          "dependsOn": [
+            "[resourceId('Microsoft.ServiceBus/namespaces', variables('sbNs'))]"
+          ],
+          "properties": {
+            "lockDuration": "PT1M",
+            "maxSizeInMegabytes": 1024,
+            "requiresDuplicateDetection": false,
+            "requiresSession": false,
+            "defaultMessageTimeToLive": "P14D",
+            "deadLetteringOnMessageExpiration": false,
+            "maxDeliveryCount": 10,
+            "status": "Active",
+            "enablePartitioning": false,
+            "enableExpress": false
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('csName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Environment": "Interview",
+        "Project": "MaritimePlatform"
+      },
+      "sku": {
+        "name": "S0"
+      },
+      "kind": "CognitiveServices",
+      "properties": {
+        "apiProperties": {},
+        "customSubDomainName": "[variables('csName')]",
+        "publicNetworkAccess": "Enabled"
+      }
+    }
+  ],
+  "outputs": {
+    "sqlServerName": {
+      "type": "string",
+      "value": "[variables('sqlName')]"
+    },
+    "sqlDatabaseName": {
+      "type": "string",
+      "value": "[variables('sqlDb')]"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "value": "[variables('saName')]"
+    },
+    "eventHubNamespace": {
+      "type": "string",
+      "value": "[variables('ehNs')]"
+    },
+    "appInsightsName": {
+      "type": "string",
+      "value": "[variables('aiName')]"
+    },
+    "keyVaultName": {
+      "type": "string",
+      "value": "[variables('kvName')]"
+    },
+    "serviceBusNamespace": {
+      "type": "string",
+      "value": "[variables('sbNs')]"
+    },
+    "cognitiveServicesName": {
+      "type": "string",
+      "value": "[variables('csName')]"
+    }
+  }
+}

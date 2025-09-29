@@ -1,0 +1,46 @@
+<step title="BackgroundTrace" date="2025-09-29T18:46:03.170" instance="4ebe23" url="/api/zipdeploy" method="POST" >
+  <step title="Cleanup Xml Logs" date="2025-09-29T18:46:03.199" /><!-- duration: 10ms -->
+  <step title="Creating temporary deployment - FetchDeploymentManager" date="2025-09-29T18:46:03.552" /><!-- duration: 12ms -->
+  <step title="Creating temporary deployment" date="2025-09-29T18:46:03.574" /><!-- duration: 193ms -->
+  <step title="Performing fetch based deployment" date="2025-09-29T18:46:04.180" >
+    <step title="Cleaning up temp folders from previous zip deployments and extracting pushed zip file /tmp/zipdeploy/e069be53-0de5-44bd-9dba-91e458c20079.zip (155.73 MB) to /tmp/zipdeploy/extracted" date="2025-09-29T18:46:05.509" >
+      <step title="ChmodRecursive Process exited with total time taken in ms: 771" date="2025-09-29T18:47:36.837" /><!-- duration: 10ms -->
+    </step><!-- duration: 91364ms -->
+    <step title="Deployment timer started" date="2025-09-29T18:47:38.924" >
+      <step title="DeploymentManager.Deploy(id:7d160e22-d5bd-41af-94bb-f65f5a4c57da)" date="2025-09-29T18:47:38.955" >
+        <step title="Collecting changeset information" date="2025-09-29T18:47:39.002" /><!-- duration: 113ms -->
+        <step title="Updating submodules" date="2025-09-29T18:47:39.118" /><!-- duration: 1128ms -->
+        <step title="Determining deployment builder" date="2025-09-29T18:47:40.497" >
+          <step title="Builder is OryxBuilder" date="2025-09-29T18:47:40.522" /><!-- duration: 11ms -->
+        </step><!-- duration: 47ms -->
+        <step title="PreDeployment: context.CleanOutputPath False" date="2025-09-29T18:47:40.634" >
+          <step title="PreDeployment: context.OutputPath /home/site/wwwroot" date="2025-09-29T18:47:40.768" >
+            <step title="Building" date="2025-09-29T18:47:40.962" >
+              <step title="Executing external process" date="2025-09-29T18:47:41.733" type="process" path="bash" arguments="-c &quot;oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform dotnet --platform-version 8.0 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddff88aaf903da | tee /tmp/oryx-build.log ; exit $PIPESTATUS &quot;" >
+                <step title="Cpu: rsync(917,10.000s)+rsync(916,1.210s)+rsync(914,6.190s)+build.sh(908,0.010s)+oryx(877,14.490s)+tee(878,0.000s)+bash(876,0.000s)=total(31.890s)" date="2025-09-29T18:49:42.261" /><!-- duration: 26ms -->
+                <step title="bash: no io activity for 61s, prev-cpu=-1.000s, current-cpu=31.890s" date="2025-09-29T18:49:42.596" /><!-- duration: 10ms -->
+                <step title="Cpu: dotnet(1102,20.270s)+build.sh(1101,0.000s)+build.sh(908,0.110s)+oryx(877,14.940s)+tee(878,0.000s)+bash(876,0.000s)=total(35.320s)" date="2025-09-29T18:51:44.187" /><!-- duration: 22ms -->
+                <step title="bash: no io activity for 61s, prev-cpu=-1.000s, current-cpu=35.320s" date="2025-09-29T18:51:44.231" /><!-- duration: 11ms -->
+                <step title="Cpu: dotnet(1102,45.340s)+build.sh(1101,0.000s)+build.sh(908,0.110s)+oryx(877,15.010s)+tee(878,0.000s)+bash(876,0.000s)=total(60.450s)" date="2025-09-29T18:52:44.984" /><!-- duration: 37ms -->
+                <step title="bash: no io activity for 121s, prev-cpu=35.320s, current-cpu=60.450s" date="2025-09-29T18:52:45.051" /><!-- duration: 47ms -->
+                <step title="Cpu: dotnet(1102,70.460s)+build.sh(1101,0.000s)+build.sh(908,0.110s)+oryx(877,15.090s)+tee(878,0.000s)+bash(876,0.000s)=total(85.660s)" date="2025-09-29T18:53:46.975" /><!-- duration: 29ms -->
+                <step title="bash: no io activity for 182s, prev-cpu=60.450s, current-cpu=85.660s" date="2025-09-29T18:53:47.122" /><!-- duration: 139ms -->
+                <step title="Cpu: dotnet(1281,33.280s)+dotnet(1239,12.850s)+build.sh(1238,0.000s)+build.sh(908,0.110s)+oryx(877,15.340s)+tee(878,0.000s)+bash(876,0.000s)=total(57.680s)" date="2025-09-29T18:55:31.191" /><!-- duration: 66ms -->
+                <step title="bash: no io activity for 60s, prev-cpu=-1.000s, current-cpu=57.680s" date="2025-09-29T18:55:31.441" /><!-- duration: 11ms -->
+                <step title="Cpu: dotnet(1281,73.430s)+dotnet(1239,13.740s)+build.sh(1238,0.000s)+build.sh(908,0.110s)+oryx(877,15.410s)+tee(878,0.000s)+bash(876,0.000s)=total(102.670s)" date="2025-09-29T18:56:32.092" /><!-- duration: 12ms -->
+                <step title="bash: no io activity for 126s, prev-cpu=57.680s, current-cpu=102.670s" date="2025-09-29T18:56:32.161" /><!-- duration: 27ms -->
+              </step><!-- duration: 605049ms -->
+              <step title="Using GenericDeploymentLogParser" date="2025-09-29T18:57:48.431" /><!-- duration: 22ms -->
+              <step title="Triggering recycle (preview mode disabled)." date="2025-09-29T18:57:50.286" /><!-- duration: 16ms -->
+              <step title="Modified file to trigger a restart of the app container." date="2025-09-29T18:57:50.365" /><!-- duration: 2ms -->
+              <step title="Skip function trigger and logicapp sync because function is not enabled." date="2025-09-29T18:57:50.411" /><!-- duration: 4ms -->
+            </step><!-- duration: 610656ms -->
+          </step><!-- duration: 610934ms -->
+          <step title="Cleaning up temp files" date="2025-09-29T18:57:51.711" /><!-- duration: 28045ms -->
+          <step title="Cleaning up temp files" date="2025-09-29T18:58:19.766" /><!-- duration: 607ms -->
+          <step title="Reloading status file with latest updates" date="2025-09-29T18:58:20.494" >
+            <step title="WebHooksManager.PublishEventAsync: PostDeployment" date="2025-09-29T18:58:20.609" /><!-- duration: 1363ms -->
+          </step><!-- duration: 1491ms -->
+          <step title="Cleaning up temporary deployment - fetch deployment was successful" date="2025-09-29T18:58:22.062" /><!-- duration: 19ms -->
+        </step><!-- duration: 641568ms -->
+      </step><!-- duration: 643458ms -->

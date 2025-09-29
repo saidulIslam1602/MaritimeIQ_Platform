@@ -1,0 +1,267 @@
+{
+  "name": "maritime-lakehouse-etl-pipeline",
+  "properties": {
+    "description": "MaritimeIQ Platform Lakehouse ETL Pipeline - Modern Data Lake Architecture with Delta Lake and Data Mesh Principles",
+    "activities": [
+      {
+        "name": "Initialize_Lakehouse_Session",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "typeProperties": {
+          "variableName": "LakehouseSessionId",
+          "value": "@concat('lakehouse-', formatDateTime(utcnow(), 'yyyyMMdd-HHmmss'), '-', take(guid(), 8))"
+        }
+      },
+      {
+        "name": "Bronze_Layer_Ingestion",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {
+            "activity": "Initialize_Lakehouse_Session",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "notebookPath": "/MaritimeIQ/Lakehouse/01_Bronze_Layer_Ingestion",
+          "baseParameters": {
+            "session_id": "@variables('LakehouseSessionId')",
+            "ingestion_mode": "incremental",
+            "data_sources": "@pipeline().parameters.DataSources",
+            "checkpoint_location": "/mnt/checkpoints/bronze/@{variables('LakehouseSessionId')}",
+            "target_format": "delta",
+            "merge_schema": "true"
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeLakehouseDatabricks",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Silver_Layer_Transformation",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {
+            "activity": "Bronze_Layer_Ingestion",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "notebookPath": "/MaritimeIQ/Lakehouse/02_Silver_Layer_Transformation",
+          "baseParameters": {
+            "session_id": "@variables('LakehouseSessionId')",
+            "bronze_path": "/mnt/datalake/maritime/bronze",
+            "silver_path": "/mnt/datalake/maritime/silver",
+            "transformation_rules": "@pipeline().parameters.TransformationRules",
+            "data_quality_checks": "true",
+            "schema_evolution": "true",
+            "cdc_enabled": "true"
+          }
+        }
+      },
+      {
+        "name": "Gold_Layer_Aggregation",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {
+            "activity": "Silver_Layer_Transformation",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "notebookPath": "/MaritimeIQ/Lakehouse/03_Gold_Layer_Aggregation",
+          "baseParameters": {
+            "session_id": "@variables('LakehouseSessionId')",
+            "silver_path": "/mnt/datalake/maritime/silver",
+            "gold_path": "/mnt/datalake/maritime/gold",
+            "aggregation_level": "@pipeline().parameters.AggregationLevel",
+            "business_rules": "@pipeline().parameters.BusinessRules",
+            "partition_strategy": "vessel_id,date"
+          }
+        }
+      },
+      {
+        "name": "ML_Feature_Engineering",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {
+            "activity": "Gold_Layer_Aggregation",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "notebookPath": "/MaritimeIQ/MLOps/FeatureEngineering",
+          "baseParameters": {
+            "session_id": "@variables('LakehouseSessionId')",
+            "source_path": "/mnt/datalake/maritime/gold",
+            "feature_store_path": "/mnt/datalake/maritime/features",
+            "feature_definitions": "@pipeline().parameters.FeatureDefinitions",
+            "time_series_features": "true",
+            "window_sizes": "[1h, 6h, 24h, 7d]"
+          }
+        }
+      },
+      {
+        "name": "Data_Mesh_Publication",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "ML_Feature_Engineering",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "url": "@pipeline().parameters.DataMeshEndpoint",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer @pipeline().parameters.DataMeshToken"
+          },
+          "body": {
+            "data_product": {
+              "name": "maritime-operational-analytics",
+              "version": "v2.1",
+              "domain": "maritime-operations",
+              "owner": "maritime-data-team",
+              "description": "Comprehensive maritime operational analytics data product",
+              "quality_score": "@activity('Gold_Layer_Aggregation').output.runOutput.data_quality_score",
+              "schema_location": "/mnt/schemas/maritime/gold/v2.1",
+              "data_location": "/mnt/datalake/maritime/gold",
+              "access_patterns": [
+                "analytical_queries",
+                "ml_training",
+                "dashboard_reporting"
+              ],
+              "sla": {
+                "availability": "99.9%",
+                "freshness": "< 5 minutes",
+                "completeness": "> 98%"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Performance_Optimization",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {
+            "activity": "Data_Mesh_Publication",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "notebookPath": "/MaritimeIQ/Optimization/LakehouseOptimization",
+          "baseParameters": {
+            "session_id": "@variables('LakehouseSessionId')",
+            "optimization_type": "full",
+            "tables_to_optimize": "[\"vessel_positions\", \"environmental_data\", \"operational_metrics\"]",
+            "z_order_columns": "[\"vessel_id\", \"timestamp\"]",
+            "vacuum_retention_hours": "168"
+          }
+        }
+      },
+      {
+        "name": "Data_Quality_Monitoring",
+        "type": "ExecutePipeline",
+        "dependsOn": [
+          {
+            "activity": "Performance_Optimization",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "pipeline": {
+            "referenceName": "maritime-data-quality-pipeline",
+            "type": "PipelineReference"
+          },
+          "parameters": {
+            "ExecutionDate": "@pipeline().TriggerTime",
+            "DataSource": "lakehouse-gold-layer",
+            "QualityThresholds": "@pipeline().parameters.QualityThresholds"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "DataSources": {
+        "type": "String",
+        "defaultValue": "[\"eventhub://ais-data\", \"eventhub://environmental-sensors\", \"eventhub://vessel-telemetry\", \"api://weather-data\"]"
+      },
+      "TransformationRules": {
+        "type": "String",
+        "defaultValue": "{\"deduplication\": true, \"standardization\": true, \"enrichment\": true, \"validation\": true}"
+      },
+      "AggregationLevel": {
+        "type": "String",
+        "defaultValue": "vessel_hourly"
+      },
+      "BusinessRules": {
+        "type": "String",
+        "defaultValue": "{\"fuel_efficiency_calculation\": \"advanced\", \"route_optimization\": \"ml_based\", \"environmental_compliance\": \"strict\"}"
+      },
+      "FeatureDefinitions": {
+        "type": "String",
+        "defaultValue": "{\"temporal_features\": true, \"spatial_features\": true, \"operational_features\": true, \"environmental_features\": true}"
+      },
+      "AnomalyThreshold": {
+        "type": "String",
+        "defaultValue": "2.0"
+      },
+      "ModelVersion": {
+        "type": "String",
+        "defaultValue": "maritime-anomaly-detection-v3.1"
+      },
+      "EnvironmentalThresholds": {
+        "type": "String",
+        "defaultValue": "{\"co2_limit\": 45.0, \"nox_limit\": 12.0, \"fuel_efficiency_target\": 0.85}"
+      },
+      "MLModelPath": {
+        "type": "String",
+        "defaultValue": "/mnt/models/environmental-impact/v2.1"
+      },
+      "PredictiveMaintenanceMLPipelineId": {
+        "type": "String",
+        "defaultValue": "maritime-predictive-maintenance-v2.0"
+      },
+      "VesselDataPath": {
+        "type": "String",
+        "defaultValue": "/mnt/datalake/maritime/silver/vessel-telemetry"
+      },
+      "MLModelVersion": {
+        "type": "String",
+        "defaultValue": "v2.0"
+      },
+      "DataMeshEndpoint": {
+        "type": "String",
+        "defaultValue": "https://api.maritimeiq.platform/data-mesh/publish"
+      },
+      "DataMeshToken": {
+        "type": "String",
+        "defaultValue": "@pipeline().parameters.DataMeshToken"
+      },
+      "QualityThresholds": {
+        "type": "String",
+        "defaultValue": "{\"completeness\": 0.99, \"accuracy\": 0.98, \"timeliness\": 0.95, \"consistency\": 0.97}"
+      }
+    },
+    "variables": {
+      "LakehouseSessionId": {
+        "type": "String"
+      },
+      "ProcessingMetrics": {
+        "type": "String"
+      }
+    },
+    "annotations": [
+      "Lakehouse",
+      "DataMesh",
+      "MLOps",
+      "DeltaLake",
+      "MaritimeIQ"
+    ],
+    "folder": {
+      "name": "MaritimeIQ Lakehouse Pipelines"
+    }
+  }
+}

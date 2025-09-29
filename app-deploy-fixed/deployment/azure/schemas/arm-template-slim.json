@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Simplified ARM template schema",
+  "description": "Lightweight schema to unblock local validation when resource provider definitions are unavailable offline.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Schema reference for the deployment template."
+    },
+    "contentVersion": {
+      "type": "string",
+      "description": "Template content version."
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Template parameters object.",
+      "additionalProperties": true
+    },
+    "variables": {
+      "type": "object",
+      "description": "Template variables object.",
+      "additionalProperties": true
+    },
+    "functions": {
+      "type": "array",
+      "description": "User-defined template functions.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "description": "Resource definitions.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Resource type identifier (e.g., Microsoft.Storage/storageAccounts)."
+          },
+          "apiVersion": {
+            "type": "string",
+            "description": "Resource API version."
+          },
+          "name": {
+            "type": "string",
+            "description": "Resource name."
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Resource location (may be omitted for global resources)."
+          },
+          "tags": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "properties": {
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ],
+            "additionalProperties": true
+          },
+          "sku": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": [
+          "type",
+          "apiVersion",
+          "name"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "description": "Template outputs object.",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "resources"
+  ],
+  "additionalProperties": true
+}
