@@ -2,7 +2,7 @@
 
 ## 2.1 Controller Architecture Overview
 
-The Maritime Data Engineering Platform implements a sophisticated controller architecture with 21 specialized controllers, all inheriting from a common `BaseMaritimeController`. This design eliminates code duplication while maintaining consistency across all API endpoints.
+The MaritimeIQ Platform implements a sophisticated controller architecture with 21 specialized controllers, all inheriting from a common `BaseMaritimeController`. This design eliminates code duplication while maintaining consistency across all API endpoints.
 
 ### 2.1.1 Base Controller Implementation
 

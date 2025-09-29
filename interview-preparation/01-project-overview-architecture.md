@@ -2,7 +2,7 @@
 
 ## 1.1 System Architecture Overview
 
-The Maritime Data Engineering Platform is a comprehensive real-time maritime operations management system built on Azure cloud infrastructure. The platform consists of multiple interconnected components designed for scalability, reliability, and real-time data processing.
+The MaritimeIQ Platform is a comprehensive real-time maritime operations management system built on Azure cloud infrastructure with enterprise-grade C# data engineering pipelines. The platform consists of multiple interconnected components designed for scalability, reliability, and real-time data processing.
 
 ### 1.1.1 High-Level Architecture
 

@@ -1,146 +1,32 @@
-# Build results  
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
-out/
-
-# Visual Studio files
-.vs/
-.vscode/settings.json
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-*.userprefs
-*.rsuser
-
-# NuGet
-*.nupkg
-**/[Pp]ackages/*
-!**/[Pp]ackages/build/
-*.nuget.props
-*.nuget.targets
-
-# Test results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
-*.trx
-*.coverage
-*.coveragexml
-
-# Node.js dependencies (for maritime-dashboard)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Next.js build output
-.next/
-*.tsbuildinfo
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-*~
-
-# IDE files
-*.swp
-*.swo
-
-# Azure Functions
-local.settings.json
-
-# Temporary files
-*.tmp
-*.temp
-
-# Log files
+# Temporary deployment files
+*.zip
+*-logs/
+app-deploy/
+sql_password.txt
 *.log
-
-# Published output
-publish/
-
-# Test scripts
-test-paths.sh
-
-# Package lock files (keep package.json but ignore lock files for now)
-package-lock.json
-yarn.lock
-
-# Docker
-.dockerignore
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Azure credentials (keep secure)
-*.publishsettings
-*.azurePubxml
-
-# Temporary files
 *.tmp
-*.tempSECRETS-LOCAL-ONLY.txt
 
-# Build artifacts (added by cleanup script)
+# Build artifacts
 bin/
 obj/
-publish/
-Functions/bin/
-Functions/obj/
-maritime-dashboard/.next/
-maritime-dashboard/out/
+.vs/
+.vscode/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet packages
+*.nupkg
+packages/
+
+# Azure Functions artifacts
+bin
+obj
+appsettings.json
+local.settings.json
+
+# Node modules (if any)
+node_modules/

@@ -8,9 +8,9 @@ The Maritime Dashboard is built using Next.js 14 with TypeScript, implementing a
 
 ```json
 {
-  "name": "havila-maritime-dashboard",
+  "name": "maritimeiq-platform-dashboard",
   "version": "1.0.0",
-  "description": "Havila Kystruten Maritime Operations Dashboard",
+  "description": "MaritimeIQ Platform Maritime Operations Dashboard",
   "key_technologies": {
     "framework": "Next.js 14",
     "language": "TypeScript",
@@ -556,7 +556,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-maritime-dark flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-havila-blue mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-maritimeiq-blue mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-white">Loading Maritime Platform...</h2>
         </div>
       </div>
@@ -566,13 +566,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-maritime-dark">
       {/* Header */}
-      <header className="bg-havila-blue shadow-lg">
+      <header className="bg-maritimeiq-blue shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <Ship className="h-8 w-8 text-havila-gold mr-3" />
+              <Ship className="h-8 w-8 text-maritimeiq-gold mr-3" />
               <div>
-                <h1 className="text-2xl font-bold text-white">Havila Kystruten</h1>
+                <h1 className="text-2xl font-bold text-white">MaritimeIQ Platform</h1>
                 <p className="text-blue-200">Maritime Operations Platform</p>
               </div>
             </div>
@@ -607,7 +607,7 @@ export default function Home() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === tab.id
-                      ? 'border-havila-blue text-havila-blue'
+                      ? 'border-maritimeiq-blue text-maritimeiq-blue'
                       : 'border-transparent text-slate-300 hover:text-white hover:border-slate-300'
                   }`}
                 >
@@ -638,7 +638,7 @@ export default function Home() {
 - **Real-time Status**: Live system health monitoring
 - **Responsive Design**: Works on desktop and mobile
 - **Loading States**: Proper loading and error handling
-- **Maritime Branding**: Custom Havila Kystruten theme
+- **Maritime Branding**: Custom MaritimeIQ Platform theme
 
 ### 6.3.2 FleetDashboard Component
 
@@ -688,7 +688,7 @@ export default function FleetDashboard() {
               <p className="text-slate-400 text-sm">Total Vessels</p>
               <p className="text-2xl font-bold text-white">{fleetMetrics?.totalVessels || 0}</p>
             </div>
-            <Ship className="h-8 w-8 text-havila-blue" />
+            <Ship className="h-8 w-8 text-maritimeiq-blue" />
           </div>
           <div className="mt-4 flex items-center text-sm">
             <TrendingUp className="h-4 w-4 text-green-400 mr-1" />
@@ -834,9 +834,9 @@ export default function RealTimeVisualization() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-slate-400 text-sm">Active Vessels</p>
-              <p className="text-3xl font-bold text-havila-blue">{metrics.vesselsActive}</p>
+              <p className="text-3xl font-bold text-maritimeiq-blue">{metrics.vesselsActive}</p>
             </div>
-            <TrendingUp className="h-8 w-8 text-havila-blue" />
+            <TrendingUp className="h-8 w-8 text-maritimeiq-blue" />
           </div>
           <p className="text-xs text-slate-500 mt-2">Real-time tracking</p>
         </div>
@@ -991,9 +991,9 @@ module.exports = {
       colors: {
         'maritime-dark': '#0F1419',
         'maritime-gray': '#1A1F2B',
-        'havila-blue': '#1E40AF',
-        'havila-gold': '#F59E0B',
-        'havila-green': '#10B981',
+        'maritimeiq-blue': '#1E40AF',
+        'maritimeiq-gold': '#F59E0B',
+        'maritimeiq-green': '#10B981',
         'nordic-blue': '#3B82F6',
         'fjord-blue': '#1D4ED8',
         'aurora-green': '#059669',
@@ -1074,7 +1074,7 @@ module.exports = {
   }
   
   .btn-primary {
-    @apply bg-havila-blue hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors;
+    @apply bg-maritimeiq-blue hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors;
   }
   
   .btn-secondary {
@@ -1084,7 +1084,7 @@ module.exports = {
 
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-havila-blue to-havila-gold bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-maritimeiq-blue to-maritimeiq-gold bg-clip-text text-transparent;
   }
   
   .maritime-shadow {

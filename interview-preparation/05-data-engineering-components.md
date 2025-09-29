@@ -2,7 +2,23 @@
 
 ## 5.1 Data Engineering Architecture Overview
 
-The Maritime Data Engineering Platform implements a comprehensive real-time data processing architecture using Azure Functions, Event Hubs, and structured data models. The system processes maritime data streams including AIS (Automatic Identification System) messages, environmental data, and vessel operations data.
+### 5.1.0 Enterprise C# Data Pipeline Architecture
+
+The MaritimeIQ Platform features a sophisticated C# data engineering layer with:
+
+**Core Data Pipeline Services:**
+- **MaritimeDataETLService**: Batch processing with transaction management and bulk SQL operations
+- **MaritimeStreamingProcessor**: Real-time Event Hub processing with circuit breaker patterns
+- **DataQualityService**: Statistical validation, anomaly detection, and automated remediation
+- **DataPipelineMonitoringService**: SLA tracking with Application Insights integration
+
+**Advanced C# Features Implemented:**
+- **Concurrent Processing**: Thread-safe collections and parallel operations
+- **Fault Tolerance**: Circuit breaker pattern with exponential backoff
+- **Performance Optimization**: Bulk SQL operations and async/await mastery
+- **Enterprise Patterns**: Dependency injection, factory patterns, and repository patterns
+
+The MaritimeIQ Platform implements a comprehensive real-time data processing architecture using enterprise-grade C# data pipelines, Azure Functions, Event Hubs, and structured data models. The system processes maritime data streams including AIS (Automatic Identification System) messages, environmental data, and vessel operations data.
 
 ### 5.1.1 Data Processing Pipeline
 
@@ -645,7 +661,7 @@ public class RouteOptimizationFunction
 ### 5.3.1 Core Maritime Data Models
 
 ```csharp
-namespace HavilaKystruten.Maritime.Models
+namespace MaritimeIQ.Platform.Models
 {
     // Core vessel information
     public class Vessel
@@ -1217,3 +1233,100 @@ private async Task<AISDataQuality> AssessAISDataQuality()
 - Know the data model relationships and constraints
 - Understand performance optimization techniques
 - Be prepared to discuss scaling scenarios and solutions
+## 5.6 Enterprise C# Data Pipeline Showcase
+
+*This section demonstrates enterprise-grade C# data engineering capabilities with real-time streaming, bulk operations, circuit breaker patterns, and concurrent processing - essential for senior .NET data engineering roles.*
+
+## 5.6 Enterprise C# Data Pipeline Architecture
+
+### 5.6.1 Advanced C# Data Engineering Implementation
+
+The MaritimeIQ Platform showcases enterprise-grade C# data engineering with:
+
+**Real-Time Streaming Service:**
+```csharp
+public class MaritimeStreamingProcessor : IDisposable
+{
+    private readonly EventProcessorClient _processor;
+    private readonly CircuitBreaker _circuitBreaker;
+    private readonly SemaphoreSlim _concurrencyLimiter;
+    
+    public async Task ProcessEventAsync(ProcessEventArgs args)
+    {
+        await _concurrencyLimiter.WaitAsync();
+        try
+        {
+            await _circuitBreaker.ExecuteAsync(async () =>
+            {
+                var vesselData = JsonSerializer.Deserialize<VesselTelemetryData>(
+                    args.Data.EventBody.ToString());
+                
+                // Parallel processing with concurrent collections
+                var tasks = new List<Task>
+                {
+                    ProcessPositionDataAsync(vesselData),
+                    ValidateDataQualityAsync(vesselData),
+                    TriggerAnomalyDetectionAsync(vesselData)
+                };
+                
+                await Task.WhenAll(tasks);
+                await args.UpdateCheckpointAsync();
+            });
+        }
+        finally
+        {
+            _concurrencyLimiter.Release();
+        }
+    }
+}
+```
+
+**ETL Service with Transaction Management:**
+```csharp
+public class MaritimeDataETLService
+{
+    public async Task<ETLJobResult> ProcessBatchAsync(string batchId)
+    {
+        using var transaction = await _connection.BeginTransactionAsync();
+        try
+        {
+            using var bulkCopy = new SqlBulkCopy(_connection, 
+                SqlBulkCopyOptions.CheckConstraints, transaction);
+            
+            await bulkCopy.WriteToServerAsync(dataTable);
+            await transaction.CommitAsync();
+            
+            return new ETLJobResult { Success = true, RecordsProcessed = dataTable.Rows.Count };
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+}
+```
+
+### 5.6.2 C# Data Engineering Interview Questions
+
+1. **"Explain your approach to real-time data processing in C#."**
+   - Event Hub integration with EventProcessorClient
+   - Circuit breaker pattern for fault tolerance
+   - Concurrent processing with SemaphoreSlim
+   - Async/await best practices
+
+2. **"How do you implement fault tolerance in data pipelines?"**
+   - Circuit breaker with exponential backoff
+   - Retry policies with Polly
+   - Dead letter queues for failed messages
+   - Health checks and monitoring
+
+3. **"Demonstrate C# performance optimization for data processing."**
+   - SqlBulkCopy for high-volume inserts
+   - Parallel processing with Task.WhenAll
+   - Memory management and object pooling
+   - Async streaming with IAsyncEnumerable
+
+---
+
+*This section demonstrates enterprise-grade C# data engineering capabilities essential for senior .NET roles.*

@@ -31,7 +31,7 @@
 ### **Step 1: Business Context Introduction (2 minutes)**
 
 **Script:**
-> "Let me walk you through a Maritime Data Engineering Platform I built for Havila Kystruten, a Norwegian passenger vessel operator. This platform processes real-time vessel data to support fleet operations, safety monitoring, and regulatory compliance."
+> "Let me walk you through the MaritimeIQ Platform I built, a comprehensive maritime data engineering solution with enterprise-grade C# data pipelines. This platform processes real-time vessel data to support fleet operations, safety monitoring, and regulatory compliance."
 
 **Key Points to Cover:**
 - **Business Problem**: Need for real-time vessel tracking, collision avoidance, and regulatory compliance

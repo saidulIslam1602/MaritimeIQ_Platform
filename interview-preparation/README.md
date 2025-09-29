@@ -70,7 +70,7 @@
 
 ## Executive Summary
 
-This comprehensive interview preparation guide covers a **Maritime Data Engineering Platform** built with modern cloud-native technologies. The platform processes real-time vessel data, provides maritime intelligence, and supports fleet operations for passenger vessel operations.
+This comprehensive interview preparation guide covers the **MaritimeIQ Platform** built with modern cloud-native technologies and enterprise-grade C# data pipelines. The platform processes real-time vessel data, provides maritime intelligence, and supports fleet operations with advanced data engineering capabilities.
 
 ### Key Technical Highlights
 
@@ -84,7 +84,8 @@ This comprehensive interview preparation guide covers a **Maritime Data Engineer
 - **Backend**: .NET 8 Web API with Entity Framework Core
 - **Frontend**: Next.js 14 with TypeScript and Tailwind CSS
 - **Database**: Azure SQL Database with optimized indexing
-- **Processing**: Azure Functions for event-driven workloads
+- **Processing**: Azure Functions + C# Data Pipelines for event-driven workloads
+- **Data Engineering**: Real-time ETL, streaming, and data quality services
 - **Infrastructure**: Azure Container Apps, Event Hubs, Key Vault, Application Insights
 
 **Scale & Performance:**
@@ -129,11 +130,11 @@ This comprehensive interview preparation guide covers a **Maritime Data Engineer
 
 ---
 
-*This guide represents **200+ pages** of comprehensive technical documentation for interview preparation covering modern cloud-native development, event-driven architectures, and scalable system design.*
+*This guide represents **200+ pages** of comprehensive technical documentation for interview preparation covering modern cloud-native development, C# data engineering pipelines, event-driven architectures, and scalable system design.*
 
 **Version:** 1.0  
 **Last Updated:** December 2024  
-**Project Repository:** Maritime_DataEngineering_Plaatform  
-**Technology Stack:** .NET 8, Azure Services, Next.js 14, TypeScript
+**Project Repository:** MaritimeIQ_Platform  
+**Technology Stack:** .NET 8, Azure Data Factory, C# Data Pipelines, Azure Services, Next.js 14, TypeScript
 
 ---
