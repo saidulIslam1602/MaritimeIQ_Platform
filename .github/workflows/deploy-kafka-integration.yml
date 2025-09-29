@@ -1,0 +1,62 @@
+name: Deploy with Kafka Integration
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      
+      - name: Test
+        run: dotnet test --no-restore --verbosity normal
+      
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish
+      
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/maritimeiq-platform:${{ github.sha }} .
+          docker tag ${{ secrets.ACR_LOGIN_SERVER }}/maritimeiq-platform:${{ github.sha }} \
+                     ${{ secrets.ACR_LOGIN_SERVER }}/maritimeiq-platform:latest
+      
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/maritimeiq-platform:${{ github.sha }}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/maritimeiq-platform:latest
+      
+      - name: Deploy to Azure Container Apps
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az containerapp update \
+              --name maritime-platform \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --image ${{ secrets.ACR_LOGIN_SERVER }}/maritimeiq-platform:${{ github.sha }} \
+              --set-env-vars \
+                Kafka__BootstrapServers=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }} \
+                Kafka__GroupId=maritime-platform-consumers

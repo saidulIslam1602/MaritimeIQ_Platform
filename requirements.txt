@@ -1,0 +1,25 @@
+# Python Dependencies for PySpark and Databricks
+# Install with: pip install -r requirements.txt
+
+# Core PySpark
+pyspark==3.5.0
+delta-spark==3.0.0
+
+# Data Processing
+pandas==2.1.3
+numpy==1.26.2
+pyarrow==14.0.1
+
+# Databricks
+databricks-cli==0.18.0
+databricks-sdk==0.12.0
+
+# Kafka Python Client (optional, for testing)
+confluent-kafka[avro]==2.3.0
+
+# Visualization (for notebooks)
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# ML and Analytics
+scikit-learn==1.3.2

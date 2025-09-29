@@ -1,0 +1,46 @@
+name: Deploy Databricks Notebooks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Databricks/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-notebooks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Databricks CLI
+        run: |
+          pip install databricks-cli
+      
+      - name: Configure Databricks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          cat > ~/.databrickscfg <<EOF
+          [DEFAULT]
+          host = $DATABRICKS_HOST
+          token = $DATABRICKS_TOKEN
+          EOF
+      
+      - name: Deploy Notebooks
+        run: |
+          cd Databricks
+          chmod +x deploy-notebooks.sh
+          ./deploy-notebooks.sh
+      
+      - name: Verify Deployment
+        run: |
+          databricks workspace ls /Workspace/MaritimeIQ

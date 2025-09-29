@@ -69,6 +69,12 @@ builder.Services.AddScoped<IMaritimeDataService, MaritimeDataService>();
 builder.Services.AddMaritimeDataPipelines(builder.Configuration);
 builder.Services.ConfigureDataPipelineOptions(builder.Configuration);
 
+// Register Kafka integration services
+builder.Services.Configure<MaritimeIQ.Platform.Services.KafkaConfiguration>(
+    builder.Configuration.GetSection("Kafka"));
+builder.Services.AddSingleton<MaritimeIQ.Platform.Services.KafkaProducerService>();
+builder.Services.AddHostedService<MaritimeIQ.Platform.Services.KafkaConsumerService>();
+
 // Note: Additional services can be registered when their interfaces are properly defined
 // builder.Services.AddScoped<IMaritimeVisionService, MaritimeVisionService>();
 // builder.Services.AddScoped<IVesselDataIngestionService, VesselDataIngestionService>();
