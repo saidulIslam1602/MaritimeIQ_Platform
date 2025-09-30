@@ -6,8 +6,8 @@ import { MARITIME_API_URL } from '@/constants/maritime'
  */
 const API_CONFIG = {
   baseUrl: typeof window !== 'undefined' 
-    ? 'https://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io'
-    : process.env.NEXT_PUBLIC_MARITIME_API_URL || 'https://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io',
+    ? 'https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io'
+    : process.env.NEXT_PUBLIC_MARITIME_API_URL || 'https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io',
   defaultOptions: {
     headers: {
       'Content-Type': 'application/json',

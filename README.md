@@ -1,6 +1,13 @@
 # MaritimeIQ Platform
 
+![MaritimeIQ Dashboard](.github/screenshots/dashboard-hero.png)
+
 A comprehensive, enterprise-grade maritime data engineering platform featuring real-time vessel tracking, advanced C# data pipelines, **Apache Kafka streaming**, **Databricks data lakehouse**, **PySpark analytics**, environmental compliance monitoring, and AI-driven fleet optimization.
+
+## 🎯 Live Demo
+- **Dashboard**: https://polite-field-024d20903.2.azurestaticapps.net
+- **API**: https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io
+- **Swagger**: https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io/swagger
 
 ## 🚢 Platform Overview
 

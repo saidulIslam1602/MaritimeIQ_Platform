@@ -5,8 +5,9 @@ export interface EnvironmentalData {
   co2: number
   nox: number
   batteryUsage: number
-  fuelConsumption: number
-  complianceStatus: ComplianceStatus
+  fuelEfficiency?: number
+  fuelConsumption?: number
+  complianceStatus?: ComplianceStatus
 }
 
 export interface ComplianceStatus {
@@ -28,10 +29,18 @@ export interface EmissionData {
 }
 
 export interface EnvironmentalMetrics {
-  totalEmissions: number
-  emissionReduction: number
-  complianceScore: number
-  greenTechUsage: number
+  // Current metrics
+  co2Today: number
+  co2Limit: number
+  noxLevel: number
+  noxLimit: number
+  batteryMode: number
+  hybridEfficiency: number
+  // Legacy metrics (optional)
+  totalEmissions?: number
+  emissionReduction?: number
+  complianceScore?: number
+  greenTechUsage?: number
 }
 
 export interface BatteryStatus {

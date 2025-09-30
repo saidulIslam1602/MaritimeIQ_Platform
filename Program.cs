@@ -97,6 +97,12 @@ builder.Services.AddSwaggerGen(c =>
 // Add HTTP clients for external services
 builder.Services.AddHttpClient();
 
+// Register Real Weather Service (MET Norway API integration)
+builder.Services.AddHttpClient<IRealWeatherService, RealWeatherService>();
+
+// Register Real Aurora Forecast Service (NOAA Space Weather integration)
+builder.Services.AddHttpClient<IAuroraForecastService, AuroraForecastService>();
+
 // Add Application Insights
 builder.Services.AddApplicationInsightsTelemetry();
 

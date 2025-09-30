@@ -1,7 +1,7 @@
 // Maritime platform constants
 
 export const MARITIME_API_URL = process.env.NEXT_PUBLIC_MARITIME_API_URL || 
-  'https://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io'
+  'https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io'
 
 export const MARITIME_FLEET = {
   NORDIC_EXPLORER: { id: 1, name: 'MS Nordic Explorer', capacity: 640 },

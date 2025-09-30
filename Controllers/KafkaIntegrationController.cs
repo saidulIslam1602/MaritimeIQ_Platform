@@ -13,7 +13,7 @@ namespace MaritimeIQ.Platform.Controllers
     public class KafkaIntegrationController : BaseMaritimeController
     {
         private readonly KafkaProducerService _kafkaProducer;
-        private readonly ILogger<KafkaIntegrationController> _logger;
+        private new readonly ILogger<KafkaIntegrationController> _logger;
 
         public KafkaIntegrationController(
             KafkaProducerService kafkaProducer,
@@ -48,7 +48,7 @@ namespace MaritimeIQ.Platform.Controllers
         /// Streams CO2, NOx, SOx emissions and battery metrics
         /// </summary>
         [HttpPost("publish/environmental")]
-        public async Task<IActionResult> PublishEnvironmentalData([FromBody] EnvironmentalSensorData sensorData)
+        public async Task<IActionResult> PublishEnvironmentalData([FromBody] Services.EnvironmentalSensorData sensorData)
         {
             return await ExecuteOperationAsync(async () =>
             {

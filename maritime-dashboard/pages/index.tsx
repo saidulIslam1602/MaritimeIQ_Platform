@@ -20,7 +20,7 @@ export default function Home() {
   const fetchSystemStatus = async () => {
     try {
       const API_URL = process.env.NEXT_PUBLIC_MARITIME_API_URL || 
-        'https://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io'
+        'https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io'
       const response = await fetch(`${API_URL}/api/monitoring/health`)
       const data = await response.json()
       setSystemStatus(data)
@@ -59,8 +59,8 @@ export default function Home() {
             <div className="flex items-center">
               <Ship className="h-8 w-8 text-havila-gold mr-3" />
               <div>
-                <h1 className="text-2xl font-bold text-white">Havila Kystruten</h1>
-                <p className="text-blue-200">Maritime Operations Platform</p>
+                <h1 className="text-2xl font-bold text-white">MaritimeIQ Platform</h1>
+                <p className="text-blue-200">Advanced Maritime Intelligence & Operations</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
