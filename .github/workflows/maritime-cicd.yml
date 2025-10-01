@@ -37,14 +37,19 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore Maritime_DataEngineering_Plaatform.sln
+      run: |
+        ls -la *.sln || true
+        dotnet restore ./Maritime_DataEngineering_Plaatform.sln
+      working-directory: ${{ github.workspace }}
 
     - name: Build application
-      run: dotnet build Maritime_DataEngineering_Plaatform.sln --no-restore --configuration Release
+      run: dotnet build ./Maritime_DataEngineering_Plaatform.sln --no-restore --configuration Release
+      working-directory: ${{ github.workspace }}
 
     - name: Run tests
       continue-on-error: true
-      run: dotnet test Maritime_DataEngineering_Plaatform.sln --no-build --configuration Release --verbosity normal
+      run: dotnet test ./Maritime_DataEngineering_Plaatform.sln --no-build --configuration Release --verbosity normal
+      working-directory: ${{ github.workspace }}
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
