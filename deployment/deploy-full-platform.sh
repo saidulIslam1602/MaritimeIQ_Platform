@@ -125,7 +125,7 @@ deploy_api() {
     
     # Build the .NET application
     print_info "Building .NET application..."
-    dotnet build --configuration Release
+    dotnet build ./Maritime_DataEngineering_Plaatform.sln --configuration Release
     
     # Create container app
     CONTAINER_APP_NAME="$PLATFORM_NAME-api"

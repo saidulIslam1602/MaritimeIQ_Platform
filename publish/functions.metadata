@@ -1,0 +1,373 @@
+[
+  {
+    "name": "ProcessAISData",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.AISProcessingFunction.ProcessAISData",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "events",
+        "direction": "In",
+        "type": "eventHubTrigger",
+        "eventHubName": "ais-data-stream",
+        "connection": "EventHubConnectionString",
+        "cardinality": "Many",
+        "dataType": "String",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "ProcessAISDataHTTP",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.AISProcessingFunction.ProcessAISDataHTTP",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "authLevel": "Function",
+        "methods": [
+          "post"
+        ],
+        "properties": {}
+      },
+      {
+        "name": "$return",
+        "type": "http",
+        "direction": "Out"
+      }
+    ]
+  },
+  {
+    "name": "MonitorAISDataQuality",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.AISProcessingFunction.MonitorAISDataQuality",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "0 */5 * * * *",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "ProcessEnvironmentalData",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.EnvironmentalMonitoringFunction.ProcessEnvironmentalData",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "events",
+        "direction": "In",
+        "type": "eventHubTrigger",
+        "eventHubName": "environmental-data",
+        "connection": "EventHubConnectionString",
+        "cardinality": "Many",
+        "dataType": "String",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "MonitorCO2Thresholds",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.EnvironmentalMonitoringFunction.MonitorCO2Thresholds",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "0 */5 * * * *",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "GenerateComplianceReport",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.EnvironmentalMonitoringFunction.GenerateComplianceReport",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "0 0 6 * * *",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "AnalyzeEnvironmentalDataHTTP",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.EnvironmentalMonitoringFunction.AnalyzeEnvironmentalDataHTTP",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "authLevel": "Function",
+        "methods": [
+          "post"
+        ],
+        "properties": {}
+      },
+      {
+        "name": "$return",
+        "type": "http",
+        "direction": "Out"
+      }
+    ]
+  },
+  {
+    "name": "ProcessBoardingNotifications",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.PassengerNotificationFunction.ProcessBoardingNotifications",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "message",
+        "direction": "In",
+        "type": "serviceBusTrigger",
+        "dataType": "String",
+        "queueName": "boarding-notifications",
+        "connection": "ServiceBusConnectionString",
+        "cardinality": "One",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "CheckNorthernLightsConditions",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.PassengerNotificationFunction.CheckNorthernLightsConditions",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "0 */30 * * * *",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "ProcessDelayNotifications",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.PassengerNotificationFunction.ProcessDelayNotifications",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "events",
+        "direction": "In",
+        "type": "eventHubTrigger",
+        "eventHubName": "vessel-delays",
+        "connection": "EventHubConnectionString",
+        "cardinality": "Many",
+        "dataType": "String",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "SendPersonalizedCommunication",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.PassengerNotificationFunction.SendPersonalizedCommunication",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "authLevel": "Function",
+        "methods": [
+          "post"
+        ],
+        "properties": {}
+      },
+      {
+        "name": "$return",
+        "type": "http",
+        "direction": "Out"
+      }
+    ]
+  },
+  {
+    "name": "SendDailyVoyageUpdates",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.PassengerNotificationFunction.SendDailyVoyageUpdates",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "0 0 7 * * *",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "SendPortArrivalNotifications",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.PassengerNotificationFunction.SendPortArrivalNotifications",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "0 */15 * * * *",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "OptimizeFleetRoutes",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.RouteOptimizationFunction.OptimizeFleetRoutes",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "0 0 */2 * * *",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "OptimizeRouteHTTP",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.RouteOptimizationFunction.OptimizeRouteHTTP",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "authLevel": "Function",
+        "methods": [
+          "post"
+        ],
+        "properties": {}
+      },
+      {
+        "name": "$return",
+        "type": "http",
+        "direction": "Out"
+      }
+    ]
+  },
+  {
+    "name": "WeatherRouteAdjustment",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.RouteOptimizationFunction.WeatherRouteAdjustment",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "events",
+        "direction": "In",
+        "type": "eventHubTrigger",
+        "eventHubName": "weather-alerts",
+        "connection": "EventHubConnectionString",
+        "cardinality": "Many",
+        "dataType": "String",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "OptimizeForNorthernLights",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.RouteOptimizationFunction.OptimizeForNorthernLights",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "0 */30 * * * *",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "OptimizeFuelEfficiency",
+    "scriptFile": "MaritimeIQ.Platform.Functions.dll",
+    "entryPoint": "MaritimeIQ.Platform.Functions.RouteOptimizationFunction.OptimizeFuelEfficiency",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "timer",
+        "direction": "In",
+        "type": "timerTrigger",
+        "schedule": "0 */15 * * * *",
+        "properties": {}
+      }
+    ]
+  }
+]

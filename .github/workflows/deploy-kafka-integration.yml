@@ -19,16 +19,16 @@ jobs:
           dotnet-version: '8.0.x'
       
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./Maritime_DataEngineering_Plaatform.sln
       
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build ./Maritime_DataEngineering_Plaatform.sln --configuration Release --no-restore
       
       - name: Test
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test ./Maritime_DataEngineering_Plaatform.sln --no-build --configuration Release --verbosity normal
       
       - name: Publish
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish ./Maritime_DataEngineering_Plaatform.sln --configuration Release --output ./publish --no-build
       
       - name: Login to Azure Container Registry
         uses: azure/docker-login@v1

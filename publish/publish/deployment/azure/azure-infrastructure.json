@@ -59,7 +59,8 @@
         "administratorLogin": "maritime-admin",
         "administratorLoginPassword": "[parameters('sqlAdminPassword')]",
         "version": "12.0",
-        "publicNetworkAccess": "Enabled"
+        "minimalTlsVersion": "1.2",
+        "publicNetworkAccess": "Disabled"
       }
     },
     {
@@ -96,15 +97,25 @@
       }
     },
     {
-      "type": "Microsoft.Sql/servers/firewallRules",
+      "type": "Microsoft.Sql/servers/auditingSettings",
       "apiVersion": "2021-11-01",
-      "name": "[concat(variables('sqlName'), '/AllowAllWindowsAzureIps')]",
+      "name": "[concat(variables('sqlName'), '/default')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('sqlName'))]"
+        "[resourceId('Microsoft.Sql/servers', variables('sqlName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('saName'))]"
       ],
       "properties": {
-        "startIpAddress": "0.0.0.0",
-        "endIpAddress": "255.255.255.255"
+        "state": "Enabled",
+        "storageEndpoint": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('saName')), '2021-09-01').primaryEndpoints.blob]",
+        "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('saName')), '2021-09-01').keys[0].value]",
+        "retentionDays": 90,
+        "auditActionsAndGroups": [
+          "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
+          "FAILED_DATABASE_AUTHENTICATION_GROUP",
+          "BATCH_COMPLETED_GROUP"
+        ],
+        "isStorageSecondaryKeyInUse": false,
+        "isAzureMonitorTargetEnabled": true
       }
     },
     {
@@ -123,7 +134,12 @@
       "properties": {
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
-        "minimumTlsVersion": "TLS1_2"
+        "minimumTlsVersion": "TLS1_2",
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "defaultAction": "Deny",
+          "ipRules": []
+        }
       }
     },
     {
@@ -209,8 +225,16 @@
         "enabledForDiskEncryption": false,
         "enabledForTemplateDeployment": false,
         "softDeleteRetentionInDays": 90,
+        "enableSoftDelete": true,
+        "enablePurgeProtection": true,
         "enableRbacAuthorization": true,
-        "publicNetworkAccess": "Enabled"
+        "publicNetworkAccess": "Enabled",
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "defaultAction": "Deny",
+          "ipRules": [],
+          "virtualNetworkRules": []
+        }
       }
     },
     {

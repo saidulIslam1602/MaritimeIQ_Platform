@@ -1,0 +1,131 @@
+{
+  "Kafka": {
+    "BootstrapServers": "your-kafka-server:9092",
+    "Topics": {
+      "AISData": "maritime.ais.data",
+      "EnvironmentalSensors": "maritime.environmental.sensors",
+      "Alerts": "maritime.alerts",
+      "VoyageEvents": "maritime.voyage.events"
+    },
+    "ConsumerGroup": "maritime-platform-consumers",
+    "Security": {
+      "Protocol": "SASL_SSL",
+      "SaslMechanism": "PLAIN",
+      "SaslUsername": "{FromKeyVault}",
+      "SaslPassword": "{FromKeyVault}"
+    },
+    "Producer": {
+      "Acks": "All",
+      "EnableIdempotence": true,
+      "MaxInFlight": 5,
+      "CompressionType": "Snappy",
+      "LingerMs": 10,
+      "BatchSize": 32768
+    },
+    "Consumer": {
+      "AutoOffsetReset": "earliest",
+      "EnableAutoCommit": false,
+      "SessionTimeoutMs": 30000,
+      "MaxPollIntervalMs": 300000
+    }
+  },
+  
+  "Databricks": {
+    "WorkspaceUrl": "https://adb-xxxxx.azuredatabricks.net",
+    "Token": "{FromKeyVault}",
+    "ClusterId": "0000-000000-xxxxxxxx",
+    "Notebooks": {
+      "DataIngestion": "/Workspace/MaritimeIQ/01_Maritime_Data_Ingestion",
+      "DataProcessing": "/Workspace/MaritimeIQ/02_Maritime_Data_Processing",
+      "MLModels": "/Workspace/MaritimeIQ/03_ML_Predictive_Maintenance"
+    },
+    "DeltaLake": {
+      "MountPoint": "/mnt/maritime",
+      "Tables": {
+        "AISPositions": "/mnt/maritime/delta/ais_positions",
+        "EnvironmentalSensors": "/mnt/maritime/delta/environmental_sensors",
+        "Voyages": "/mnt/maritime/delta/voyages",
+        "Alerts": "/mnt/maritime/delta/alerts",
+        "Analytics": {
+          "EmissionTrends": "/mnt/maritime/delta/analytics/emission_trends",
+          "VesselPerformance": "/mnt/maritime/delta/analytics/vessel_performance",
+          "MaintenancePredictions": "/mnt/maritime/delta/analytics/maintenance_predictions",
+          "FuelEfficiency": "/mnt/maritime/delta/analytics/fuel_efficiency"
+        }
+      }
+    },
+    "SparkConfig": {
+      "spark.sql.adaptive.enabled": "true",
+      "spark.sql.adaptive.coalescePartitions.enabled": "true",
+      "spark.sql.shuffle.partitions": "200",
+      "spark.default.parallelism": "100"
+    }
+  },
+  
+  "PySpark": {
+    "BatchJobs": {
+      "VoyageProcessing": {
+        "Schedule": "0 2 * * *",
+        "InputPath": "/mnt/maritime/delta/voyages",
+        "OutputPath": "/mnt/maritime/delta/analytics/voyage_metrics",
+        "RetentionDays": 90
+      },
+      "EmissionAnalytics": {
+        "Schedule": "0 3 * * *",
+        "InputPath": "/mnt/maritime/delta/environmental_sensors",
+        "OutputPath": "/mnt/maritime/delta/analytics/emissions",
+        "RetentionDays": 365
+      },
+      "FleetAggregations": {
+        "Schedule": "0 4 * * *",
+        "InputPath": "/mnt/maritime/delta/ais_positions",
+        "OutputPath": "/mnt/maritime/delta/analytics/fleet_metrics",
+        "RetentionDays": 90
+      }
+    },
+    "StreamingJobs": {
+      "RealtimeAggregation": {
+        "Enabled": true,
+        "CheckpointLocation": "/mnt/maritime/checkpoints/realtime_agg",
+        "TriggerInterval": "10 seconds"
+      }
+    }
+  },
+  
+  "DataQuality": {
+    "Rules": {
+      "AISData": {
+        "MaxNullPercentage": 5.0,
+        "LatitudeRange": [-90, 90],
+        "LongitudeRange": [-180, 180],
+        "SpeedRange": [0, 40]
+      },
+      "EnvironmentalData": {
+        "MaxNullPercentage": 5.0,
+        "CO2Threshold": 1000,
+        "BatteryRange": [0, 100]
+      }
+    },
+    "Monitoring": {
+      "CheckInterval": "5 minutes",
+      "AlertThreshold": 95.0,
+      "NotificationEmail": "maritime-ops@company.com"
+    }
+  },
+  
+  "Integration": {
+    "EventHubToKafka": {
+      "Enabled": true,
+      "Bridge": "Azure Functions",
+      "MappingRules": {
+        "ais-data-stream": "maritime.ais.data",
+        "environmental-sensors": "maritime.environmental.sensors"
+      }
+    },
+    "KafkaToDatabricks": {
+      "Enabled": true,
+      "StreamingIngestion": true,
+      "CheckpointPath": "/mnt/maritime/checkpoints"
+    }
+  }
+}

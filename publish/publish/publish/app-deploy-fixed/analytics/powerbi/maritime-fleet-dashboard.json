@@ -1,0 +1,265 @@
+{
+  "version": "1.0",
+  "name": "MaritimeIQ Fleet Operations Dashboard",
+  "description": "Real-time fleet operations, vessel tracking, and performance analytics for MaritimeIQ Platform",
+  "dataModel": {
+    "tables": [
+      {
+        "name": "Vessels",
+        "source": {
+          "type": "azureSqlDatabase",
+          "connectionString": "#{DATABASE_CONNECTION_STRING}#",
+          "query": "SELECT * FROM vessels WHERE status = 'Active'"
+        },
+        "refreshSchedule": "Every 15 minutes"
+      },
+      {
+        "name": "VoyageData",
+        "source": {
+          "type": "azureSqlDatabase",
+          "connectionString": "#{DATABASE_CONNECTION_STRING}#",
+          "query": "SELECT * FROM vw_FleetAnalyticsDashboard"
+        },
+        "refreshSchedule": "Every 5 minutes"
+      },
+      {
+        "name": "EnvironmentalData",
+        "source": {
+          "type": "azureSqlDatabase",
+          "connectionString": "#{DATABASE_CONNECTION_STRING}#",
+          "query": "SELECT * FROM environmental_data WHERE timestamp >= DATEADD(day, -1, GETDATE())"
+        },
+        "refreshSchedule": "Every 5 minutes"
+      },
+      {
+        "name": "NorthernLightsForecasts",
+        "source": {
+          "type": "azureSqlDatabase",
+          "connectionString": "#{DATABASE_CONNECTION_STRING}#",
+          "query": "SELECT * FROM northern_lights_forecasts WHERE forecast_date >= CAST(GETDATE() AS DATE)"
+        },
+        "refreshSchedule": "Every 3 hours"
+      }
+    ]
+  },
+  "reports": [
+    {
+      "name": "Fleet Overview",
+      "pages": [
+        {
+          "name": "Real-time Fleet Status",
+          "visualizations": [
+            {
+              "type": "card",
+              "title": "Active Vessels",
+              "dataSource": "Vessels",
+              "measure": "COUNT(vessel_id)",
+              "position": { "x": 0, "y": 0, "width": 2, "height": 2 }
+            },
+            {
+              "type": "map",
+              "title": "Fleet Positions",
+              "dataSource": "EnvironmentalData",
+              "latitude": "latitude",
+              "longitude": "longitude",
+              "size": "speed_knots",
+              "color": "co2_emissions_kg_h",
+              "position": { "x": 2, "y": 0, "width": 6, "height": 4 }
+            },
+            {
+              "type": "gauge",
+              "title": "Average Fleet Speed",
+              "dataSource": "VoyageData", 
+              "measure": "AVG(avg_speed)",
+              "min": 0,
+              "max": 25,
+              "target": 18,
+              "position": { "x": 8, "y": 0, "width": 2, "height": 2 }
+            },
+            {
+              "type": "lineChart",
+              "title": "Fuel Consumption Trend",
+              "dataSource": "EnvironmentalData",
+              "xAxis": "timestamp",
+              "yAxis": "fuel_consumption_lph",
+              "series": "vessel_id",
+              "position": { "x": 0, "y": 4, "width": 5, "height": 3 }
+            },
+            {
+              "type": "barChart",
+              "title": "CO2 Emissions by Vessel",
+              "dataSource": "VoyageData",
+              "xAxis": "vessel_name",
+              "yAxis": "avg_co2_emissions",
+              "position": { "x": 5, "y": 4, "width": 5, "height": 3 }
+            }
+          ]
+        },
+        {
+          "name": "Environmental Compliance",
+          "visualizations": [
+            {
+              "type": "card",
+              "title": "Fleet CO2 Average",
+              "dataSource": "VoyageData",
+              "measure": "AVG(avg_co2_emissions)",
+              "format": "0.0",
+              "suffix": " g/kWh",
+              "position": { "x": 0, "y": 0, "width": 2, "height": 2 }
+            },
+            {
+              "type": "card",
+              "title": "Hybrid Mode Usage",
+              "dataSource": "EnvironmentalData",
+              "measure": "AVG(CASE WHEN hybrid_mode_active = 1 THEN 100.0 ELSE 0.0 END)",
+              "format": "0.0",
+              "suffix": "%",
+              "position": { "x": 2, "y": 0, "width": 2, "height": 2 }
+            },
+            {
+              "type": "donutChart",
+              "title": "Compliance Status",
+              "dataSource": "VoyageData",
+              "category": "CASE WHEN avg_co2_emissions <= 50 THEN 'Compliant' ELSE 'Non-Compliant' END",
+              "measure": "COUNT(*)",
+              "position": { "x": 4, "y": 0, "width": 3, "height": 3 }
+            },
+            {
+              "type": "areaChart",
+              "title": "Battery Efficiency Trend",
+              "dataSource": "EnvironmentalData",
+              "xAxis": "timestamp",
+              "yAxis": "battery_charge_percent",
+              "series": "vessel_id",
+              "position": { "x": 7, "y": 0, "width": 3, "height": 3 }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Passenger Experience",
+      "pages": [
+        {
+          "name": "Northern Lights Dashboard",
+          "visualizations": [
+            {
+              "type": "card",
+              "title": "Tonight's Aurora Probability",
+              "dataSource": "NorthernLightsForecasts",
+              "measure": "MAX(aurora_probability)",
+              "filter": "forecast_date = CAST(GETDATE() AS DATE)",
+              "format": "0",
+              "suffix": "%",
+              "position": { "x": 0, "y": 0, "width": 2, "height": 2 }
+            },
+            {
+              "type": "card",
+              "title": "Optimal Viewing Time",
+              "dataSource": "NorthernLightsForecasts",
+              "measure": "MAX(optimal_viewing_time)",
+              "filter": "forecast_date = CAST(GETDATE() AS DATE)",
+              "format": "HH:mm",
+              "position": { "x": 2, "y": 0, "width": 2, "height": 2 }
+            },
+            {
+              "type": "lineChart",
+              "title": "7-Day Aurora Forecast",
+              "dataSource": "NorthernLightsForecasts",
+              "xAxis": "forecast_date",
+              "yAxis": "aurora_probability",
+              "position": { "x": 4, "y": 0, "width": 6, "height": 3 }
+            },
+            {
+              "type": "table",
+              "title": "Viewing Locations",
+              "dataSource": "NorthernLightsForecasts",
+              "columns": ["forecast_date", "aurora_probability", "aurora_intensity", "weather_description"],
+              "filter": "forecast_date >= CAST(GETDATE() AS DATE)",
+              "position": { "x": 0, "y": 3, "width": 10, "height": 4 }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dataflows": [
+    {
+      "name": "Maritime Real-time Processing",
+      "schedule": "Every 5 minutes",
+      "transformations": [
+        {
+          "name": "CleanEnvironmentalData",
+          "type": "dataQuality",
+          "rules": [
+            "Remove records where co2_emissions_kg_h > 100 or co2_emissions_kg_h < 0",
+            "Fill missing battery_charge_percent with vessel average",
+            "Convert UTC timestamps to Norwegian time"
+          ]
+        },
+        {
+          "name": "CalculateCompliance",
+          "type": "calculation",
+          "formulas": [
+            "co2_compliance = IF(co2_emissions_kg_h <= 50, 'Compliant', 'Non-Compliant')",
+            "efficiency_score = (100 - fuel_consumption_lph/150*100) * (battery_charge_percent/100)",
+            "environmental_grade = SWITCH(TRUE(), efficiency_score >= 90, 'A', efficiency_score >= 80, 'B', efficiency_score >= 70, 'C', 'D')"
+          ]
+        }
+      ]
+    }
+  ],
+  "alerts": [
+    {
+      "name": "High CO2 Emissions Alert",
+      "condition": "avg_co2_emissions > 50",
+      "recipients": ["operations@maritimeiq.com", "environmental@maritimeiq.com"],
+      "frequency": "Immediate"
+    },
+    {
+      "name": "Northern Lights High Probability",
+      "condition": "aurora_probability > 80",
+      "recipients": ["passenger-services@maritimeiq.com"],
+      "frequency": "Daily at 18:00"
+    },
+    {
+      "name": "Low Battery Alert",
+      "condition": "battery_charge_percent < 20",
+      "recipients": ["technical@maritimeiq.com", "bridge@maritimeiq.com"],
+      "frequency": "Immediate"
+    }
+  ],
+  "deployment": {
+    "workspace": {
+      "name": "Maritime Data Intelligence Platform",
+      "description": "Havila Kystruten Maritime Operations Analytics"
+    },
+    "security": {
+      "rowLevelSecurity": {
+        "enabled": true,
+        "rules": [
+          {
+            "role": "Operations Team",
+            "filter": "TRUE()",
+            "tables": ["Vessels", "VoyageData", "EnvironmentalData"]
+          },
+          {
+            "role": "Environmental Team", 
+            "filter": "TRUE()",
+            "tables": ["EnvironmentalData", "VoyageData"]
+          },
+          {
+            "role": "Passenger Services",
+            "filter": "TRUE()",
+            "tables": ["NorthernLightsForecasts", "Vessels"]
+          }
+        ]
+      }
+    },
+    "embedding": {
+      "enabled": true,
+      "allowedDomains": ["maritimeiq.com", "maritimeiq.platform"],
+      "authentication": "AAD"
+    }
+  }
+}

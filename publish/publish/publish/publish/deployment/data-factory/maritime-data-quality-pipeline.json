@@ -1,0 +1,205 @@
+{
+  "name": "maritime-data-quality-pipeline",
+  "properties": {
+    "description": "MaritimeIQ Platform Data Quality Pipeline - Advanced Data Validation, Profiling, and Quality Monitoring",
+    "activities": [
+      {
+        "name": "Data_Quality_Assessment",
+        "type": "DatabricksNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "notebookPath": "/MaritimeIQ/DataQuality/DataProfilingAndValidation",
+          "baseParameters": {
+            "execution_date": "@pipeline().parameters.ExecutionDate",
+            "data_source": "@pipeline().parameters.DataSource",
+            "quality_thresholds": "@pipeline().parameters.QualityThresholds"
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeDataLakeDatabricks",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "AIS_Data_Validation",
+        "type": "Validation",
+        "dependsOn": [
+          {
+            "activity": "Data_Quality_Assessment",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "dataset": {
+            "referenceName": "AISRawDataset",
+            "type": "DatasetReference"
+          },
+          "timeout": "0.00:10:00",
+          "sleep": 30,
+          "minimumSize": 1024
+        }
+      },
+      {
+        "name": "Environmental_Data_Cleansing",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {
+            "activity": "AIS_Data_Validation",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "notebookPath": "/MaritimeIQ/DataCleansing/EnvironmentalDataCleansing",
+          "baseParameters": {
+            "input_path": "@pipeline().parameters.RawDataPath",
+            "output_path": "@pipeline().parameters.CleanDataPath",
+            "cleansing_rules": "@pipeline().parameters.CleansingRules"
+          }
+        }
+      },
+      {
+        "name": "Data_Quality_Metrics_Calculation",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          {
+            "activity": "Environmental_Data_Cleansing",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "storedProcedureName": "usp_CalculateDataQualityMetrics",
+          "storedProcedureParameters": {
+            "execution_date": {
+              "value": "@pipeline().parameters.ExecutionDate",
+              "type": "String"
+            },
+            "data_source": {
+              "value": "@pipeline().parameters.DataSource",
+              "type": "String"
+            }
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeAnalyticsDatabase",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Data_Quality_Alerting",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "Data_Quality_Metrics_Calculation",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "0.00:05:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "url": "@pipeline().parameters.AlertingEndpoint",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer @pipeline().parameters.AlertingToken"
+          },
+          "body": {
+            "pipeline": "maritime-data-quality-pipeline",
+            "execution_time": "@pipeline().TriggerTime",
+            "quality_score": "@activity('Data_Quality_Metrics_Calculation').output.firstRow.quality_score",
+            "issues_detected": "@activity('Data_Quality_Metrics_Calculation').output.firstRow.issues_count",
+            "data_completeness": "@activity('Data_Quality_Metrics_Calculation').output.firstRow.completeness_percentage"
+          }
+        }
+      },
+      {
+        "name": "Update_Data_Lineage",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "Data_Quality_Alerting",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "url": "@pipeline().parameters.DataLineageEndpoint",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "pipeline_name": "@pipeline().Pipeline",
+            "execution_id": "@pipeline().RunId",
+            "source_datasets": [
+              "AIS_Raw_Data",
+              "Environmental_Sensors",
+              "Vessel_Telemetry"
+            ],
+            "target_datasets": [
+              "AIS_Validated_Data",
+              "Environmental_Clean_Data",
+              "Quality_Metrics"
+            ],
+            "transformation_type": "Data Quality Pipeline",
+            "execution_timestamp": "@pipeline().TriggerTime",
+            "quality_score": "@activity('Data_Quality_Metrics_Calculation').output.firstRow.quality_score"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "ExecutionDate": {
+        "type": "String",
+        "defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd')"
+      },
+      "DataSource": {
+        "type": "String",
+        "defaultValue": "maritime-sensors"
+      },
+      "QualityThresholds": {
+        "type": "String",
+        "defaultValue": "{\"completeness\": 0.95, \"accuracy\": 0.98, \"timeliness\": 0.90}"
+      },
+      "RawDataPath": {
+        "type": "String",
+        "defaultValue": "/mnt/datalake/maritime/raw/@{formatDateTime(utcnow(), 'yyyy/MM/dd')}"
+      },
+      "CleanDataPath": {
+        "type": "String",
+        "defaultValue": "/mnt/datalake/maritime/curated/@{formatDateTime(utcnow(), 'yyyy/MM/dd')}"
+      },
+      "CleansingRules": {
+        "type": "String",
+        "defaultValue": "{\"outlier_detection\": true, \"missing_value_imputation\": true, \"anomaly_detection\": true}"
+      },
+      "AlertingEndpoint": {
+        "type": "String",
+        "defaultValue": "https://api.maritimeiq.platform/webhooks/data-quality-alerts"
+      },
+      "AlertingToken": {
+        "type": "String",
+        "defaultValue": "@pipeline().parameters.AlertingToken"
+      },
+      "DataLineageEndpoint": {
+        "type": "String",
+        "defaultValue": "https://api.maritimeiq.platform/data-lineage/update"
+      }
+    },
+    "annotations": [
+      "DataQuality",
+      "MaritimeIQ",
+      "DataValidation",
+      "Monitoring"
+    ],
+    "folder": {
+      "name": "MaritimeIQ Data Quality Pipelines"
+    }
+  }
+}

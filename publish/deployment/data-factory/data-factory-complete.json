@@ -1,0 +1,132 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dataFactoryName": {
+      "type": "string",
+      "defaultValue": "maritimeiq-data-factory",
+      "metadata": {
+        "description": "Name of the Data Factory"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "norwayeast",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "eventHubNamespace": {
+      "type": "string",
+      "defaultValue": "ehns-maritimeplat-70396"
+    },
+    "sqlServerName": {
+      "type": "string",
+      "defaultValue": "sql-maritimeplat-70396"
+    },
+    "sqlDatabaseName": {
+      "type": "string",
+      "defaultValue": "maritimeplat-db"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "stmaritimeplat70396"
+    },
+    "keyVaultName": {
+      "type": "string",
+      "defaultValue": "kv-maritimeplat-70396"
+    }
+  },
+  "variables": {
+    "eventHubConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/authorizationRules', parameters('eventHubNamespace'), 'RootManageSharedAccessKey'), '2021-11-01').primaryConnectionString]",
+    "storageConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2021-09-01').keys[0].value, ';EndpointSuffix=core.windows.net')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DataFactory/factories",
+      "apiVersion": "2018-06-01",
+      "name": "[parameters('dataFactoryName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.DataFactory/factories/linkedServices",
+      "apiVersion": "2018-06-01",
+      "name": "[concat(parameters('dataFactoryName'), '/aisdataeventhub')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+      ],
+      "properties": {
+        "type": "AzureEventHub",
+        "typeProperties": {
+          "connectionString": "[variables('eventHubConnectionString')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.DataFactory/factories/linkedServices",
+      "apiVersion": "2018-06-01",
+      "name": "[concat(parameters('dataFactoryName'), '/maritimesqldb')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+      ],
+      "properties": {
+        "type": "AzureSqlDatabase",
+        "typeProperties": {
+          "server": "[concat(parameters('sqlServerName'), '.database.windows.net')]",
+          "database": "[parameters('sqlDatabaseName')]",
+          "authenticationType": "ManagedServiceIdentity"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.DataFactory/factories/linkedServices",
+      "apiVersion": "2018-06-01",
+      "name": "[concat(parameters('dataFactoryName'), '/maritimestorage')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+      ],
+      "properties": {
+        "type": "AzureBlobStorage",
+        "typeProperties": {
+          "connectionString": "[variables('storageConnectionString')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.DataFactory/factories/linkedServices",
+      "apiVersion": "2018-06-01",
+      "name": "[concat(parameters('dataFactoryName'), '/maritimekeyvault')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+      ],
+      "properties": {
+        "type": "AzureKeyVault",
+        "typeProperties": {
+          "baseUrl": "[concat('https://', parameters('keyVaultName'), '.vault.azure.net/')]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "dataFactoryName": {
+      "type": "string",
+      "value": "[parameters('dataFactoryName')]"
+    },
+    "dataFactoryId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+    },
+    "dataFactoryIdentityPrincipalId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]"
+    },
+    "studioUrl": {
+      "type": "string",
+      "value": "[concat('https://adf.azure.com/en-us/home?factory=/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.DataFactory/factories/', parameters('dataFactoryName'))]"
+    }
+  }
+}
