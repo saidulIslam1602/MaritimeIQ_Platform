@@ -11,9 +11,9 @@ on:
   workflow_dispatch:  # Allow manual triggers
 
 env:
-  REGISTRY: maritimeplatformacr.azurecr.io
+  REGISTRY: maritimeregistry70396.azurecr.io
   IMAGE_NAME: maritimeiq-platform
-  AZURE_RESOURCE_GROUP: $(az acr show --name maritimeplatformacr --query resourceGroup -o tsv)
+  AZURE_RESOURCE_GROUP: maritime-platform-rg
 
 jobs:
   # Job 1: Build and Test
