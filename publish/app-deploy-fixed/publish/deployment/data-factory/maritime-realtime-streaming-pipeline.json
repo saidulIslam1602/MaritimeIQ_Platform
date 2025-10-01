@@ -1,0 +1,290 @@
+{
+  "name": "maritime-realtime-streaming-pipeline",
+  "properties": {
+    "description": "MaritimeIQ Platform Real-time Streaming Pipeline - Complex Event Processing with ML Integration",
+    "activities": [
+      {
+        "name": "Initialize_Streaming_Session",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "typeProperties": {
+          "variableName": "StreamingSessionId",
+          "value": "@guid()"
+        }
+      },
+      {
+        "name": "Deploy_Stream_Analytics_Job",
+        "type": "AzureResourceManagerTemplate",
+        "dependsOn": [
+          {
+            "activity": "Initialize_Streaming_Session",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "resourceGroupName": "maritime-platform-rg",
+          "template": {
+            "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "parameters": {
+              "streamAnalyticsJobName": {
+                "type": "string",
+                "defaultValue": "maritime-realtime-analytics"
+              }
+            },
+            "resources": [
+              {
+                "type": "Microsoft.StreamAnalytics/streamingJobs",
+                "apiVersion": "2020-03-01",
+                "name": "[parameters('streamAnalyticsJobName')]",
+                "location": "[resourceGroup().location]",
+                "properties": {
+                  "sku": {
+                    "name": "Standard"
+                  },
+                  "outputErrorPolicy": "Stop",
+                  "eventsOutOfOrderPolicy": "Adjust",
+                  "eventsOutOfOrderMaxDelayInSeconds": 60,
+                  "eventsLateArrivalMaxDelayInSeconds": 300,
+                  "dataLocale": "en-US",
+                  "compatibilityLevel": "1.2",
+                  "contentStoragePolicy": "SystemAccount"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "Start_Anomaly_Detection",
+        "type": "DatabricksSparkJar",
+        "dependsOn": [
+          {
+            "activity": "Deploy_Stream_Analytics_Job",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "mainClassName": "com.maritimeiq.streaming.AnomalyDetection",
+          "parameters": [
+            "@variables('StreamingSessionId')",
+            "@pipeline().parameters.AnomalyThreshold",
+            "@pipeline().parameters.ModelVersion"
+          ],
+          "libraries": [
+            {
+              "jar": "dbfs:/mnt/libraries/maritime-analytics-1.0.jar"
+            }
+          ]
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeAnalyticsDatabricks",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Real_Time_Vessel_Tracking",
+        "type": "ExecutePipeline",
+        "dependsOn": [
+          {
+            "activity": "Start_Anomaly_Detection",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "pipeline": {
+            "referenceName": "vessel-position-enrichment-pipeline",
+            "type": "PipelineReference"
+          },
+          "parameters": {
+            "StreamingSessionId": "@variables('StreamingSessionId')",
+            "TrackingMode": "Real-time",
+            "EnrichmentLevel": "Full"
+          },
+          "waitOnCompletion": false
+        }
+      },
+      {
+        "name": "Environmental_Impact_Processing",
+        "type": "DatabricksSparkPython",
+        "dependsOn": [
+          {
+            "activity": "Real_Time_Vessel_Tracking",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "pythonFile": "dbfs:/mnt/maritime-analytics/environmental_impact_ml.py",
+          "parameters": [
+            "@variables('StreamingSessionId')",
+            "@pipeline().parameters.EnvironmentalThresholds",
+            "@pipeline().parameters.MLModelPath"
+          ],
+          "libraries": [
+            {
+              "pypi": {
+                "package": "scikit-learn==1.3.0"
+              }
+            },
+            {
+              "pypi": {
+                "package": "pandas==2.0.3"
+              }
+            },
+            {
+              "pypi": {
+                "package": "numpy==1.24.3"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Predictive_Maintenance_Scoring",
+        "type": "AzureMLExecutePipeline",
+        "dependsOn": [
+          {
+            "activity": "Environmental_Impact_Processing",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "mlPipelineId": "@pipeline().parameters.PredictiveMaintenanceMLPipelineId",
+          "mlPipelineParameters": {
+            "vessel_data_path": "@pipeline().parameters.VesselDataPath",
+            "model_version": "@pipeline().parameters.MLModelVersion",
+            "prediction_horizon": "30"
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "MaritimeMLWorkspace",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Stream_to_Delta_Lake",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {
+            "activity": "Predictive_Maintenance_Scoring",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "notebookPath": "/MaritimeIQ/DataLake/StreamToDeltaLake",
+          "baseParameters": {
+            "session_id": "@variables('StreamingSessionId')",
+            "output_format": "delta",
+            "partition_columns": "year,month,day,vessel_id",
+            "optimize_writes": "true",
+            "auto_compact": "true"
+          }
+        }
+      },
+      {
+        "name": "Update_Data_Catalog",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "Stream_to_Delta_Lake",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "url": "@pipeline().parameters.DataCatalogEndpoint",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer @pipeline().parameters.DataCatalogToken"
+          },
+          "body": {
+            "catalog_entry": {
+              "dataset_name": "maritime_realtime_stream",
+              "schema_version": "v2.1",
+              "data_classification": "operational",
+              "retention_policy": "7_years",
+              "quality_score": "@activity('Data_Quality_Assessment').output.runOutput.quality_score",
+              "last_updated": "@pipeline().TriggerTime",
+              "lineage": {
+                "source_systems": ["AIS_Transponders", "Environmental_Sensors", "IoT_Devices"],
+                "transformation_pipeline": "@pipeline().Pipeline",
+                "execution_id": "@pipeline().RunId"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "ExecutionDate": {
+        "type": "String",
+        "defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
+      },
+      "DataSource": {
+        "type": "String",
+        "defaultValue": "real-time-maritime-streams"
+      },
+      "QualityThresholds": {
+        "type": "String",
+        "defaultValue": "{\"completeness\": 0.98, \"accuracy\": 0.99, \"timeliness\": 0.95, \"consistency\": 0.97}"
+      },
+      "AnomalyThreshold": {
+        "type": "String",
+        "defaultValue": "2.5"
+      },
+      "ModelVersion": {
+        "type": "String",
+        "defaultValue": "maritime-anomaly-v3.2"
+      },
+      "EnvironmentalThresholds": {
+        "type": "String",
+        "defaultValue": "{\"co2_max\": 50.0, \"fuel_efficiency_min\": 0.8, \"battery_min\": 20.0}"
+      },
+      "MLModelPath": {
+        "type": "String",
+        "defaultValue": "dbfs:/mnt/models/environmental-impact-v2.1"
+      },
+      "PredictiveMaintenanceMLPipelineId": {
+        "type": "String",
+        "defaultValue": "maritime-predictive-maintenance-v1.3"
+      },
+      "VesselDataPath": {
+        "type": "String",
+        "defaultValue": "/mnt/datalake/maritime/vessels/telemetry"
+      },
+      "MLModelVersion": {
+        "type": "String",
+        "defaultValue": "predictive-maintenance-v2.0"
+      },
+      "DataCatalogEndpoint": {
+        "type": "String",
+        "defaultValue": "https://api.maritimeiq.platform/data-catalog/register"
+      },
+      "DataCatalogToken": {
+        "type": "String",
+        "defaultValue": "@pipeline().parameters.DataCatalogToken"
+      }
+    },
+    "variables": {
+      "StreamingSessionId": {
+        "type": "String"
+      },
+      "QualityScore": {
+        "type": "String"
+      },
+      "ProcessingStatus": {
+        "type": "String",
+        "defaultValue": "In Progress"
+      }
+    },
+    "annotations": [
+      "RealTimeStreaming",
+      "DataQuality",
+      "MLIntegration",
+      "MaritimeIQ"
+    ],
+    "folder": {
+      "name": "MaritimeIQ Real-time Pipelines"
+    }
+  }
+}

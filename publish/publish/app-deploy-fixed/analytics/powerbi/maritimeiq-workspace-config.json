@@ -1,0 +1,447 @@
+{
+  "workspaceId": "havila-maritime-analytics",
+  "displayName": "Havila Kystruten Maritime Analytics",
+  "description": "Comprehensive business intelligence and analytics for Havila Kystruten's coastal operations",
+  "environment": "production",
+  "region": "West Europe",
+  "capacityId": "A1",
+  "dataGateway": {
+    "enabled": true,
+    "name": "havila-maritime-gateway",
+    "datasources": [
+      {
+        "name": "HavilaAzureSQL",
+        "type": "AzureSqlDatabase",
+        "connectionDetails": {
+          "server": "havila-maritime-sql.database.windows.net",
+          "database": "HavilaMaritime",
+          "authenticationType": "ServicePrincipal"
+        }
+      },
+      {
+        "name": "HavilaCosmosDB",
+        "type": "CosmosDB",
+        "connectionDetails": {
+          "endpoint": "https://havila-maritime-cosmos.documents.azure.com",
+          "database": "MaritimeOperations",
+          "authenticationType": "ServicePrincipal"
+        }
+      },
+      {
+        "name": "HavilaEventHub",
+        "type": "EventHub",
+        "connectionDetails": {
+          "namespace": "havila-maritime-events",
+          "eventHub": "vessel-telemetry",
+          "consumerGroup": "powerbi-analytics"
+        }
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "name": "VesselOperations",
+      "description": "Real-time vessel operational data including position, speed, and status",
+      "refreshSchedule": {
+        "type": "streaming",
+        "interval": "realtime"
+      },
+      "tables": [
+        {
+          "name": "VesselPositions",
+          "source": "EventHub:vessel-telemetry",
+          "columns": [
+            { "name": "VesselId", "type": "string" },
+            { "name": "VesselName", "type": "string" },
+            { "name": "Latitude", "type": "decimal" },
+            { "name": "Longitude", "type": "decimal" },
+            { "name": "Speed", "type": "decimal" },
+            { "name": "Heading", "type": "decimal" },
+            { "name": "Timestamp", "type": "datetime" }
+          ]
+        },
+        {
+          "name": "RoutePerformance",
+          "source": "AzureSQL:RouteAnalytics",
+          "refreshSchedule": "hourly",
+          "columns": [
+            { "name": "RouteId", "type": "string" },
+            { "name": "VesselId", "type": "string" },
+            { "name": "PortFrom", "type": "string" },
+            { "name": "PortTo", "type": "string" },
+            { "name": "ScheduledDuration", "type": "timespan" },
+            { "name": "ActualDuration", "type": "timespan" },
+            { "name": "DelayMinutes", "type": "int" },
+            { "name": "FuelConsumption", "type": "decimal" },
+            { "name": "Date", "type": "date" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PassengerExperience",
+      "description": "Passenger satisfaction, bookings, and service metrics",
+      "refreshSchedule": {
+        "type": "scheduled",
+        "times": ["06:00", "12:00", "18:00"]
+      },
+      "tables": [
+        {
+          "name": "BookingMetrics",
+          "source": "AzureSQL:BookingAnalytics",
+          "columns": [
+            { "name": "BookingDate", "type": "date" },
+            { "name": "VesselId", "type": "string" },
+            { "name": "Route", "type": "string" },
+            { "name": "PassengerCount", "type": "int" },
+            { "name": "Revenue", "type": "decimal" },
+            { "name": "OccupancyRate", "type": "decimal" },
+            { "name": "SeasonalCategory", "type": "string" }
+          ]
+        },
+        {
+          "name": "CustomerSatisfaction",
+          "source": "CosmosDB:FeedbackData",
+          "columns": [
+            { "name": "FeedbackId", "type": "string" },
+            { "name": "VesselId", "type": "string" },
+            { "name": "Route", "type": "string" },
+            { "name": "Rating", "type": "int" },
+            { "name": "Category", "type": "string" },
+            { "name": "SentimentScore", "type": "decimal" },
+            { "name": "Date", "type": "date" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EnvironmentalCompliance",
+      "description": "Environmental monitoring and sustainability metrics",
+      "refreshSchedule": {
+        "type": "scheduled",
+        "times": ["04:00", "16:00"]
+      },
+      "tables": [
+        {
+          "name": "EmissionsData",
+          "source": "AzureSQL:EnvironmentalMetrics",
+          "columns": [
+            { "name": "VesselId", "type": "string" },
+            { "name": "Date", "type": "date" },
+            { "name": "CO2Emissions", "type": "decimal" },
+            { "name": "NOxEmissions", "type": "decimal" },
+            { "name": "SOxEmissions", "type": "decimal" },
+            { "name": "FuelType", "type": "string" },
+            { "name": "FuelConsumption", "type": "decimal" }
+          ]
+        },
+        {
+          "name": "WasteManagement",
+          "source": "AzureSQL:WasteTracking",
+          "columns": [
+            { "name": "VesselId", "type": "string" },
+            { "name": "Date", "type": "date" },
+            { "name": "WasteType", "type": "string" },
+            { "name": "QuantityKg", "type": "decimal" },
+            { "name": "DisposalMethod", "type": "string" },
+            { "name": "RecyclingRate", "type": "decimal" }
+          ]
+        }
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "name": "Maritime Operations Dashboard",
+      "description": "Real-time operational overview for fleet management",
+      "type": "dashboard",
+      "refreshRate": "5 minutes",
+      "pages": [
+        {
+          "name": "Fleet Overview",
+          "visuals": [
+            {
+              "type": "map",
+              "title": "Real-time Vessel Positions",
+              "dataset": "VesselOperations",
+              "table": "VesselPositions",
+              "coordinates": ["Latitude", "Longitude"],
+              "tooltip": ["VesselName", "Speed", "Heading"]
+            },
+            {
+              "type": "gauge",
+              "title": "Fleet Utilization",
+              "dataset": "VesselOperations",
+              "metric": "OccupancyRate",
+              "target": 85
+            },
+            {
+              "type": "card",
+              "title": "Active Vessels",
+              "dataset": "VesselOperations",
+              "metric": "count(VesselId)"
+            }
+          ]
+        },
+        {
+          "name": "Route Performance",
+          "visuals": [
+            {
+              "type": "line_chart",
+              "title": "On-time Performance Trend",
+              "dataset": "VesselOperations",
+              "table": "RoutePerformance",
+              "x_axis": "Date",
+              "y_axis": "DelayMinutes",
+              "groupBy": "VesselId"
+            },
+            {
+              "type": "bar_chart",
+              "title": "Fuel Efficiency by Route",
+              "dataset": "VesselOperations",
+              "table": "RoutePerformance",
+              "x_axis": "RouteId",
+              "y_axis": "FuelConsumption"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Passenger Experience Analytics",
+      "description": "Customer satisfaction and booking analysis",
+      "type": "report",
+      "refreshRate": "1 hour",
+      "pages": [
+        {
+          "name": "Booking Trends",
+          "visuals": [
+            {
+              "type": "area_chart",
+              "title": "Booking Volume by Season",
+              "dataset": "PassengerExperience",
+              "table": "BookingMetrics",
+              "x_axis": "BookingDate",
+              "y_axis": "PassengerCount",
+              "groupBy": "SeasonalCategory"
+            },
+            {
+              "type": "donut_chart",
+              "title": "Revenue by Route",
+              "dataset": "PassengerExperience",
+              "table": "BookingMetrics",
+              "values": "Revenue",
+              "legend": "Route"
+            }
+          ]
+        },
+        {
+          "name": "Customer Satisfaction",
+          "visuals": [
+            {
+              "type": "gauge",
+              "title": "Overall Satisfaction Score",
+              "dataset": "PassengerExperience",
+              "table": "CustomerSatisfaction",
+              "metric": "avg(Rating)",
+              "min": 1,
+              "max": 5,
+              "target": 4.2
+            },
+            {
+              "type": "bar_chart",
+              "title": "Satisfaction by Category",
+              "dataset": "PassengerExperience",
+              "table": "CustomerSatisfaction",
+              "x_axis": "Category",
+              "y_axis": "avg(Rating)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Environmental Sustainability Report",
+      "description": "Environmental compliance and sustainability metrics",
+      "type": "report",
+      "refreshRate": "daily",
+      "pages": [
+        {
+          "name": "Emissions Monitoring",
+          "visuals": [
+            {
+              "type": "line_chart",
+              "title": "CO2 Emissions Trend",
+              "dataset": "EnvironmentalCompliance",
+              "table": "EmissionsData",
+              "x_axis": "Date",
+              "y_axis": "CO2Emissions",
+              "groupBy": "VesselId"
+            },
+            {
+              "type": "stacked_bar_chart",
+              "title": "Emissions by Type",
+              "dataset": "EnvironmentalCompliance",
+              "table": "EmissionsData",
+              "x_axis": "VesselId",
+              "y_axis": ["CO2Emissions", "NOxEmissions", "SOxEmissions"]
+            }
+          ]
+        },
+        {
+          "name": "Waste Management",
+          "visuals": [
+            {
+              "type": "pie_chart",
+              "title": "Waste Distribution by Type",
+              "dataset": "EnvironmentalCompliance",
+              "table": "WasteManagement",
+              "values": "QuantityKg",
+              "legend": "WasteType"
+            },
+            {
+              "type": "gauge",
+              "title": "Fleet Recycling Rate",
+              "dataset": "EnvironmentalCompliance",
+              "table": "WasteManagement",
+              "metric": "avg(RecyclingRate)",
+              "target": 75
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "security": {
+    "rowLevelSecurity": {
+      "enabled": true,
+      "roles": [
+        {
+          "name": "Fleet Managers",
+          "filter": "[VesselId] IN VALUES('HC001', 'HC002', 'HC003', 'HC004')",
+          "members": ["fleet-managers@havila.no"]
+        },
+        {
+          "name": "Environmental Officers",
+          "filter": "[Category] = 'Environmental'",
+          "members": ["environmental@havila.no"]
+        },
+        {
+          "name": "Passenger Services",
+          "filter": "[Category] IN ('Passenger', 'Service')",
+          "members": ["passenger-services@havila.no"]
+        }
+      ]
+    },
+    "dataClassification": {
+      "personalData": ["PassengerName", "Email", "Phone"],
+      "confidential": ["Revenue", "CostData", "ProfitMargin"],
+      "restricted": ["SafetyIncidents", "ComplianceViolations"]
+    }
+  },
+  "alerts": [
+    {
+      "name": "Vessel Delay Alert",
+      "condition": "DelayMinutes > 30",
+      "frequency": "immediate",
+      "recipients": ["operations@havila.no"],
+      "message": "Vessel {VesselName} is delayed by {DelayMinutes} minutes on route {Route}"
+    },
+    {
+      "name": "Low Satisfaction Alert",
+      "condition": "avg(Rating) < 3.5",
+      "frequency": "daily",
+      "recipients": ["customer-service@havila.no"],
+      "message": "Customer satisfaction has dropped below 3.5 for {VesselName}"
+    },
+    {
+      "name": "Emissions Threshold Alert",
+      "condition": "CO2Emissions > 1000",
+      "frequency": "daily",
+      "recipients": ["environmental@havila.no"],
+      "message": "CO2 emissions exceeded 1000kg for vessel {VesselId}"
+    }
+  ],
+  "integration": {
+    "azureServices": {
+      "streamAnalytics": {
+        "enabled": true,
+        "jobName": "havila-maritime-analytics",
+        "inputStreams": ["vessel-telemetry", "passenger-feedback", "environmental-data"]
+      },
+      "machineLearning": {
+        "enabled": true,
+        "workspace": "havila-ml-workspace",
+        "models": [
+          {
+            "name": "demand-forecasting",
+            "type": "regression",
+            "purpose": "Predict passenger demand by route and season"
+          },
+          {
+            "name": "maintenance-prediction",
+            "type": "classification",
+            "purpose": "Predict vessel maintenance needs"
+          },
+          {
+            "name": "route-optimization",
+            "type": "optimization",
+            "purpose": "Optimize routes for fuel efficiency and timing"
+          }
+        ]
+      },
+      "cognitiveServices": {
+        "enabled": true,
+        "services": ["text-analytics", "form-recognizer", "translator"],
+        "purpose": "Analyze passenger feedback and multilingual content"
+      }
+    },
+    "thirdPartyConnectors": [
+      {
+        "name": "Weather API",
+        "type": "REST",
+        "endpoint": "https://api.weather.com/maritime",
+        "refreshInterval": "15 minutes"
+      },
+      {
+        "name": "AIS Maritime Traffic",
+        "type": "WebSocket",
+        "endpoint": "wss://ais.havila.no/stream",
+        "refreshInterval": "real-time"
+      }
+    ]
+  },
+  "governance": {
+    "dataLineage": {
+      "enabled": true,
+      "tracking": ["source", "transformation", "destination"]
+    },
+    "auditLog": {
+      "enabled": true,
+      "retention": "7 years",
+      "events": ["access", "modification", "export"]
+    },
+    "backup": {
+      "enabled": true,
+      "frequency": "daily",
+      "retention": "30 days",
+      "location": "West Europe"
+    }
+  },
+  "performance": {
+    "caching": {
+      "enabled": true,
+      "strategy": "hybrid",
+      "ttl": "15 minutes"
+    },
+    "compression": {
+      "enabled": true,
+      "algorithm": "gzip"
+    },
+    "scaling": {
+      "autoScale": true,
+      "minCapacity": "A1",
+      "maxCapacity": "A3"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"title": "ARM deployment template schema shim",
+	"description": "Local shim that delegates to the simplified schema for offline IntelliSense. Use the official schema URL for full validation.",
+	"$comment": "Full schema: https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json",
+	"allOf": [
+		{
+			"$ref": "../arm-template-slim.json"
+		}
+	]
+}

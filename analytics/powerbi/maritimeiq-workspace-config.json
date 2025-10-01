@@ -7,31 +7,31 @@
   "capacityId": "A1",
   "dataGateway": {
     "enabled": true,
-    "name": "havila-maritime-gateway",
+    "name": "maritimeiq-gateway",
     "datasources": [
       {
-        "name": "HavilaAzureSQL",
+        "name": "MaritimeIQAzureSQL",
         "type": "AzureSqlDatabase",
         "connectionDetails": {
-          "server": "havila-maritime-sql.database.windows.net",
-          "database": "HavilaMaritime",
+          "server": "maritimeiq-platform-sql.database.windows.net",
+          "database": "MaritimeIQPlatform",
           "authenticationType": "ServicePrincipal"
         }
       },
       {
-        "name": "HavilaCosmosDB",
+        "name": "MaritimeIQCosmosDB",
         "type": "CosmosDB",
         "connectionDetails": {
-          "endpoint": "https://havila-maritime-cosmos.documents.azure.com",
+          "endpoint": "https://maritimeiq-platform-cosmos.documents.azure.com",
           "database": "MaritimeOperations",
           "authenticationType": "ServicePrincipal"
         }
       },
       {
-        "name": "HavilaEventHub",
+        "name": "MaritimeIQEventHub",
         "type": "EventHub",
         "connectionDetails": {
-          "namespace": "havila-maritime-events",
+          "namespace": "maritimeiq-platform-events",
           "eventHub": "vessel-telemetry",
           "consumerGroup": "powerbi-analytics"
         }
@@ -319,17 +319,17 @@
         {
           "name": "Fleet Managers",
           "filter": "[VesselId] IN VALUES('HC001', 'HC002', 'HC003', 'HC004')",
-          "members": ["fleet-managers@havila.no"]
+          "members": ["fleet-managers@maritimeiq.com"]
         },
         {
           "name": "Environmental Officers",
           "filter": "[Category] = 'Environmental'",
-          "members": ["environmental@havila.no"]
+          "members": ["environmental@maritimeiq.com"]
         },
         {
           "name": "Passenger Services",
           "filter": "[Category] IN ('Passenger', 'Service')",
-          "members": ["passenger-services@havila.no"]
+          "members": ["passenger-services@maritimeiq.com"]
         }
       ]
     },
@@ -344,21 +344,21 @@
       "name": "Vessel Delay Alert",
       "condition": "DelayMinutes > 30",
       "frequency": "immediate",
-      "recipients": ["operations@havila.no"],
+      "recipients": ["operations@maritimeiq.com"],
       "message": "Vessel {VesselName} is delayed by {DelayMinutes} minutes on route {Route}"
     },
     {
       "name": "Low Satisfaction Alert",
       "condition": "avg(Rating) < 3.5",
       "frequency": "daily",
-      "recipients": ["customer-service@havila.no"],
+      "recipients": ["customer-service@maritimeiq.com"],
       "message": "Customer satisfaction has dropped below 3.5 for {VesselName}"
     },
     {
       "name": "Emissions Threshold Alert",
       "condition": "CO2Emissions > 1000",
       "frequency": "daily",
-      "recipients": ["environmental@havila.no"],
+      "recipients": ["environmental@maritimeiq.com"],
       "message": "CO2 emissions exceeded 1000kg for vessel {VesselId}"
     }
   ],
@@ -366,12 +366,12 @@
     "azureServices": {
       "streamAnalytics": {
         "enabled": true,
-        "jobName": "havila-maritime-analytics",
+        "jobName": "maritimeiq-analytics",
         "inputStreams": ["vessel-telemetry", "passenger-feedback", "environmental-data"]
       },
       "machineLearning": {
         "enabled": true,
-        "workspace": "havila-ml-workspace",
+        "workspace": "maritimeiq-ml-workspace",
         "models": [
           {
             "name": "demand-forecasting",
@@ -406,7 +406,7 @@
       {
         "name": "AIS Maritime Traffic",
         "type": "WebSocket",
-        "endpoint": "wss://ais.havila.no/stream",
+        "endpoint": "wss://ais.maritimeiq.com/stream",
         "refreshInterval": "real-time"
       }
     ]

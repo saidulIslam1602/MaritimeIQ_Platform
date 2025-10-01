@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Havila Kystruten Maritime Platform - Complete Azure Deployment Script
+# MaritimeIQ Platform - Complete Azure Deployment Script
 # This script demonstrates the comprehensive Azure services integration
 # for the maritime operations platform
 
@@ -14,13 +14,13 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-RESOURCE_GROUP="havila-maritime-rg"
+RESOURCE_GROUP="maritimeiq-platform-rg"
 LOCATION="westeurope"
 SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID}"
-PROJECT_NAME="havila-maritime"
+PROJECT_NAME="maritimeiq-platform"
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}  Havila Kystruten Maritime Platform   ${NC}"
+echo -e "${BLUE}  MaritimeIQ Platform                  ${NC}"
 echo -e "${BLUE}  Complete Azure Services Deployment   ${NC}"
 echo -e "${BLUE}========================================${NC}"
 
@@ -55,7 +55,7 @@ print_status "Creating resource group: $RESOURCE_GROUP"
 az group create \
     --name "$RESOURCE_GROUP" \
     --location "$LOCATION" \
-    --tags Environment=Production Project=Havila-Maritime Owner=havila-it@havila.no
+    --tags Environment=Production Project=MaritimeIQ-Platform Owner=maritime-platform@example.com
 
 echo -e "\n${BLUE}1. Core Infrastructure Services${NC}"
 
@@ -147,9 +147,9 @@ az iot hub create \
     --sku S1 \
     --unit 1
 
-# Register IoT Devices (Havila Vessels)
-print_status "Registering Havila vessels as IoT devices..."
-VESSELS=("havila-castor-device" "havila-pollux-device" "havila-capella-device" "havila-polaris-device")
+# Register IoT Devices (Maritime Vessels)
+print_status "Registering maritime vessels as IoT devices..."
+VESSELS=("vessel-castor-device" "vessel-pollux-device" "vessel-capella-device" "vessel-polaris-device")
 
 for vessel in "${VESSELS[@]}"; do
     print_status "Registering vessel device: $vessel"
@@ -218,8 +218,8 @@ az stream-analytics job create \
 print_status "Creating SQL Database for analytics storage..."
 SQL_SERVER_NAME="${PROJECT_NAME}-sqlserver-$(date +%s | tail -c 6)"
 SQL_DB_NAME="${PROJECT_NAME}-database"
-SQL_ADMIN_USER="havilaadmin"
-SQL_ADMIN_PASSWORD="HavilaMaritime2024!"
+SQL_ADMIN_USER="maritimeadmin"
+SQL_ADMIN_PASSWORD="MaritimePlatform2024!"
 
 az sql server create \
     --name "$SQL_SERVER_NAME" \
@@ -316,11 +316,11 @@ APP_INSIGHTS_CONNECTION_STRING=$(az monitor app-insights component show \
     --query connectionString -o tsv)
 
 # Store secrets
-az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "havila-servicebus-connection" --value "$SERVICE_BUS_CONNECTION"
-az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "havila-eventhub-connection" --value "$EVENT_HUB_CONNECTION"
-az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "havila-iothub-connection" --value "$IOT_HUB_CONNECTION"
-az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "havila-cognitive-key" --value "$COGNITIVE_KEY"
-az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "havila-appinsights-key" --value "$APP_INSIGHTS_KEY"
+az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "maritime-servicebus-connection" --value "$SERVICE_BUS_CONNECTION"
+az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "maritime-eventhub-connection" --value "$EVENT_HUB_CONNECTION"
+az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "maritime-iothub-connection" --value "$IOT_HUB_CONNECTION"
+az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "maritime-cognitive-key" --value "$COGNITIVE_KEY"
+az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "maritime-appinsights-key" --value "$APP_INSIGHTS_KEY"
 
 # Duplicate secrets using configuration-friendly naming for automatic binding
 az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "ServiceBus--ConnectionString" --value "$SERVICE_BUS_CONNECTION"
@@ -350,7 +350,7 @@ echo "  🌐 Web App: $WEB_APP_NAME"
 echo ""
 echo -e "${YELLOW}Next Steps:${NC}"
 echo "1. Configure Power BI workspace for maritime analytics"
-echo "2. Deploy the Havila Maritime application to the Web App"
+echo "2. Deploy the MaritimeIQ application to the Web App"
 echo "3. Set up monitoring and alerting rules"
 echo "4. Configure vessel IoT devices to send telemetry"
 echo "5. Create Stream Analytics queries for real-time processing"
@@ -365,11 +365,11 @@ echo "  📱 IoT Device Integration"
 echo "  🤖 AI-Powered Analytics"
 echo "  📊 Real-time Reporting"
 echo ""
-echo -e "${BLUE}Havila Kystruten Maritime Platform - Ready for Operations!${NC}"
+echo -e "${BLUE}MaritimeIQ Platform - Ready for Operations!${NC}"
 
 # Create environment configuration file
 cat > "${PROJECT_NAME}-environment.env" << EOF
-# Havila Kystruten Maritime Platform - Environment Configuration
+# MaritimeIQ Platform - Environment Configuration
 # Generated on: $(date)
 
 # Azure Resources
@@ -415,11 +415,11 @@ ACR_LOGIN_SERVER=${ACR_NAME}.azurecr.io
 WEBAPP_NAME=${WEB_APP_NAME}
 WEBAPP_URL=https://${WEB_APP_NAME}.azurewebsites.net
 
-# Havila Fleet Configuration
-FLEET_VESSELS=havila-castor-device,havila-pollux-device,havila-capella-device,havila-polaris-device
+# Maritime Fleet Configuration
+FLEET_VESSELS=vessel-castor-device,vessel-pollux-device,vessel-capella-device,vessel-polaris-device
 MARITIME_ROUTE=Bergen-Kirkenes
 SERVICE_REGION=Norwegian Coastal Route
 EOF
 
 print_status "Environment configuration saved to: ${PROJECT_NAME}-environment.env"
-echo -e "${GREEN}✅ Havila Kystruten Maritime Platform deployment completed successfully!${NC}"
+echo -e "${GREEN}✅ MaritimeIQ Platform deployment completed successfully!${NC}"

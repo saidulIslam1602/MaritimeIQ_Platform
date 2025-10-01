@@ -1,4 +1,4 @@
--- Havila Kystruten Maritime Platform Database Schema
+-- MaritimeIQ Platform Database Schema
 -- Complete implementation matching Azure Portal Step-by-Step Guide requirements
 
 -- Create tables for maritime data intelligence platform
@@ -185,12 +185,12 @@ CREATE INDEX IX_northern_lights_date ON northern_lights_forecasts(forecast_date)
 CREATE INDEX IX_notifications_passenger_id ON passenger_notifications(passenger_id);
 CREATE INDEX IX_notifications_sent_at ON passenger_notifications(sent_at);
 
--- Insert sample maritime data for Havila Kystruten demo
+-- Insert sample maritime data for MaritimeIQ Platform demo
 INSERT INTO vessels (vessel_name, imo_number, ship_type, route_assignment, status, passenger_capacity, hybrid_system_type, battery_capacity_kwh, fuel_type, year_built) VALUES
-('MS Havila Capella', '9892689', 'Coastal Cruise Ship', 'Bergen-Kirkenes', 'Active', 640, 'Hybrid Battery', 6200, 'Marine Gas Oil/Battery', 2021),
-('MS Havila Castor', '9892691', 'Coastal Cruise Ship', 'Bergen-Kirkenes', 'Active', 640, 'Hybrid Battery', 6200, 'Marine Gas Oil/Battery', 2021),
-('MS Havila Polaris', '9892703', 'Coastal Cruise Ship', 'Bergen-Kirkenes', 'Active', 640, 'Hybrid Battery', 6200, 'Marine Gas Oil/Battery', 2022),
-('MS Havila Pollux', '9892715', 'Coastal Cruise Ship', 'Bergen-Kirkenes', 'Active', 640, 'Hybrid Battery', 6200, 'Marine Gas Oil/Battery', 2022);
+('MS Maritime Capella', '9892689', 'Coastal Cruise Ship', 'Bergen-Kirkenes', 'Active', 640, 'Hybrid Battery', 6200, 'Marine Gas Oil/Battery', 2021),
+('MS Maritime Castor', '9892691', 'Coastal Cruise Ship', 'Bergen-Kirkenes', 'Active', 640, 'Hybrid Battery', 6200, 'Marine Gas Oil/Battery', 2021),
+('MS Maritime Polaris', '9892703', 'Coastal Cruise Ship', 'Bergen-Kirkenes', 'Active', 640, 'Hybrid Battery', 6200, 'Marine Gas Oil/Battery', 2022),
+('MS Maritime Pollux', '9892715', 'Coastal Cruise Ship', 'Bergen-Kirkenes', 'Active', 640, 'Hybrid Battery', 6200, 'Marine Gas Oil/Battery', 2022);
 
 INSERT INTO ports (port_name, country, latitude, longitude, port_type) VALUES
 ('Bergen', 'Norway', 60.3913, 5.3221, 'Coastal Port'),
@@ -205,31 +205,31 @@ INSERT INTO ports (port_name, country, latitude, longitude, port_type) VALUES
 ('Båtsfjord', 'Norway', 70.6341, 29.7216, 'Coastal Port');
 
 INSERT INTO voyages (vessel_id, departure_port_id, arrival_port_id, scheduled_departure, scheduled_arrival, voyage_status, passenger_count, fuel_consumed_liters, co2_emissions_kg, battery_usage_kwh) VALUES
-((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Havila Capella'),
+((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Maritime Capella'),
  (SELECT port_id FROM ports WHERE port_name = 'Bergen'),
  (SELECT port_id FROM ports WHERE port_name = 'Tromsø'),
  '2024-03-15 14:30:00', '2024-03-16 08:00:00', 'Completed', 524, 2500.50, 6580.25, 1850.75),
-((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Havila Castor'),
+((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Maritime Castor'),
  (SELECT port_id FROM ports WHERE port_name = 'Tromsø'),
  (SELECT port_id FROM ports WHERE port_name = 'Kirkenes'),
  '2024-03-16 10:00:00', '2024-03-17 06:00:00', 'Completed', 445, 2200.75, 5789.95, 1650.25),
-((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Havila Polaris'),
+((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Maritime Polaris'),
  (SELECT port_id FROM ports WHERE port_name = 'Kirkenes'),
  (SELECT port_id FROM ports WHERE port_name = 'Bergen'),
  '2024-03-17 09:30:00', '2024-03-18 20:00:00', 'In Progress', 587, 3200.00, 8420.00, 2100.50),
-((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Havila Pollux'),
+((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Maritime Pollux'),
  (SELECT port_id FROM ports WHERE port_name = 'Bergen'),
  (SELECT port_id FROM ports WHERE port_name = 'Ålesund'),
  '2024-03-18 12:00:00', '2024-03-18 18:00:00', 'Scheduled', 0, NULL, NULL, NULL);
 
 INSERT INTO environmental_data (vessel_id, timestamp, latitude, longitude, speed_knots, fuel_consumption_lph, battery_charge_percent, co2_emissions_kg_h, nox_emissions_kg_h, sox_emissions_kg_h, weather_conditions, sea_state, hybrid_mode_active) VALUES
-((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Havila Capella'),
+((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Maritime Capella'),
  '2024-03-15 15:00:00', 60.5, 5.5, 18.5, 125.5, 85.2, 45.2, 8.1, 0.3, 'Clear', 'Calm', 1),
-((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Havila Capella'),
+((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Maritime Capella'),
  '2024-03-15 16:00:00', 61.2, 6.1, 19.2, 128.3, 82.1, 46.8, 8.3, 0.32, 'Clear', 'Calm', 1),
-((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Havila Castor'),
+((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Maritime Castor'),
  '2024-03-16 11:00:00', 70.1, 19.5, 17.8, 118.7, 88.5, 42.9, 7.8, 0.28, 'Partly Cloudy', 'Moderate', 1),
-((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Havila Polaris'),
+((SELECT vessel_id FROM vessels WHERE vessel_name = 'MS Maritime Polaris'),
  '2024-03-17 14:00:00', 69.8, 25.2, 16.5, 112.3, 91.2, 41.5, 7.5, 0.25, 'Overcast', 'Slight', 1);
 
 INSERT INTO ai_models (model_name, model_type, version, accuracy_score) VALUES

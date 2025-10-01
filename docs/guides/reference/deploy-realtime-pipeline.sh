@@ -18,7 +18,7 @@ LOCATION="norwayeast"
 SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:-}"
 
 # Event Hub Configuration
-EVENTHUB_NAMESPACE="havila-maritime-events"
+EVENTHUB_NAMESPACE="maritimeiq-platform-events"
 EVENTHUB_NAME="maritime-telemetry"
 EVENTHUB_CONSUMER_GROUP="analytics"
 
@@ -26,7 +26,7 @@ EVENTHUB_CONSUMER_GROUP="analytics"
 STREAM_ANALYTICS_JOB="maritime-analytics"
 
 # Cosmos DB Configuration
-COSMOSDB_ACCOUNT="havila-maritime-cosmos"
+COSMOSDB_ACCOUNT="maritimeiq-platform-cosmos"
 COSMOSDB_DATABASE="MaritimeData"
 
 # Function to print colored output
@@ -245,8 +245,8 @@ EOF
 setup_azure_function() {
     print_status "Setting up Azure Function for data processing..."
     
-    local function_app_name="havila-maritime-processor"
-    local storage_account="havilamaritimestorage"
+    local function_app_name="maritimeiq-processor"
+    local storage_account="maritimeiqplatformstorage"
     
     # Create storage account for Function App
     if ! az storage account show --name "$storage_account" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
@@ -281,7 +281,7 @@ setup_azure_function() {
 # Main deployment function
 main() {
     echo "=================================================="
-    echo "     Havila Kystruten Real-time Data Pipeline"
+    echo "     MaritimeIQ Real-time Data Pipeline"
     echo "            Deployment Script v1.0"
     echo "=================================================="
     echo ""

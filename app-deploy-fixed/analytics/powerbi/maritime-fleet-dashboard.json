@@ -232,7 +232,7 @@
   "deployment": {
     "workspace": {
       "name": "Maritime Data Intelligence Platform",
-      "description": "Havila Kystruten Maritime Operations Analytics"
+      "description": "MaritimeIQ Platform Maritime Operations Analytics"
     },
     "security": {
       "rowLevelSecurity": {
