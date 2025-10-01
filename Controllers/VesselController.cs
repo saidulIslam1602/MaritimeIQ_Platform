@@ -19,17 +19,17 @@ namespace MaritimeIQ.Platform.Controllers
         }
 
         /// <summary>
-        /// Get all vessels in Havila Kystruten fleet with real-time data
+        /// Get all vessels in maritime fleet with real-time data
         /// </summary>
         [HttpGet]
         public ActionResult<IEnumerable<Vessel>> GetFleet()
         {
             var fleet = _maritimeData.GetFleet();
-            _logger.LogInformation($"Retrieved {fleet.Count()} vessels from Havila fleet");
+            _logger.LogInformation($"Retrieved {fleet.Count()} vessels from maritime fleet");
             return Ok(new
             {
                 TotalVessels = fleet.Count,
-                FleetOperator = "Havila Kystruten AS",
+                FleetOperator = "Maritime Operations AS",
                 RouteNetwork = "Bergen-Kirkenes Coastal Route",
                 Vessels = fleet,
                 LastUpdated = DateTime.UtcNow

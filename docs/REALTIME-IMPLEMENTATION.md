@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the comprehensive real-time data ingestion and analytics system implemented for the Havila Kystruten Maritime Platform. The system provides live data streaming, dynamic analytics, and real-time visualizations for maritime operations.
+This document describes the comprehensive real-time data ingestion and analytics system implemented for the MaritimeIQ Platform. The system provides live data streaming, dynamic analytics, and real-time visualizations for maritime operations.
 
 ## Architecture Components
 
@@ -276,6 +276,6 @@ npm run deploy
 
 ## Conclusion
 
-The real-time maritime data analytics system provides Havila Kystruten with comprehensive visibility into fleet operations, environmental compliance, and passenger services. The system's scalable architecture ensures reliable performance while delivering actionable insights for operational excellence and regulatory compliance.
+The real-time maritime data analytics system provides comprehensive visibility into fleet operations, environmental compliance, and passenger services. The system's scalable architecture ensures reliable performance while delivering actionable insights for operational excellence and regulatory compliance.
 
 The implementation leverages Azure's cloud-native services for high availability, security, and performance, while providing an intuitive dashboard interface for real-time monitoring and decision-making.

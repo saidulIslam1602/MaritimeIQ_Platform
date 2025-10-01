@@ -1,8 +1,8 @@
 # Project Structure Documentation
 
-## Havila Maritime Platform - Organized Structure
+## MaritimeIQ Platform - Organized Structure
 
-This document describes the organized folder structure of the Havila Maritime Platform.
+This document describes the organized folder structure of the MaritimeIQ Platform.
 
 ## 📁 Root Directory Structure
 
@@ -23,17 +23,17 @@ This document describes the organized folder structure of the Havila Maritime Pl
 │   │   ├── docker-compose.prod.yml # Production environment
 │   │   └── nginx.conf            # Web server configuration
 │   └── kubernetes/               # Kubernetes manifests
-│       └── havila-maritime-deployment.yaml
+│       └── maritimeiq-platform-deployment.yaml
 ├── devops/                       # DevOps and automation
 │   ├── pipelines/                # CI/CD pipeline definitions
 │   │   └── azure-pipelines-enhanced.yml
 │   └── scripts/                  # Deployment and automation scripts
-│       └── deploy-havila-maritime-platform.sh
+│       └── deploy-maritimeiq-platform.sh
 ├── analytics/                    # Analytics and reporting
 │   ├── powerbi/                  # Power BI configurations
-│   │   └── havila-workspace-config.json
+│   │   └── maritimeiq-workspace-config.json
 │   └── stream-analytics/         # Stream Analytics queries
-│       └── havila-maritime-analytics.sql
+│       └── maritimeiq-maritime-analytics.sql
 ├── docs/                         # Documentation
 └── bin/, obj/                    # Build artifacts (auto-generated)
 ```
@@ -92,7 +92,7 @@ docker-compose up -d
 ### Production Deployment
 ```bash
 # Azure deployment
-./devops/scripts/deploy-havila-maritime-platform.sh
+./devops/scripts/deploy-maritimeiq-platform.sh
 
 # Kubernetes deployment
 kubectl apply -f deployment/kubernetes/
@@ -113,6 +113,6 @@ If you need to reference files in their new locations:
 - Configuration files: `config/appsettings.json`
 - Docker files: `deployment/docker/Dockerfile`
 - Pipeline files: `devops/pipelines/azure-pipelines-enhanced.yml`
-- Deployment scripts: `devops/scripts/deploy-havila-maritime-platform.sh`
+- Deployment scripts: `devops/scripts/deploy-maritimeiq-platform.sh`
 
 The application will continue to work as before, but with a much cleaner and more professional structure.

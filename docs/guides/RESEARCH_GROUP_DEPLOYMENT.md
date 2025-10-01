@@ -1,7 +1,7 @@
 # Maritime Platform - Research Group Deployment Guide
 
 ## Overview
-This guide provides multiple deployment options for the Havila Maritime Platform tailored for research groups with different infrastructure capabilities and requirements.
+This guide provides multiple deployment options for the MaritimeIQ Platform tailored for research groups with different infrastructure capabilities and requirements.
 
 ## Deployment Options Summary
 

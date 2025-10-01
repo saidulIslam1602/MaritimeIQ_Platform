@@ -118,7 +118,7 @@ export const useRealTimeData = (dataTypes: string[]) => {
   useEffect(() => {
     // Initialize WebSocket service
     const config: WebSocketConfig = {
-      url: 'wss://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io/ws',
+      url: 'wss://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io/ws',
       autoReconnect: true,
       reconnectInterval: 5000,
       maxReconnectAttempts: 10

@@ -126,7 +126,7 @@ export default function RouteOptimization() {
             <div>
               <p className="text-blue-400 font-medium">Weather Optimization Available</p>
               <p className="text-slate-400 text-sm">Alternative route through Lofoten can save 2.5 hours due to favorable winds</p>
-              <p className="text-xs text-slate-500">Recommended for Havila Capella - departing in 4 hours</p>
+              <p className="text-xs text-slate-500">Recommended for MS Nordic Aurora - departing in 4 hours</p>
             </div>
           </div>
 

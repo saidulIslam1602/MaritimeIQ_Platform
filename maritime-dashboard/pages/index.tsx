@@ -43,7 +43,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-maritime-dark flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-havila-blue mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-maritime-blue mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-white">Loading Maritime Platform...</h2>
         </div>
       </div>
@@ -53,11 +53,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-maritime-dark">
       {/* Header */}
-      <header className="bg-havila-blue shadow-lg">
+      <header className="bg-maritime-blue shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
-              <Ship className="h-8 w-8 text-havila-gold mr-3" />
+              <Ship className="h-8 w-8 text-maritime-gold mr-3" />
               <div>
                 <h1 className="text-2xl font-bold text-white">MaritimeIQ Platform</h1>
                 <p className="text-blue-200">Advanced Maritime Intelligence & Operations</p>
@@ -94,7 +94,7 @@ export default function Home() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === tab.id
-                      ? 'border-havila-blue text-havila-blue'
+                      ? 'border-maritime-blue text-maritime-blue'
                       : 'border-transparent text-slate-300 hover:text-white hover:border-slate-300'
                   }`}
                 >
@@ -139,7 +139,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div className="text-slate-400">
-              © 2025 Havila Kystruten. Maritime Platform v2.0.0
+              © 2025 MaritimeIQ Platform. v2.0.0
             </div>
             <div className="flex items-center text-slate-400">
               <Activity className="h-4 w-4 mr-2" />

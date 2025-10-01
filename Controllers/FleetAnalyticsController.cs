@@ -6,7 +6,7 @@ namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
     /// Fleet Analytics Service - Provides comprehensive analytics, reporting, 
-    /// and business intelligence for Havila Kystruten maritime operations
+    /// and business intelligence for maritime operations
     /// </summary>
     [ApiController]
     [Route("api/fleet-analytics")]

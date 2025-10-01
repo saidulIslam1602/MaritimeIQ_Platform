@@ -131,7 +131,7 @@ import { analyticsService } from '@/services/analytics/analytics'
 ```typescript
 import { formatNumber, formatDateTime } from '@/utils/formatters'
 import { calculateFuelEfficiency } from '@/utils/calculations'
-import { HAVILA_FLEET, EMISSION_LIMITS } from '@/constants/maritime'
+import { MARITIME_FLEET, EMISSION_LIMITS } from '@/constants/maritime'
 ```
 
 ## 🎯 Benefits

@@ -68,7 +68,7 @@ namespace MaritimeIQ.Platform.Services
                     new MaritimeDashboard
                     {
                         Id = "fleet-operations",
-                        Name = "Havila Fleet Operations Dashboard",
+                        Name = "Maritime Fleet Operations Dashboard",
                         Description = "Real-time fleet monitoring, vessel positions, and operational metrics",
                         Category = "Operations",
                         Reports = new List<MaritimePowerBIReport>
@@ -516,7 +516,7 @@ namespace MaritimeIQ.Platform.Services
                     {
                         Id = "maritime-operations",
                         Name = "Maritime Operations Dataset",
-                        Description = "Core operational data for Havila fleet",
+                        Description = "Core operational data for maritime fleet",
                         LastRefresh = DateTime.UtcNow.AddHours(-2),
                         RefreshStatus = "Success"
                     },
@@ -655,7 +655,7 @@ namespace MaritimeIQ.Platform.Services
                 return new Dictionary<string, object>
                 {
                     ["workspaceId"] = _workspaceId,
-                    ["name"] = "Havila Kystruten Maritime Workspace",
+                    ["name"] = "MaritimeIQ Operations Workspace",
                     ["description"] = "PowerBI workspace for maritime operations analytics",
                     ["status"] = "Active",
                     ["lastAccessed"] = DateTime.UtcNow.AddMinutes(-Random.Shared.Next(1, 60)),

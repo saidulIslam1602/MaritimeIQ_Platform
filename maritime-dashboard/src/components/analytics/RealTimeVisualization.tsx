@@ -57,7 +57,7 @@ export default function RealTimeVisualization() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-havila-blue"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-maritime-blue"></div>
       </div>
     )
   }
@@ -72,7 +72,7 @@ export default function RealTimeVisualization() {
               <p className="text-gray-400 text-sm">Active Vessels</p>
               <p className="text-2xl font-bold text-white">{insightsData?.fleet?.activeVessels || 0}</p>
             </div>
-            <Ship className="h-8 w-8 text-havila-blue" />
+            <Ship className="h-8 w-8 text-maritime-blue" />
           </div>
           <div className="flex items-center mt-2 text-green-400">
             <TrendingUp className="h-4 w-4 mr-1" />
@@ -86,7 +86,7 @@ export default function RealTimeVisualization() {
               <p className="text-gray-400 text-sm">Total Passengers</p>
               <p className="text-2xl font-bold text-white">{insightsData?.voyages?.totalPassengers?.toLocaleString() || 0}</p>
             </div>
-            <Users className="h-8 w-8 text-havila-blue" />
+            <Users className="h-8 w-8 text-maritime-blue" />
           </div>
           <div className="flex items-center mt-2 text-blue-400">
             <Activity className="h-4 w-4 mr-1" />
@@ -114,7 +114,7 @@ export default function RealTimeVisualization() {
               <p className="text-gray-400 text-sm">Avg Speed</p>
               <p className="text-2xl font-bold text-white">{insightsData?.fleet?.averageSpeedKnots?.toFixed(1) || 0} kn</p>
             </div>
-            <Gauge className="h-8 w-8 text-havila-blue" />
+            <Gauge className="h-8 w-8 text-maritime-blue" />
           </div>
           <div className="flex items-center mt-2 text-blue-400">
             <Activity className="h-4 w-4 mr-1" />

@@ -177,7 +177,7 @@ namespace MaritimeIQ.Platform.Services
     // Extension methods for dependency injection
     public static class EventHubExtensions
     {
-        public static IServiceCollection AddHavilaEventHubs(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMaritimeEventHubs(this IServiceCollection services, IConfiguration configuration)
         {
             var config = configuration.GetSection("EventHub").Get<EventHubConfiguration>() ?? new EventHubConfiguration();
             services.AddSingleton(config);

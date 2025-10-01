@@ -225,7 +225,7 @@ namespace MaritimeIQ.Platform.Data
         /// <summary>
         /// Bergen-Kirkenes route definition
         /// </summary>
-        public static List<MaritimeRoute> GetHavilaRoutes()
+        public static List<MaritimeRoute> GetMaritimeRoutes()
         {
             return new List<MaritimeRoute>
             {

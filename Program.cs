@@ -47,7 +47,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 
-// Register Havila Maritime services
+// Register Maritime Platform services
 builder.Services.AddScoped<AISProcessingService>();
 builder.Services.AddScoped<EnvironmentalMonitoringService>();
 builder.Services.AddScoped<PassengerNotificationService>();
@@ -88,9 +88,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Havila Kystruten Maritime Platform",
+        Title = "MaritimeIQ Platform",
         Version = "v2.0",
-        Description = "Comprehensive maritime operations platform with AI-powered analytics, real-time monitoring, IoT integration, and Power BI reporting for Havila Kystruten's coastal fleet operations."
+        Description = "Comprehensive maritime operations platform with AI-powered analytics, real-time monitoring, IoT integration, and Power BI reporting for coastal fleet operations."
     });
 });
 
@@ -159,12 +159,12 @@ builder.Services.AddHealthChecks()
     .AddCheck("database", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Database connection ready"))
     .AddCheck("azure-services", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Azure services ready"));
 
-// Add CORS for Havila web applications
+// Add CORS for Maritime web applications
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("HavilaPolicy", policy =>
+    options.AddPolicy("MaritimePolicy", policy =>
     {
-        policy.WithOrigins("https://havila-maritime.azurewebsites.net", "https://localhost:5001")
+        policy.WithOrigins("https://maritimeiq-platform.azurewebsites.net", "https://localhost:5001")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -179,7 +179,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Havila Kystruten Maritime Platform v2.0");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MaritimeIQ Platform v2.0");
         c.RoutePrefix = string.Empty; // Serve Swagger UI at app's root
     });
 }
@@ -203,7 +203,7 @@ app.Use(async (context, next) =>
 app.UseHttpsRedirection();
 
 // Add CORS
-app.UseCors("HavilaPolicy");
+app.UseCors("MaritimePolicy");
 
 app.UseRouting();
 app.UseAuthorization();
@@ -244,7 +244,7 @@ if (app.Environment.IsDevelopment())
 // Main API endpoints
 app.MapGet("/", () => new
 {
-    Message = "Havila Kystruten Maritime Operations API",
+    Message = "MaritimeIQ Operations API",
     Description = "Comprehensive maritime service for vessel management, route planning, and safety monitoring",
     Timestamp = DateTime.UtcNow,
     Version = "2.0.0",
@@ -268,7 +268,7 @@ app.MapGet("/api/status", () => new
 {
     Status = "Operational",
     Timestamp = DateTime.UtcNow,
-    Platform = "Havila Kystruten Maritime Platform",
+    Platform = "MaritimeIQ Platform",
     Version = "2.0.0",
     Uptime = TimeSpan.FromMilliseconds(Environment.TickCount64),
     ActiveServices = new string[]

@@ -129,7 +129,7 @@ namespace MaritimeIQ.Platform.Services
     // Extension methods for dependency injection and configuration
     public static class KeyVaultExtensions
     {
-        public static IServiceCollection AddHavilaKeyVault(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMaritimeKeyVault(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<KeyVaultConfiguration>(configuration.GetSection("KeyVault"));
             services.AddSingleton<IKeyVaultService, KeyVaultService>();
@@ -137,7 +137,7 @@ namespace MaritimeIQ.Platform.Services
             return services;
         }
 
-        public static IConfigurationBuilder AddHavilaKeyVault(this IConfigurationBuilder builder, KeyVaultConfiguration config)
+        public static IConfigurationBuilder AddMaritimeKeyVault(this IConfigurationBuilder builder, KeyVaultConfiguration config)
         {
             var credential = BuildCredential(config);
 
@@ -166,16 +166,16 @@ namespace MaritimeIQ.Platform.Services
         }
     }
 
-    // Havila-specific secret names
-    public static class HavilaSecrets
+    // Maritime platform secret names
+    public static class MaritimeSecrets
     {
-        public const string SqlConnectionString = "HavilaSqlConnectionString";
-        public const string StorageConnectionString = "HavilaStorageConnectionString";
-        public const string ServiceBusConnectionString = "HavilaServiceBusConnectionString";
-        public const string EventHubsConnectionString = "HavilaEventHubsConnectionString";
-        public const string ApplicationInsightsConnectionString = "HavilaApplicationInsightsConnectionString";
-        public const string OpenAIApiKey = "HavilaOpenAIApiKey";
-        public const string PowerBIClientSecret = "HavilaPowerBIClientSecret";
-        public const string ContainerRegistryPassword = "HavilaACRPassword";
+        public const string SqlConnectionString = "MaritimeSqlConnectionString";
+        public const string StorageConnectionString = "MaritimeStorageConnectionString";
+        public const string ServiceBusConnectionString = "MaritimeServiceBusConnectionString";
+        public const string EventHubsConnectionString = "MaritimeEventHubsConnectionString";
+        public const string ApplicationInsightsConnectionString = "MaritimeApplicationInsightsConnectionString";
+        public const string OpenAIApiKey = "MaritimeOpenAIApiKey";
+        public const string PowerBIClientSecret = "MaritimePowerBIClientSecret";
+        public const string ContainerRegistryPassword = "MaritimeACRPassword";
     }
 }

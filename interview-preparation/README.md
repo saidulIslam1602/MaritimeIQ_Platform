@@ -70,43 +70,56 @@
 
 ## Executive Summary
 
-This comprehensive interview preparation guide covers the **MaritimeIQ Platform** built with modern cloud-native technologies and enterprise-grade C# data pipelines. The platform processes real-time vessel data, provides maritime intelligence, and supports fleet operations with advanced data engineering capabilities.
+This comprehensive interview preparation guide covers the **MaritimeIQ Platform** built with modern cloud-native technologies, **Apache Kafka streaming**, **Databricks data lakehouse**, **PySpark batch analytics**, and enterprise-grade C# data pipelines. The platform processes real-time vessel data, provides maritime intelligence, and supports fleet operations with advanced data engineering capabilities.
 
 ### Key Technical Highlights
 
 **Architecture Overview:**
-- **Multi-tier Architecture**: API layer, service layer, data processing layer, and presentation layer
-- **Event-Driven Design**: Azure Event Hubs for real-time AIS message processing
+- **Multi-tier Architecture**: API layer, service layer, data lakehouse, and presentation layer
+- **Event-Driven Design**: Apache Kafka + Azure Event Hubs for real-time streaming
+- **Data Lakehouse**: Databricks with Delta Lake (Bronze-Silver-Gold medallion architecture)
+- **Batch Processing**: PySpark jobs processing 10M+ records/hour
 - **Microservices Pattern**: Loosely coupled services with clear boundaries
 - **Cloud-Native**: Fully deployed on Microsoft Azure with managed services
 
 **Technology Stack:**
 - **Backend**: .NET 8 Web API with Entity Framework Core
+- **Streaming**: Apache Kafka with Confluent platform (exactly-once semantics)
+- **Data Lakehouse**: Azure Databricks with Delta Lake (ACID transactions, time travel)
+- **Big Data**: PySpark 3.5+ for distributed processing (batch & streaming)
 - **Frontend**: Next.js 14 with TypeScript and Tailwind CSS
 - **Database**: Azure SQL Database with optimized indexing
 - **Processing**: Azure Functions + C# Data Pipelines for event-driven workloads
-- **Data Engineering**: Real-time ETL, streaming, and data quality services
-- **Infrastructure**: Azure Container Apps, Event Hubs, Key Vault, Application Insights
+- **Data Engineering**: Kafka streaming, real-time ETL, data quality, PySpark analytics
+- **Infrastructure**: Azure Container Apps, Kafka, Databricks, Event Hubs, Application Insights
+- **CI/CD**: GitHub Actions with automated Kafka & Databricks deployment
 
 **Scale & Performance:**
-- **Processing Capacity**: 500+ AIS messages per second
+- **Kafka Throughput**: 500+ messages/second with exactly-once delivery semantics
+- **PySpark Batch**: 10M+ records/hour on distributed clusters
+- **Databricks**: Auto-scaling 2-16 worker nodes based on load
 - **API Performance**: Sub-100ms response times (95th percentile)
-- **Real-time Updates**: Dashboard refreshes every 30 seconds
+- **Real-time Updates**: < 50ms end-to-end stream processing latency
 - **Data Volume**: Processing millions of position updates daily
 - **Scalability**: Auto-scaling from 1 to 50+ instances based on demand
+- **ML Models**: Predictive maintenance with 85%+ accuracy
 
 ### Quick Reference: Technology Decisions
 
 | Decision Point | Chosen Technology | Key Reasons |
 |----------------|------------------|-------------|
 | **API Framework** | .NET 8 Web API | Performance, type safety, Azure integration |
+| **Streaming Platform** | Apache Kafka | High-throughput, exactly-once semantics, partitioning |
+| **Data Lakehouse** | Databricks + Delta Lake | ACID transactions, time travel, unified batch/streaming |
+| **Big Data Processing** | PySpark 3.5+ | Distributed computing, 10M+ records/hour, scalability |
 | **Database** | Azure SQL Database | ACID guarantees, complex queries, compliance |
-| **Event Processing** | Azure Event Hubs | Managed service, auto-scaling, reliability |
+| **Event Processing** | Azure Event Hubs + Kafka | Managed service, auto-scaling, reliability |
 | **Compute Platform** | Azure Container Apps | Cost-effective, auto-scaling, managed |
 | **Frontend Framework** | Next.js 14 | React ecosystem, TypeScript, performance |
-| **Authentication** | Azure AD + Certificates | Enterprise integration, certificate-based auth |
+| **ML Platform** | Databricks ML | Integrated MLflow, auto-scaling clusters, production-ready |
+| **CI/CD** | GitHub Actions | Automated Kafka/Databricks deployment, free for public repos |
 | **Monitoring** | Application Insights | Deep integration, custom metrics, alerting |
-| **Deployment** | ARM Templates | Infrastructure as Code, repeatability |
+| **Deployment** | Docker + K8s + ARM | Containerization, orchestration, Infrastructure as Code |
 
 ### Final Preparation Tips
 
@@ -130,11 +143,11 @@ This comprehensive interview preparation guide covers the **MaritimeIQ Platform*
 
 ---
 
-*This guide represents **200+ pages** of comprehensive technical documentation for interview preparation covering modern cloud-native development, C# data engineering pipelines, event-driven architectures, and scalable system design.*
+*This guide represents **200+ pages** of comprehensive technical documentation for interview preparation covering modern cloud-native development, Apache Kafka streaming, Databricks data lakehouse, PySpark analytics, C# data engineering pipelines, event-driven architectures, and scalable system design.*
 
-**Version:** 1.0  
-**Last Updated:** December 2024  
+**Version:** 2.0  
+**Last Updated:** September 2024  
 **Project Repository:** MaritimeIQ_Platform  
-**Technology Stack:** .NET 8, Azure Data Factory, C# Data Pipelines, Azure Services, Next.js 14, TypeScript
+**Technology Stack:** .NET 8, Apache Kafka, Databricks, Delta Lake, PySpark, C# Data Pipelines, Azure Services, Next.js 14, TypeScript
 
 ---

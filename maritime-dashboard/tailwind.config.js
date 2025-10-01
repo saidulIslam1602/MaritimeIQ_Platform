@@ -11,8 +11,8 @@ module.exports = {
         'maritime-blue': '#1e40af',
         'maritime-dark': '#0f172a',
         'maritime-light': '#f8fafc',
-        'havila-blue': '#003f7f',
-        'havila-gold': '#ffd700'
+        'maritime-blue': '#003f7f',
+        'maritime-gold': '#ffd700'
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

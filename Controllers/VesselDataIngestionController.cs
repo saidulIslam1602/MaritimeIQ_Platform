@@ -6,7 +6,7 @@ namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
     /// Vessel Data Ingestion Service - Handles real-time AIS data, sensor readings,
-    /// IoT integration, and environmental monitoring for the Havila fleet
+    /// IoT integration, and environmental monitoring for the maritime fleet
     /// </summary>
     [ApiController]
     [Route("api/vessel-data-ingestion")]

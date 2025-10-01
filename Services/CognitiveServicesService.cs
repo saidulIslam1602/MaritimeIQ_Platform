@@ -287,7 +287,7 @@ namespace MaritimeIQ.Platform.Services
             }
 
             // Detect vessel names
-            var vesselNames = new[] { "havila castor", "havila pollux", "havila capella", "havila polaris" };
+            var vesselNames = new[] { "arctic explorer", "nordic spirit", "nordic aurora", "coastal voyager" };
             foreach (var vessel in vesselNames)
             {
                 if (lowerText.Contains(vessel))
@@ -443,7 +443,7 @@ namespace MaritimeIQ.Platform.Services
                 ["ScheduleInquiry"] = "Our vessels operate daily on the Bergen-Kirkenes route. The journey takes approximately 6.5 days. Would you like specific departure times?",
                 ["WeatherInquiry"] = "Current weather conditions along the Norwegian coast are generally good for sailing. Check our real-time weather updates in the app.",
                 ["NorthernLightsInquiry"] = "The Northern Lights season runs from September to March. Our best viewing locations are north of Bodø, particularly around Tromsø.",
-                ["GeneralInquiry"] = "Thank you for contacting Havila Kystruten. How can I assist you with your journey along the beautiful Norwegian coast?"
+                ["GeneralInquiry"] = "Thank you for contacting Maritime Operations. How can I assist you with your journey along the beautiful Norwegian coast?"
             };
 
             return responses.ContainsKey(intent) ? responses[intent] : responses["GeneralInquiry"];
@@ -668,7 +668,7 @@ namespace MaritimeIQ.Platform.Services
     // Extension methods for dependency injection
     public static class CognitiveServicesExtensions
     {
-        public static IServiceCollection AddHavilaCognitiveServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMaritimeCognitiveServices(this IServiceCollection services, IConfiguration configuration)
         {
             var config = configuration.GetSection("CognitiveServices").Get<CognitiveServicesConfiguration>();
             services.AddSingleton(config!);

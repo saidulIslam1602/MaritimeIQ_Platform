@@ -5,7 +5,7 @@ namespace MaritimeIQ.Platform.Services
 {
     /// <summary>
     /// Environmental Monitoring Service - Real-time CO2 thresholds, emission alerts,
-    /// and environmental compliance monitoring for Havila's hybrid fleet
+    /// and environmental compliance monitoring for maritime hybrid fleet
     /// </summary>
     public class EnvironmentalMonitoringService
     {

@@ -1,7 +1,7 @@
 namespace MaritimeIQ.Platform.Models;
 
 /// <summary>
-/// High-level operational snapshot for the Havila maritime platform.
+/// High-level operational snapshot for the MaritimeIQ platform.
 /// </summary>
 public record MaritimeInsightsOverview(
     FleetAnalyticsSnapshot Fleet,

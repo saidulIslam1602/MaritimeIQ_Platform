@@ -135,7 +135,7 @@ namespace MaritimeIQ.Platform.Services
     // Extension methods for dependency injection
     public static class ServiceBusExtensions
     {
-        public static IServiceCollection AddHavilaServiceBus(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMaritimeServiceBus(this IServiceCollection services, IConfiguration configuration)
         {
             var config = configuration.GetSection("ServiceBus").Get<ServiceBusConfiguration>();
             services.AddSingleton(config!);

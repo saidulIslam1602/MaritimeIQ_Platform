@@ -9,7 +9,7 @@ This visualization platform provides a professional, interview-ready interface t
 ### 🎯 **Key Features**
 
 #### **Fleet Management Dashboard**
-- ✅ Real-time vessel tracking for 4 Havila Kystruten ships
+- ✅ Real-time vessel tracking for 4 maritime fleet vessels
 - ✅ Live performance metrics (passengers, on-time performance)
 - ✅ Individual vessel status monitoring
 - ✅ Interactive fleet overview with capacity utilization
@@ -76,7 +76,7 @@ open http://localhost:8080
 ## 🎨 **Interview Demonstration Script**
 
 ### **1. Start with Fleet Management (30 seconds)**
-"Here's our live fleet management dashboard showing all 4 Havila Kystruten vessels operating on the Bergen-Kirkenes route. You can see real-time passenger counts, on-time performance at 98.5%, and individual vessel status including speed and position data."
+"Here's our live fleet management dashboard showing all 4 maritime fleet vessels operating on the Bergen-Kirkenes route. You can see real-time passenger counts, on-time performance at 98.5%, and individual vessel status including speed and position data."
 
 ### **2. Show Route Optimization (45 seconds)**
 "Our AI-powered route optimization system provides real-time recommendations. For example, you can see here it's suggesting a weather-optimized route through Lofoten that saves 2.5 hours, and it's automatically sent Northern Lights viewing alerts to 342 passengers based on clear sky predictions."

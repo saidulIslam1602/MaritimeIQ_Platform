@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: maritimeplatformacr.azurecr.io
-  IMAGE_NAME: havila-maritime
+  IMAGE_NAME: maritimeiq-platform
   AZURE_RESOURCE_GROUP: $(az acr show --name maritimeplatformacr --query resourceGroup -o tsv)
 
 jobs:
@@ -110,12 +110,12 @@ jobs:
       uses: azure/aci-deploy@v1
       with:
         resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
-        dns-name-label: havila-maritime-staging-${{ github.run_number }}
+          dns-name-label: maritimeiq-staging-${{ github.run_number }}
         image: ${{ needs.build-and-test.outputs.image-tag }}
         registry-login-server: ${{ env.REGISTRY }}
         registry-username: ${{ secrets.ACR_USERNAME }}
         registry-password: ${{ secrets.ACR_PASSWORD }}
-        name: havila-maritime-staging
+          name: maritimeiq-staging
         location: 'Norway East'
         cpu: 1
         memory: 1.5
@@ -128,7 +128,7 @@ jobs:
       run: |
         echo "Waiting for container to start..."
         sleep 30
-        HEALTH_URL="http://havila-maritime-staging-${{ github.run_number }}.norwayeast.azurecontainer.io:8080/health"
+          HEALTH_URL="http://maritimeiq-staging-${{ github.run_number }}.norwayeast.azurecontainer.io:8080/health"
         curl -f $HEALTH_URL || exit 1
 
   # Job 4: Integration Tests
@@ -143,11 +143,11 @@ jobs:
 
     - name: Run API Integration Tests
       run: |
-        BASE_URL="http://havila-maritime-staging-${{ github.run_number }}.norwayeast.azurecontainer.io:8080"
+          BASE_URL="http://maritimeiq-staging-${{ github.run_number }}.norwayeast.azurecontainer.io:8080"
         
         # Test Fleet Management API
         echo "Testing Fleet Management API..."
-        curl -f "$BASE_URL/api/vessels" | jq '.[] | select(.name == "MS Havila Castor")'
+          curl -f "$BASE_URL/api/vessels" | jq '.[] | select(.name == "MS Arctic Explorer")'
         
         # Test Route Planning API
         echo "Testing Route Planning API..."
@@ -178,12 +178,12 @@ jobs:
       uses: azure/aci-deploy@v1
       with:
         resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
-        dns-name-label: havila-maritime-prod
+          dns-name-label: maritimeiq-prod
         image: ${{ needs.build-and-test.outputs.image-tag }}
         registry-login-server: ${{ env.REGISTRY }}
         registry-username: ${{ secrets.ACR_USERNAME }}
         registry-password: ${{ secrets.ACR_PASSWORD }}
-        name: havila-maritime-production
+          name: maritimeiq-production
         location: 'Norway East'
         cpu: 2
         memory: 3
@@ -196,12 +196,12 @@ jobs:
       run: |
         echo "Waiting for production container to start..."
         sleep 45
-        HEALTH_URL="http://havila-maritime-prod.norwayeast.azurecontainer.io:8080/health"
+          HEALTH_URL="http://maritimeiq-prod.norwayeast.azurecontainer.io:8080/health"
         curl -f $HEALTH_URL || exit 1
         echo "✅ Production deployment successful!"
 
     - name: Notify Teams
       run: |
-        echo "🚢 Havila Kystruten Maritime Platform deployed successfully!"
-        echo "Production URL: http://havila-maritime-prod.norwayeast.azurecontainer.io:8080"
-        echo "Swagger API: http://havila-maritime-prod.norwayeast.azurecontainer.io:8080/swagger"
+          echo "🚢 MaritimeIQ Platform deployed successfully!"
+          echo "Production URL: http://maritimeiq-prod.norwayeast.azurecontainer.io:8080"
+          echo "Swagger API: http://maritimeiq-prod.norwayeast.azurecontainer.io:8080/swagger"

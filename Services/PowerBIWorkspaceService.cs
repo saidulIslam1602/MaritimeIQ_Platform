@@ -323,7 +323,7 @@ namespace MaritimeIQ.Platform.Services
                         IsActive = true,
                         Condition = "DelayMinutes > 30",
                         Frequency = "Immediate",
-                        Recipients = new List<string> { "operations@havila.no" },
+                        Recipients = new List<string> { "operations@maritime-ops.com" },
                         LastTriggered = DateTime.UtcNow.AddHours(-2),
                         TriggerCount = 5
                     },
@@ -335,7 +335,7 @@ namespace MaritimeIQ.Platform.Services
                         IsActive = true,
                         Condition = "avg(Rating) < 3.5",
                         Frequency = "Daily",
-                        Recipients = new List<string> { "customer-service@havila.no" },
+                        Recipients = new List<string> { "customer-service@maritime-ops.com" },
                         LastTriggered = DateTime.UtcNow.AddDays(-1),
                         TriggerCount = 2
                     }
@@ -370,9 +370,9 @@ namespace MaritimeIQ.Platform.Services
                     AverageViewDuration = TimeSpan.FromMinutes(Random.Shared.Next(5, 30)),
                     TopViewers = new List<string> 
                     { 
-                        "fleet.manager@havila.no", 
-                        "operations@havila.no", 
-                        "captain.smith@havila.no" 
+                "fleet.manager@maritime-ops.com",
+                "operations@maritime-ops.com",
+                "captain.smith@maritime-ops.com"
                     },
                     PeakUsageHour = Random.Shared.Next(8, 18),
                     MobileViewPercentage = Random.Shared.Next(20, 60),
@@ -596,7 +596,7 @@ namespace MaritimeIQ.Platform.Services
     // Extension methods for dependency injection
     public static class PowerBIExtensions
     {
-        public static IServiceCollection AddHavilaPowerBI(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMaritimePowerBI(this IServiceCollection services, IConfiguration configuration)
         {
             var config = configuration.GetSection("PowerBI").Get<PowerBIConfiguration>();
             services.AddSingleton(config!);

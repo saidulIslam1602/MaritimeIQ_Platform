@@ -15,7 +15,7 @@ namespace MaritimeIQ.Platform.Services
     {
         public string ConnectionString { get; set; } = string.Empty;
         public string DeviceConnectionString { get; set; } = string.Empty;
-        public string HubName { get; set; } = "havila-maritime-iothub";
+        public string HubName { get; set; } = "maritimeiq-iothub";
         public int TelemetryIntervalSeconds { get; set; } = 30;
     }
 
@@ -141,7 +141,7 @@ namespace MaritimeIQ.Platform.Services
                 twin.Tags["vesselId"] = vesselId;
                 twin.Tags["deviceType"] = "vessel";
                 twin.Tags["location"] = "norwegian-coast";
-                twin.Tags["operator"] = "havila-kystruten";
+                twin.Tags["operator"] = "maritime-operations";
 
                 await _registryManager.AddDeviceAsync(device);
                 await _registryManager.UpdateTwinAsync(deviceId, twin, "*");
@@ -178,8 +178,8 @@ namespace MaritimeIQ.Platform.Services
             {
                 try
                 {
-                    // Simulate telemetry from Havila Kystruten vessels
-                    await ProcessHavilaFleetTelemetry();
+            // Simulate telemetry from maritime fleet vessels
+            await ProcessMaritimeFleetTelemetry();
                     await Task.Delay(TimeSpan.FromSeconds(_config.TelemetryIntervalSeconds), stoppingToken);
                 }
                 catch (Exception ex)
@@ -190,15 +190,15 @@ namespace MaritimeIQ.Platform.Services
             }
         }
 
-        private async Task ProcessHavilaFleetTelemetry()
+        private async Task ProcessMaritimeFleetTelemetry()
         {
-            // Simulate telemetry from Havila's 4 vessels
+            // Simulate telemetry from maritime fleet vessels
             var vessels = new[]
             {
-                new { Id = "HAVILA_CASTOR", Name = "MS Arctic Explorer" },
-                new { Id = "HAVILA_POLLUX", Name = "MS Nordic Spirit" },
-                new { Id = "HAVILA_CAPELLA", Name = "MS Nordic Aurora" },
-                new { Id = "HAVILA_POLARIS", Name = "MS Coastal Voyager" }
+                new { Id = "VESSEL_ALPHA", Name = "MS Arctic Explorer" },
+                new { Id = "VESSEL_BETA", Name = "MS Nordic Spirit" },
+                new { Id = "VESSEL_GAMMA", Name = "MS Nordic Aurora" },
+                new { Id = "VESSEL_DELTA", Name = "MS Coastal Voyager" }
             };
 
             foreach (var vessel in vessels)
@@ -253,7 +253,7 @@ namespace MaritimeIQ.Platform.Services
     // Extension methods for dependency injection
     public static class IoTHubExtensions
     {
-        public static IServiceCollection AddHavilaIoTHub(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMaritimeIoTHub(this IServiceCollection services, IConfiguration configuration)
         {
             var config = configuration.GetSection("IoTHub").Get<IoTHubConfiguration>();
             services.AddSingleton(config!);

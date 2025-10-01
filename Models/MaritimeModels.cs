@@ -416,7 +416,7 @@ namespace MaritimeIQ.Platform.Models
         public decimal PowerConsumptionKWh { get; set; }
         
         [Column(TypeName = "decimal(8,2)")]
-        public decimal BatteryStateOfCharge { get; set; } // For Havila's hybrid vessels
+        public decimal BatteryStateOfCharge { get; set; } // For maritime hybrid vessels
         
         [Column(TypeName = "decimal(6,2)")]
         public decimal WaterTemperature { get; set; }

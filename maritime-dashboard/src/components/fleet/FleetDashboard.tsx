@@ -60,8 +60,8 @@ export default function FleetDashboard() {
   const fetchFleetData = async () => {
     try {
       const API_URL = typeof window !== 'undefined' 
-        ? 'https://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io'
-        : process.env.NEXT_PUBLIC_MARITIME_API_URL || 'https://maritime-platform.icystone-47eb4b00.norwayeast.azurecontainerapps.io'
+        ? 'https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io'
+        : process.env.NEXT_PUBLIC_MARITIME_API_URL || 'https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io'
       const response = await fetch(`${API_URL}/api/vessel`)
       const data = await response.json()
       setFleetData(data)
@@ -93,7 +93,7 @@ export default function FleetDashboard() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-havila-blue"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-maritime-blue"></div>
       </div>
     )
   }
@@ -104,7 +104,7 @@ export default function FleetDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="metric-card">
           <div className="flex items-center">
-            <Ship className="h-8 w-8 text-havila-blue mr-3" />
+            <Ship className="h-8 w-8 text-maritime-blue mr-3" />
             <div>
               <p className="text-2xl font-bold text-white">{fleetData?.totalVessels || 0}</p>
               <p className="text-slate-400">Total Vessels</p>

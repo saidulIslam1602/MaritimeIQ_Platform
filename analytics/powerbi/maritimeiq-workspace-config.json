@@ -1,7 +1,7 @@
 {
-  "workspaceId": "havila-maritime-analytics",
-  "displayName": "Havila Kystruten Maritime Analytics",
-  "description": "Comprehensive business intelligence and analytics for Havila Kystruten's coastal operations",
+  "workspaceId": "maritimeiq-analytics",
+  "displayName": "MaritimeIQ Analytics",
+  "description": "Comprehensive business intelligence and analytics for maritime coastal operations",
   "environment": "production",
   "region": "West Europe",
   "capacityId": "A1",
