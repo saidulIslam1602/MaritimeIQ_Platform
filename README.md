@@ -240,7 +240,6 @@ maritime-emissions --input /path/to/data --output /path/to/results
 ├── analytics/                    # Business intelligence
 │   ├── powerbi/                  # Power BI configurations
 │   └── stream-analytics/         # Stream processing
-├── interview-preparation/        # Comprehensive technical documentation
 ├── requirements.txt              # NEW: Python dependencies
 └── docs/                         # Documentation
 ```
