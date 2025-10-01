@@ -174,16 +174,15 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Enable Swagger in all environments (production-safe)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MaritimeIQ Platform v2.0");
-        c.RoutePrefix = string.Empty; // Serve Swagger UI at app's root
-    });
-}
-else
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MaritimeIQ Platform v2.0");
+    c.RoutePrefix = "swagger"; // Serve Swagger UI at /swagger
+});
+
+if (!app.Environment.IsDevelopment())
 {
     // Production error handling
     app.UseExceptionHandler("/Error");
