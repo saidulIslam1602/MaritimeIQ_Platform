@@ -19,6 +19,7 @@ env:
   REGISTRY: maritimeregistry70396.azurecr.io
   IMAGE_NAME: maritimeiq-platform
   AZURE_RESOURCE_GROUP: maritime-platform-rg
+  IMAGE_TAG: maritimeregistry70396.azurecr.io/maritimeiq-platform:latest
 
 jobs:
   # Job 1: Build and Test
@@ -107,14 +108,14 @@ jobs:
       run: |
         echo "## 🔒 Security Scan Results" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "**Image:** ${{ needs.build-and-test.outputs.image-tag }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Image:** ${{ env.IMAGE_TAG }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo '```' >> $GITHUB_STEP_SUMMARY
         trivy image \
           --severity CRITICAL,HIGH,MEDIUM \
           --format table \
           --scanners vuln,secret,config \
-          ${{ needs.build-and-test.outputs.image-tag }} >> $GITHUB_STEP_SUMMARY || echo "Scan completed with warnings" >> $GITHUB_STEP_SUMMARY
+          ${{ env.IMAGE_TAG }} >> $GITHUB_STEP_SUMMARY || echo "Scan completed with warnings" >> $GITHUB_STEP_SUMMARY
         echo '```' >> $GITHUB_STEP_SUMMARY
 
   # Job 3: Deploy to Staging
@@ -135,12 +136,13 @@ jobs:
     - name: Deploy to Azure Container Apps (Staging)
       run: |
         echo "🚀 Deploying to staging environment..."
+        echo "Image: ${{ env.IMAGE_TAG }}"
         
         # Update the container app with new image
         az containerapp update \
           --name maritime-api-container \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --image ${{ needs.build-and-test.outputs.image-tag }} \
+          --image ${{ env.IMAGE_TAG }} \
           --set-env-vars \
             ASPNETCORE_ENVIRONMENT=Staging \
             ASPNETCORE_URLS=http://+:8080
@@ -163,7 +165,7 @@ jobs:
         echo "**Status:** ✅ Deployed" >> $GITHUB_STEP_SUMMARY
         echo "**URL:** https://$FQDN" >> $GITHUB_STEP_SUMMARY
         echo "**Swagger:** https://$FQDN/swagger" >> $GITHUB_STEP_SUMMARY
-        echo "**Image:** ${{ needs.build-and-test.outputs.image-tag }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Image:** ${{ env.IMAGE_TAG }}" >> $GITHUB_STEP_SUMMARY
 
     - name: Health check
       continue-on-error: true
@@ -262,12 +264,13 @@ jobs:
     - name: Deploy to Production
       run: |
         echo "🚀 Deploying to PRODUCTION environment..."
+        echo "Image: ${{ env.IMAGE_TAG }}"
         
         # Deploy the same tested image to production
         az containerapp update \
           --name maritime-api-container \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --image ${{ needs.build-and-test.outputs.image-tag }} \
+          --image ${{ env.IMAGE_TAG }} \
           --set-env-vars \
             ASPNETCORE_ENVIRONMENT=Production \
             ASPNETCORE_URLS=http://+:8080
