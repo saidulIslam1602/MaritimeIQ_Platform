@@ -1,45 +1,39 @@
 {
-  // MaritimeIQ Platform PowerBI Workspace Configuration
-  // Comprehensive business intelligence setup for maritime operations analytics
-  // Supports real-time vessel tracking, environmental monitoring, and fleet analytics
-  
-  "workspaceId": "maritimeiq-analytics",                    // Unique workspace identifier
-  "displayName": "MaritimeIQ Analytics",                     // User-friendly workspace name
+  "workspaceId": "maritimeiq-analytics",
+  "displayName": "MaritimeIQ Analytics",
   "description": "Comprehensive business intelligence and analytics for maritime coastal operations",
-  "environment": "production",                               // Deployment environment
-  "region": "West Europe",                                   // Azure region for data residency
-  "capacityId": "A1",                                       // PowerBI Premium capacity tier
-  // Data Gateway Configuration for On-Premises and Cloud Data Sources
-  // Enables secure connectivity between PowerBI and maritime data sources
+  "environment": "production",
+  "region": "West Europe",
+  "capacityId": "A1",
   "dataGateway": {
-    "enabled": true,                                          // Gateway connectivity enabled
-    "name": "maritimeiq-gateway",                            // Gateway instance name
-    "datasources": [                                         // Connected data sources
+    "enabled": true,
+    "name": "maritimeiq-gateway",
+    "datasources": [
       {
-        "name": "MaritimeIQAzureSQL",                        // Primary SQL database connection
-        "type": "AzureSqlDatabase",                          // Azure SQL Database type
+        "name": "MaritimeIQAzureSQL",
+        "type": "AzureSqlDatabase",
         "connectionDetails": {
-          "server": "maritimeiq-platform-sql.database.windows.net",  // SQL server endpoint
-          "database": "MaritimeIQPlatform",                  // Database name
-          "authenticationType": "ServicePrincipal"           // Service principal authentication
+          "server": "maritimeiq-platform-sql.database.windows.net",
+          "database": "MaritimeIQPlatform",
+          "authenticationType": "ServicePrincipal"
         }
       },
       {
-        "name": "MaritimeIQCosmosDB",                        // NoSQL document database
-        "type": "CosmosDB",                                  // Azure Cosmos DB type
+        "name": "MaritimeIQCosmosDB",
+        "type": "CosmosDB",
         "connectionDetails": {
-          "endpoint": "https://maritimeiq-platform-cosmos.documents.azure.com",  // Cosmos DB endpoint
-          "database": "MaritimeOperations",                  // Database name
-          "authenticationType": "ServicePrincipal"           // Service principal authentication
+          "endpoint": "https://maritimeiq-platform-cosmos.documents.azure.com",
+          "database": "MaritimeOperations",
+          "authenticationType": "ServicePrincipal"
         }
       },
       {
-        "name": "MaritimeIQEventHub",                        // Real-time streaming data
-        "type": "EventHub",                                 // Azure Event Hub type
+        "name": "MaritimeIQEventHub",
+        "type": "EventHub",
         "connectionDetails": {
-          "namespace": "maritimeiq-platform-events",        // Event Hub namespace
-          "eventHub": "vessel-telemetry",                   // Telemetry data stream
-          "consumerGroup": "powerbi-analytics"              // Analytics consumer group
+          "namespace": "maritimeiq-platform-events",
+          "eventHub": "vessel-telemetry",
+          "consumerGroup": "powerbi-analytics"
         }
       }
     ]
