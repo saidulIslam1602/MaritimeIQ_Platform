@@ -4,8 +4,17 @@ using MaritimeIQ.Platform.Services;
 namespace MaritimeIQ.Platform.Controllers
 {
     /// <summary>
-    /// Environmental Monitoring Controller - Provides REST API endpoints for
-    /// environmental compliance monitoring and emission tracking
+    /// Environmental Monitoring Controller for MaritimeIQ Platform
+    /// 
+    /// This controller provides comprehensive environmental monitoring capabilities including:
+    /// - Real-time emission tracking and compliance monitoring
+    /// - Environmental data processing and analysis
+    /// - Alert generation for environmental thresholds
+    /// - Integration with hybrid propulsion systems
+    /// - Compliance reporting for maritime regulations
+    /// 
+    /// Supports IMO 2020 sulfur regulations, NOx Tier III compliance,
+    /// and hybrid battery system monitoring for sustainable maritime operations.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]

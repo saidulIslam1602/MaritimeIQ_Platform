@@ -1,3 +1,17 @@
+/**
+ * MaritimeIQ Platform - Main Dashboard Component
+ * 
+ * This is the primary dashboard interface for the MaritimeIQ Platform, providing:
+ * - Real-time fleet management and vessel tracking
+ * - Environmental monitoring and compliance reporting
+ * - Route optimization and performance analytics
+ * - System health monitoring and diagnostics
+ * - Interactive data visualization and reporting
+ * 
+ * The dashboard supports multiple operational views and real-time data updates
+ * for maritime operations management and decision support.
+ */
+
 import { useState, useEffect } from 'react'
 import { Ship, MapPin, Activity, AlertTriangle, CheckCircle, TrendingUp, Waves, Wind, Thermometer, Zap } from 'lucide-react'
 import FleetDashboard from '../src/components/fleet/FleetDashboard'
@@ -6,37 +20,57 @@ import EnvironmentalMonitoring from '../src/components/environmental/Environment
 import RouteOptimization from '../src/components/optimization/RouteOptimization'
 import RealTimeVisualization from '../src/components/analytics/RealTimeVisualization'
 
+/**
+ * Main Dashboard Component for MaritimeIQ Platform
+ * 
+ * @returns JSX.Element - Complete dashboard interface with navigation and content areas
+ */
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('fleet')
-  const [systemStatus, setSystemStatus] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  // State management for dashboard functionality
+  const [activeTab, setActiveTab] = useState('fleet')        // Currently active dashboard tab
+  const [systemStatus, setSystemStatus] = useState<any>(null) // System health status data
+  const [isLoading, setIsLoading] = useState(true)          // Loading state for initial data fetch
 
+  /**
+   * Effect hook for initial data loading and periodic updates
+   * Sets up real-time system status monitoring with 30-second intervals
+   */
   useEffect(() => {
-    fetchSystemStatus()
+    fetchSystemStatus()                                    // Initial system status fetch
     const interval = setInterval(fetchSystemStatus, 30000) // Update every 30 seconds
-    return () => clearInterval(interval)
+    return () => clearInterval(interval)                    // Cleanup on component unmount
   }, [])
 
+  /**
+   * Fetches current system health status from the MaritimeIQ API
+   * Handles API connectivity and error states gracefully
+   */
   const fetchSystemStatus = async () => {
     try {
+      // API endpoint configuration with fallback to production URL
       const API_URL = process.env.NEXT_PUBLIC_MARITIME_API_URL || 
         'https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io'
+      
       const response = await fetch(`${API_URL}/api/monitoring/health`)
       const data = await response.json()
-      setSystemStatus(data)
-      setIsLoading(false)
+      setSystemStatus(data)                                // Update system status state
+      setIsLoading(false)                                  // Mark loading as complete
     } catch (error) {
       console.error('Failed to fetch system status:', error)
-      setIsLoading(false)
+      setIsLoading(false)                                  // Ensure loading state is cleared on error
     }
   }
 
+  /**
+   * Dashboard navigation tabs configuration
+   * Defines the main operational areas of the MaritimeIQ Platform
+   */
   const tabs = [
-    { id: 'fleet', name: 'Fleet Management', icon: Ship },
-    { id: 'realtime', name: 'Real-time Analytics', icon: Zap },
-    { id: 'routes', name: 'Route Optimization', icon: MapPin },
-    { id: 'environment', name: 'Environmental', icon: Waves },
-    { id: 'system', name: 'System Health', icon: Activity }
+    { id: 'fleet', name: 'Fleet Management', icon: Ship },        // Vessel tracking and fleet operations
+    { id: 'realtime', name: 'Real-time Analytics', icon: Zap },  // Live data visualization and analytics
+    { id: 'routes', name: 'Route Optimization', icon: MapPin }, // Route planning and optimization
+    { id: 'environment', name: 'Environmental', icon: Waves },   // Environmental monitoring and compliance
+    { id: 'system', name: 'System Health', icon: Activity }     // System diagnostics and health monitoring
   ]
 
   if (isLoading) {
