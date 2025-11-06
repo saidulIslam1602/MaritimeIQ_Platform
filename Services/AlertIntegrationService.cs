@@ -172,7 +172,7 @@ namespace MaritimeIQ.Platform.Services
 
                     _logger.LogWarning("Vessel tracking alert converted to incident: {IncidentId}", incident.Id);
                 }
-            });
+            }, nameof(ProcessVesselTrackingAlert));
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace MaritimeIQ.Platform.Services
                 );
 
                 _logger.LogWarning("Performance alert converted to incident: {IncidentId}", incident.Id);
-            });
+            }, nameof(ProcessPerformanceAlert));
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace MaritimeIQ.Platform.Services
                 });
 
                 _logger.LogError("Security alert converted to incident: {IncidentId}", incident.Id);
-            });
+            }, nameof(ProcessSecurityAlert));
         }
 
         /// <summary>
@@ -332,7 +332,7 @@ namespace MaritimeIQ.Platform.Services
                     _logger.LogError(ex, "Alert integration test failed");
                     return false;
                 }
-            });
+            }, nameof(TestAlertIntegrationAsync));
         }
 
         /// <summary>

@@ -95,7 +95,7 @@ namespace MaritimeIQ.Platform.Services
                 }
 
                 return trends;
-            });
+            }, nameof(GetIncidentTrendsAsync));
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace MaritimeIQ.Platform.Services
                     PerformanceScore = CalculatePerformanceScore(systemHealth),
                     ReliabilityScore = CalculateReliabilityScore(metrics, systemHealth)
                 };
-            });
+            }, nameof(GetSREMetricsAsync));
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace MaritimeIQ.Platform.Services
                     LastActivity = DateTime.UtcNow.AddMinutes(-Random.Shared.Next(1, 60)), // Simulated
                     ResponseTime = TimeSpan.FromMinutes(Random.Shared.Next(1, 15)) // Simulated
                 }).ToList();
-            });
+            }, nameof(GetOnCallStatusAsync));
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace MaritimeIQ.Platform.Services
                     Duration = i.Duration,
                     AffectedServices = i.AffectedServices
                 }).ToList();
-            });
+            }, nameof(GetRecentIncidentsAsync));
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace MaritimeIQ.Platform.Services
                         ["Security"] = Random.Shared.Next(0, 2)
                     }
                 };
-            });
+            }, nameof(GetAlertingSummaryAsync));
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace MaritimeIQ.Platform.Services
                     SLOBreach = CalculateSLOBreaches(systemHealth),
                     ReliabilityScore = CalculateReliabilityScore(metrics, systemHealth)
                 };
-            });
+            }, nameof(GetReliabilityMetricsAsync));
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace MaritimeIQ.Platform.Services
                     IsPublished = Random.Shared.NextDouble() > 0.3, // 70% published
                     CreatedAt = i.ResolvedAt?.AddHours(Random.Shared.Next(1, 48)) ?? DateTime.UtcNow
                 }).ToList();
-            });
+            }, nameof(GetPostMortemSummaryAsync));
         }
 
         // Helper methods for calculations
