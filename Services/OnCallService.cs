@@ -70,7 +70,7 @@ namespace MaritimeIQ.Platform.Services
 
                 _logger.LogWarning("No {Role} on-call engineer found for current time", role);
                 return null;
-            });
+            }, nameof(GetCurrentOnCallEngineerAsync));
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace MaritimeIQ.Platform.Services
                     .OrderBy(s => s.StartTime)
                     .ThenBy(s => s.Role)
                     .ToList();
-            });
+            }, nameof(GetOnCallTeamAsync));
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace MaritimeIQ.Platform.Services
                 });
 
                 return true;
-            });
+            }, nameof(GetCurrentScheduleAsync));
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace MaritimeIQ.Platform.Services
                 
                 _logger.LogInformation("Schedule entry updated: {ScheduleId}", scheduleId);
                 return true;
-            });
+            }, nameof(GetScheduleAsync));
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace MaritimeIQ.Platform.Services
 
                 _logger.LogWarning("Cannot escalate: End of escalation chain reached for engineer {EngineerId}", currentEngineerId);
                 return null;
-            });
+            }, nameof(EscalateToNextLevelAsync));
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace MaritimeIQ.Platform.Services
                 }
 
                 return chain;
-            });
+            }, nameof(GetEscalationChainAsync));
         }
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace MaritimeIQ.Platform.Services
 
                 await Task.Delay(100); // Simulate notification delay
                 return true;
-            });
+            }, nameof(NotifyOnCallEngineerAsync));
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace MaritimeIQ.Platform.Services
                 
                 _logger.LogInformation("Engineer registered: {EngineerName} ({Email})", engineer.Name, engineer.Email);
                 return true;
-            });
+            }, nameof(RegisterEngineerAsync));
         }
 
         /// <summary>
@@ -335,7 +335,7 @@ namespace MaritimeIQ.Platform.Services
                 
                 _logger.LogInformation("Engineer updated: {EngineerName}", updatedEngineer.Name);
                 return true;
-            });
+            }, nameof(UpdateEngineerAsync));
         }
 
         /// <summary>
@@ -359,7 +359,7 @@ namespace MaritimeIQ.Platform.Services
             {
                 await Task.CompletedTask; // Async for consistency
                 return _engineers.Values.Where(e => e.IsActive).OrderBy(e => e.Name).ToList();
-            });
+            }, nameof(GetEngineerAsync));
         }
 
         /// <summary>
@@ -393,7 +393,7 @@ namespace MaritimeIQ.Platform.Services
 
                 _logger.LogInformation("Escalation chain test completed successfully. Notified {Count} engineers", chain.Count);
                 return true;
-            });
+            }, nameof(GetAllEngineersAsync));
         }
 
         /// <summary>

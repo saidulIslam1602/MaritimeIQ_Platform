@@ -139,7 +139,7 @@ namespace MaritimeIQ.Platform.Services
 
                 _logger.LogInformation("Incident created: {IncidentId} - {Title} (Severity: {Severity})", incident.Id, title, severity);
                 return incident;
-            });
+            }, nameof(CreateIncidentAsync));
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace MaritimeIQ.Platform.Services
                     .OrderByDescending(i => i.CreatedAt)
                     .Take(limit)
                     .ToList();
-            });
+            }, nameof(GetIncidentHistoryAsync));
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace MaritimeIQ.Platform.Services
 
                 _logger.LogInformation("Incident acknowledged: {IncidentId} by {AcknowledgedBy}", incidentId, acknowledgedBy);
                 return true;
-            });
+            }, nameof(AcknowledgeIncidentAsync));
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace MaritimeIQ.Platform.Services
                     incidentId, previousStatus, status, updatedBy);
                 
                 return true;
-            });
+            }, nameof(UpdateIncidentStatusAsync));
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace MaritimeIQ.Platform.Services
 
                 _logger.LogInformation("Incident resolved: {IncidentId} by {ResolvedBy} - {ResolutionNote}", incidentId, resolvedBy, resolutionNote);
                 return true;
-            });
+            }, nameof(ResolveIncidentAsync));
         }
 
         /// <summary>
@@ -320,7 +320,7 @@ namespace MaritimeIQ.Platform.Services
 
                 await Task.CompletedTask;
                 return true;
-            });
+            }, nameof(AddIncidentUpdateAsync));
         }
 
         /// <summary>
@@ -366,7 +366,7 @@ namespace MaritimeIQ.Platform.Services
                 metrics.IncidentRate = incidents.Count / days;
 
                 return metrics;
-            });
+            }, nameof(GetIncidentMetricsAsync));
         }
 
         /// <summary>
@@ -392,7 +392,7 @@ namespace MaritimeIQ.Platform.Services
 
                 _logger.LogInformation("Post-mortem created: {PostMortemId} for incident {IncidentId}", postMortem.Id, incidentId);
                 return postMortem;
-            });
+            }, nameof(AddIncidentUpdateAsync));
         }
 
         /// <summary>
@@ -422,7 +422,7 @@ namespace MaritimeIQ.Platform.Services
                     incident.Id, vesselId, emergencyType);
 
                 return true;
-            });
+            }, nameof(TriggerMaritimeEmergencyIncidentAsync));
         }
 
         /// <summary>
@@ -456,7 +456,7 @@ namespace MaritimeIQ.Platform.Services
                     incident.Id, vesselId, violationType, actualValue, thresholdValue);
 
                 return true;
-            });
+            }, nameof(TriggerEnvironmentalComplianceIncidentAsync));
         }
 
         /// <summary>
@@ -491,7 +491,7 @@ namespace MaritimeIQ.Platform.Services
                     incident.Id, serviceName, outageType, affectedServices.Count);
 
                 return true;
-            });
+            }, nameof(TriggerSystemOutageIncidentAsync));
         }
     }
 }
