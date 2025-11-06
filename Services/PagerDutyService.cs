@@ -128,7 +128,7 @@ namespace MaritimeIQ.Platform.Services
                     stopwatch.Stop();
                     _telemetryClient.TrackDependency("PagerDuty", "TriggerIncident", DateTime.UtcNow.Subtract(stopwatch.Elapsed), stopwatch.Elapsed, true);
                 }
-            });
+            }, nameof(TriggerIncidentAsync));
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace MaritimeIQ.Platform.Services
                     _telemetryClient.TrackException(ex);
                     return false;
                 }
-            });
+            }, nameof(AcknowledgeIncidentAsync));
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace MaritimeIQ.Platform.Services
                     _telemetryClient.TrackException(ex);
                     return false;
                 }
-            });
+            }, nameof(ResolveIncidentAsync));
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace MaritimeIQ.Platform.Services
                     _telemetryClient.TrackException(ex);
                     return false;
                 }
-            });
+            }, nameof(SendIncidentUpdateAsync));
         }
 
         /// <summary>
@@ -324,7 +324,7 @@ namespace MaritimeIQ.Platform.Services
                     _telemetryClient.TrackException(ex);
                     return new List<PagerDutyIncident>();
                 }
-            });
+            }, nameof(GetActiveIncidentsAsync));
         }
 
         /// <summary>
@@ -363,7 +363,7 @@ namespace MaritimeIQ.Platform.Services
                     _logger.LogError(ex, "PagerDuty integration test failed");
                     return false;
                 }
-            });
+            }, nameof(TestIntegrationAsync));
         }
 
         /// <summary>
