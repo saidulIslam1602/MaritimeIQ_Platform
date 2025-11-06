@@ -126,7 +126,7 @@ namespace MaritimeIQ.Platform.Services
                 finally
                 {
                     stopwatch.Stop();
-                    _telemetryClient.TrackDependency("PagerDuty", "TriggerIncident", DateTime.UtcNow.Subtract(stopwatch.Elapsed), stopwatch.Elapsed, true);
+                    _telemetryClient.TrackDependency("PagerDuty", "TriggerIncident", "https://events.pagerduty.com", DateTime.UtcNow.Subtract(stopwatch.Elapsed), stopwatch.Elapsed, true);
                 }
             }, nameof(TriggerIncidentAsync));
         }
