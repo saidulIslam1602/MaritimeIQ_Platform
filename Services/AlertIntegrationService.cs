@@ -194,7 +194,7 @@ namespace MaritimeIQ.Platform.Services
                     ["EmissionType"] = emissionType,
                     ["ThresholdExceeded"] = ((actual - threshold) / threshold * 100).ToString("F1") + "%"
                 });
-            });
+            }, nameof(ProcessEnvironmentalAlert));
         }
 
         /// <summary>
