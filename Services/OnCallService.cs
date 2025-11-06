@@ -109,7 +109,7 @@ namespace MaritimeIQ.Platform.Services
                     .Where(s => s.IsActive && s.StartTime <= now && s.EndTime >= now)
                     .OrderBy(s => s.StartTime)
                     .FirstOrDefault();
-            });
+            }, nameof(GetCurrentScheduleAsync));
         }
 
         /// <summary>
@@ -347,7 +347,7 @@ namespace MaritimeIQ.Platform.Services
             {
                 await Task.CompletedTask; // Async for consistency
                 return _engineers.TryGetValue(engineerId, out var engineer) ? engineer : null;
-            });
+            }, nameof(GetEngineerAsync));
         }
 
         /// <summary>
