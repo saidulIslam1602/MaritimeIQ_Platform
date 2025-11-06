@@ -62,6 +62,13 @@ builder.Services.AddScoped<ISecurityService, SecurityService>();
 // Register core services that are properly implemented  
 builder.Services.AddScoped<ISafetyService, SafetyService>();
 
+// Register incident management and on-call services
+builder.Services.AddScoped<IPagerDutyService, PagerDutyService>();
+builder.Services.AddScoped<IIncidentManagementService, IncidentManagementService>();
+builder.Services.AddScoped<IOnCallService, OnCallService>();
+builder.Services.AddScoped<IAlertIntegrationService, AlertIntegrationService>();
+builder.Services.AddScoped<IIncidentDashboardService, IncidentDashboardService>();
+
 // Core data service for controllers
 builder.Services.AddScoped<IMaritimeDataService, MaritimeDataService>();
 
