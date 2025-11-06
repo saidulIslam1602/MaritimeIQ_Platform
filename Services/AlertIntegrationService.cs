@@ -76,7 +76,7 @@ namespace MaritimeIQ.Platform.Services
                 });
 
                 _logger.LogInformation("Application Insights alert converted to incident: {IncidentId}", incident.Id);
-            });
+            }, nameof(ProcessApplicationInsightsAlert));
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace MaritimeIQ.Platform.Services
                 );
 
                 _logger.LogWarning("System health alert converted to incident: {IncidentId}", incident.Id);
-            });
+            }, nameof(ProcessSystemHealthAlert));
         }
 
         /// <summary>

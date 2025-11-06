@@ -418,7 +418,7 @@ namespace MaritimeIQ.Platform.Services
                     customDetails
                 );
 
-                Logger.LogCritical("Maritime emergency incident triggered: {IncidentId} - Vessel {VesselId}, Type: {EmergencyType}", 
+                _logger.LogCritical("Maritime emergency incident triggered: {IncidentId} - Vessel {VesselId}, Type: {EmergencyType}", 
                     incident.Id, vesselId, emergencyType);
 
                 return true;
@@ -452,7 +452,7 @@ namespace MaritimeIQ.Platform.Services
                     customDetails
                 );
 
-                Logger.LogWarning("Environmental compliance incident triggered: {IncidentId} - Vessel {VesselId}, {ViolationType}: {ActualValue} > {ThresholdValue}", 
+                _logger.LogWarning("Environmental compliance incident triggered: {IncidentId} - Vessel {VesselId}, {ViolationType}: {ActualValue} > {ThresholdValue}", 
                     incident.Id, vesselId, violationType, actualValue, thresholdValue);
 
                 return true;

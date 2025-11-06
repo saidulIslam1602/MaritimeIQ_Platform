@@ -84,7 +84,7 @@ namespace MaritimeIQ.Platform.Services
                     var json = JsonConvert.SerializeObject(payload, Formatting.Indented);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    Logger.LogInformation("Triggering PagerDuty incident: {Summary} (Severity: {Severity}, DedupKey: {DedupKey})", 
+                    _logger.LogInformation("Triggering PagerDuty incident: {Summary} (Severity: {Severity}, DedupKey: {DedupKey})", 
                         summary, severity, dedupKey);
 
                     var response = await _httpClient.PostAsync(EVENTS_API_URL, content);
@@ -103,14 +103,14 @@ namespace MaritimeIQ.Platform.Services
                             ["Status"] = result?.Status ?? "unknown"
                         });
 
-                        Logger.LogInformation("PagerDuty incident triggered successfully. Status: {Status}, Message: {Message}", 
+                        _logger.LogInformation("PagerDuty incident triggered successfully. Status: {Status}, Message: {Message}", 
                             result?.Status, result?.Message);
                         
                         return dedupKey;
                     }
                     else
                     {
-                        Logger.LogError("Failed to trigger PagerDuty incident. Status: {StatusCode}, Response: {Response}", 
+                        _logger.LogError("Failed to trigger PagerDuty incident. Status: {StatusCode}, Response: {Response}", 
                             response.StatusCode, responseContent);
                         
                         _telemetryClient.TrackException(new Exception($"PagerDuty API error: {response.StatusCode} - {responseContent}"));
@@ -119,7 +119,7 @@ namespace MaritimeIQ.Platform.Services
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Error triggering PagerDuty incident: {Summary}", summary);
+                    _logger.LogError(ex, "Error triggering PagerDuty incident: {Summary}", summary);
                     _telemetryClient.TrackException(ex);
                     throw;
                 }
@@ -150,7 +150,7 @@ namespace MaritimeIQ.Platform.Services
                     var json = JsonConvert.SerializeObject(payload);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    Logger.LogInformation("Acknowledging PagerDuty incident: {DedupKey} by {AcknowledgedBy}", dedupKey, acknowledgedBy);
+                    _logger.LogInformation("Acknowledging PagerDuty incident: {DedupKey} by {AcknowledgedBy}", dedupKey, acknowledgedBy);
 
                     var response = await _httpClient.PostAsync(EVENTS_API_URL, content);
                     var responseContent = await response.Content.ReadAsStringAsync();
@@ -163,18 +163,18 @@ namespace MaritimeIQ.Platform.Services
                             ["AcknowledgedBy"] = acknowledgedBy
                         });
 
-                        Logger.LogInformation("PagerDuty incident acknowledged successfully: {DedupKey}", dedupKey);
+                        _logger.LogInformation("PagerDuty incident acknowledged successfully: {DedupKey}", dedupKey);
                         return true;
                     }
                     else
                     {
-                        Logger.LogError("Failed to acknowledge PagerDuty incident: {DedupKey}. Response: {Response}", dedupKey, responseContent);
+                        _logger.LogError("Failed to acknowledge PagerDuty incident: {DedupKey}. Response: {Response}", dedupKey, responseContent);
                         return false;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Error acknowledging PagerDuty incident: {DedupKey}", dedupKey);
+                    _logger.LogError(ex, "Error acknowledging PagerDuty incident: {DedupKey}", dedupKey);
                     _telemetryClient.TrackException(ex);
                     return false;
                 }
@@ -210,7 +210,7 @@ namespace MaritimeIQ.Platform.Services
                     var json = JsonConvert.SerializeObject(payload);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    Logger.LogInformation("Resolving PagerDuty incident: {DedupKey} by {ResolvedBy}", dedupKey, resolvedBy);
+                    _logger.LogInformation("Resolving PagerDuty incident: {DedupKey} by {ResolvedBy}", dedupKey, resolvedBy);
 
                     var response = await _httpClient.PostAsync(EVENTS_API_URL, content);
                     var responseContent = await response.Content.ReadAsStringAsync();
@@ -224,18 +224,18 @@ namespace MaritimeIQ.Platform.Services
                             ["ResolutionNote"] = resolutionNote ?? "No note provided"
                         });
 
-                        Logger.LogInformation("PagerDuty incident resolved successfully: {DedupKey}", dedupKey);
+                        _logger.LogInformation("PagerDuty incident resolved successfully: {DedupKey}", dedupKey);
                         return true;
                     }
                     else
                     {
-                        Logger.LogError("Failed to resolve PagerDuty incident: {DedupKey}. Response: {Response}", dedupKey, responseContent);
+                        _logger.LogError("Failed to resolve PagerDuty incident: {DedupKey}. Response: {Response}", dedupKey, responseContent);
                         return false;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Error resolving PagerDuty incident: {DedupKey}", dedupKey);
+                    _logger.LogError(ex, "Error resolving PagerDuty incident: {DedupKey}", dedupKey);
                     _telemetryClient.TrackException(ex);
                     return false;
                 }
@@ -287,7 +287,7 @@ namespace MaritimeIQ.Platform.Services
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Error sending PagerDuty incident update: {DedupKey}", dedupKey);
+                    _logger.LogError(ex, "Error sending PagerDuty incident update: {DedupKey}", dedupKey);
                     _telemetryClient.TrackException(ex);
                     return false;
                 }
@@ -314,13 +314,13 @@ namespace MaritimeIQ.Platform.Services
                     }
                     else
                     {
-                        Logger.LogError("Failed to get active PagerDuty incidents. Response: {Response}", responseContent);
+                        _logger.LogError("Failed to get active PagerDuty incidents. Response: {Response}", responseContent);
                         return new List<PagerDutyIncident>();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Error getting active PagerDuty incidents");
+                    _logger.LogError(ex, "Error getting active PagerDuty incidents");
                     _telemetryClient.TrackException(ex);
                     return new List<PagerDutyIncident>();
                 }
@@ -336,7 +336,7 @@ namespace MaritimeIQ.Platform.Services
             {
                 try
                 {
-                    Logger.LogInformation("Testing PagerDuty integration...");
+                    _logger.LogInformation("Testing PagerDuty integration...");
                     
                     var testIncidentKey = await TriggerIncidentAsync(
                         "MaritimeIQ Platform - Integration Test", 
@@ -355,12 +355,12 @@ namespace MaritimeIQ.Platform.Services
                     
                     var resolved = await ResolveIncidentAsync(testIncidentKey, "System", "Integration test completed successfully");
                     
-                    Logger.LogInformation("PagerDuty integration test completed. Resolved: {Resolved}", resolved);
+                    _logger.LogInformation("PagerDuty integration test completed. Resolved: {Resolved}", resolved);
                     return !string.IsNullOrEmpty(testIncidentKey) && resolved;
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "PagerDuty integration test failed");
+                    _logger.LogError(ex, "PagerDuty integration test failed");
                     return false;
                 }
             });

@@ -68,7 +68,7 @@ namespace MaritimeIQ.Platform.Services
                     return engineer;
                 }
 
-                Logger.LogWarning("No {Role} on-call engineer found for current time", role);
+                _logger.LogWarning("No {Role} on-call engineer found for current time", role);
                 return null;
             });
         }
@@ -230,7 +230,7 @@ namespace MaritimeIQ.Platform.Services
                     return nextEngineer;
                 }
 
-                Logger.LogWarning("Cannot escalate: End of escalation chain reached for engineer {EngineerId}", currentEngineerId);
+                _logger.LogWarning("Cannot escalate: End of escalation chain reached for engineer {EngineerId}", currentEngineerId);
                 return null;
             });
         }
@@ -502,7 +502,7 @@ namespace MaritimeIQ.Platform.Services
                 _schedules[schedule.Id] = schedule;
             }
 
-            Logger.LogInformation("Initialized sample on-call data: {EngineerCount} engineers, {ScheduleCount} schedules", 
+            _logger.LogInformation("Initialized sample on-call data: {EngineerCount} engineers, {ScheduleCount} schedules", 
                 engineers.Length, schedules.Length);
         }
     }
