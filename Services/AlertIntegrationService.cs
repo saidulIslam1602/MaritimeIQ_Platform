@@ -23,7 +23,6 @@ namespace MaritimeIQ.Platform.Services
     {
         private readonly IIncidentManagementService _incidentService;
         private readonly TelemetryClient _telemetryClient;
-        private readonly IConfiguration _configuration;
 
         public override string ServiceName => "Alert Integration Service";
 
@@ -35,7 +34,6 @@ namespace MaritimeIQ.Platform.Services
         {
             _incidentService = incidentService;
             _telemetryClient = telemetryClient;
-            _configuration = configuration;
         }
 
         /// <summary>
@@ -45,7 +43,7 @@ namespace MaritimeIQ.Platform.Services
         {
             await ExecuteOperationAsync(async () =>
             {
-                Logger.LogInformation("Processing Application Insights alert: {AlertName}", alertName);
+                _logger.LogInformation("Processing Application Insights alert: {AlertName}", alertName);
 
                 // Determine severity based on alert name and data
                 var severity = DetermineAlertSeverity(alertName, alertData);
@@ -77,7 +75,7 @@ namespace MaritimeIQ.Platform.Services
                     ["Category"] = category.ToString()
                 });
 
-                Logger.LogInformation("Application Insights alert converted to incident: {IncidentId}", incident.Id);
+                _logger.LogInformation("Application Insights alert converted to incident: {IncidentId}", incident.Id);
             });
         }
 
@@ -92,7 +90,7 @@ namespace MaritimeIQ.Platform.Services
                 if (healthStatus.OverallStatus == "Healthy")
                     return;
 
-                Logger.LogWarning("Processing system health alert: {Status}", healthStatus.OverallStatus);
+                _logger.LogWarning("Processing system health alert: {Status}", healthStatus.OverallStatus);
 
                 var severity = healthStatus.OverallStatus switch
                 {
@@ -126,7 +124,7 @@ namespace MaritimeIQ.Platform.Services
                     customDetails
                 );
 
-                Logger.LogWarning("System health alert converted to incident: {IncidentId}", incident.Id);
+                _logger.LogWarning("System health alert converted to incident: {IncidentId}", incident.Id);
             });
         }
 
@@ -137,7 +135,7 @@ namespace MaritimeIQ.Platform.Services
         {
             await ExecuteOperationAsync(async () =>
             {
-                Logger.LogWarning("Processing vessel tracking alert: {VesselId} - {AlertType}", vesselId, alertType);
+                _logger.LogWarning("Processing vessel tracking alert: {VesselId} - {AlertType}", vesselId, alertType);
 
                 var severity = alertType.ToLower() switch
                 {
@@ -172,7 +170,7 @@ namespace MaritimeIQ.Platform.Services
                         customDetails
                     );
 
-                    Logger.LogWarning("Vessel tracking alert converted to incident: {IncidentId}", incident.Id);
+                    _logger.LogWarning("Vessel tracking alert converted to incident: {IncidentId}", incident.Id);
                 }
             });
         }
@@ -184,7 +182,7 @@ namespace MaritimeIQ.Platform.Services
         {
             await ExecuteOperationAsync(async () =>
             {
-                Logger.LogWarning("Processing environmental alert: {VesselId} - {EmissionType}: {Actual} > {Threshold}", 
+                _logger.LogWarning("Processing environmental alert: {VesselId} - {EmissionType}: {Actual} > {Threshold}", 
                     vesselId, emissionType, actual, threshold);
 
                 // Use the dedicated environmental compliance incident trigger
@@ -206,7 +204,7 @@ namespace MaritimeIQ.Platform.Services
         {
             await ExecuteOperationAsync(async () =>
             {
-                Logger.LogWarning("Processing performance alert: {ServiceName} - {MetricName}: {Actual} vs {Threshold}", 
+                _logger.LogWarning("Processing performance alert: {ServiceName} - {MetricName}: {Actual} vs {Threshold}", 
                     serviceName, metricName, actual, threshold);
 
                 var severity = DeterminePerformanceSeverity(metricName, threshold, actual);
@@ -230,7 +228,7 @@ namespace MaritimeIQ.Platform.Services
                     customDetails
                 );
 
-                Logger.LogWarning("Performance alert converted to incident: {IncidentId}", incident.Id);
+                _logger.LogWarning("Performance alert converted to incident: {IncidentId}", incident.Id);
             });
         }
 
@@ -241,7 +239,7 @@ namespace MaritimeIQ.Platform.Services
         {
             await ExecuteOperationAsync(async () =>
             {
-                Logger.LogError("Processing security alert: {AlertType} from {Source}", alertType, source);
+                _logger.LogError("Processing security alert: {AlertType} from {Source}", alertType, source);
 
                 var severity = alertType.ToLower() switch
                 {
@@ -279,7 +277,7 @@ namespace MaritimeIQ.Platform.Services
                     ["Severity"] = severity.ToString()
                 });
 
-                Logger.LogError("Security alert converted to incident: {IncidentId}", incident.Id);
+                _logger.LogError("Security alert converted to incident: {IncidentId}", incident.Id);
             });
         }
 
@@ -290,7 +288,7 @@ namespace MaritimeIQ.Platform.Services
         {
             return await ExecuteOperationAsync(async () =>
             {
-                Logger.LogInformation("Testing alert integration system...");
+                _logger.LogInformation("Testing alert integration system...");
 
                 try
                 {
@@ -326,12 +324,12 @@ namespace MaritimeIQ.Platform.Services
                         850.0
                     );
 
-                    Logger.LogInformation("Alert integration test completed successfully");
+                    _logger.LogInformation("Alert integration test completed successfully");
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Alert integration test failed");
+                    _logger.LogError(ex, "Alert integration test failed");
                     return false;
                 }
             });

@@ -111,11 +111,11 @@ namespace MaritimeIQ.Platform.Services
                         );
 
                         incident.PagerDutyIncidentId = pagerDutyKey;
-                        Logger.LogInformation("PagerDuty incident created: {PagerDutyKey} for incident {IncidentId}", pagerDutyKey, incident.Id);
+                        _logger.LogInformation("PagerDuty incident created: {PagerDutyKey} for incident {IncidentId}", pagerDutyKey, incident.Id);
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Failed to create PagerDuty incident for {IncidentId}", incident.Id);
+                        _logger.LogError(ex, "Failed to create PagerDuty incident for {IncidentId}", incident.Id);
                         // Continue without PagerDuty - incident is still created locally
                     }
                 }
@@ -137,7 +137,7 @@ namespace MaritimeIQ.Platform.Services
                     ["category"] = category.ToString()
                 });
 
-                Logger.LogInformation("Incident created: {IncidentId} - {Title} (Severity: {Severity})", incident.Id, title, severity);
+                _logger.LogInformation("Incident created: {IncidentId} - {Title} (Severity: {Severity})", incident.Id, title, severity);
                 return incident;
             });
         }
@@ -151,7 +151,7 @@ namespace MaritimeIQ.Platform.Services
             {
                 await Task.CompletedTask; // Async for consistency
                 return _incidents.TryGetValue(incidentId, out var incident) ? incident : null;
-            });
+            }, nameof(GetIncidentAsync));
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace MaritimeIQ.Platform.Services
                     .Where(i => i.Status != IncidentStatus.Resolved && i.Status != IncidentStatus.Closed)
                     .OrderByDescending(i => i.CreatedAt)
                     .ToList();
-            });
+            }, nameof(GetActiveIncidentsAsync));
         }
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace MaritimeIQ.Platform.Services
                     ["TimeToAcknowledge"] = incident.TimeToAcknowledge?.ToString() ?? "Unknown"
                 });
 
-                Logger.LogInformation("Incident acknowledged: {IncidentId} by {AcknowledgedBy}", incidentId, acknowledgedBy);
+                _logger.LogInformation("Incident acknowledged: {IncidentId} by {AcknowledgedBy}", incidentId, acknowledgedBy);
                 return true;
             });
         }
@@ -247,7 +247,7 @@ namespace MaritimeIQ.Platform.Services
                     ["new_status"] = status.ToString()
                 });
 
-                Logger.LogInformation("Incident status updated: {IncidentId} from {PreviousStatus} to {NewStatus} by {UpdatedBy}", 
+                _logger.LogInformation("Incident status updated: {IncidentId} from {PreviousStatus} to {NewStatus} by {UpdatedBy}", 
                     incidentId, previousStatus, status, updatedBy);
                 
                 return true;
@@ -287,7 +287,7 @@ namespace MaritimeIQ.Platform.Services
                     ["Duration"] = incident.Duration?.ToString() ?? "Unknown"
                 });
 
-                Logger.LogInformation("Incident resolved: {IncidentId} by {ResolvedBy} - {ResolutionNote}", incidentId, resolvedBy, resolutionNote);
+                _logger.LogInformation("Incident resolved: {IncidentId} by {ResolvedBy} - {ResolutionNote}", incidentId, resolvedBy, resolutionNote);
                 return true;
             });
         }
@@ -390,7 +390,7 @@ namespace MaritimeIQ.Platform.Services
 
                 _postMortems[postMortem.Id] = postMortem;
 
-                Logger.LogInformation("Post-mortem created: {PostMortemId} for incident {IncidentId}", postMortem.Id, incidentId);
+                _logger.LogInformation("Post-mortem created: {PostMortemId} for incident {IncidentId}", postMortem.Id, incidentId);
                 return postMortem;
             });
         }
@@ -487,7 +487,7 @@ namespace MaritimeIQ.Platform.Services
 
                 incident.AffectedServices = affectedServices;
 
-                Logger.LogError("System outage incident triggered: {IncidentId} - Service: {ServiceName}, Type: {OutageType}, Affected: {AffectedCount}", 
+                _logger.LogError("System outage incident triggered: {IncidentId} - Service: {ServiceName}, Type: {OutageType}, Affected: {AffectedCount}", 
                     incident.Id, serviceName, outageType, affectedServices.Count);
 
                 return true;

@@ -45,7 +45,7 @@ namespace MaritimeIQ.Platform.Controllers
         {
             try
             {
-                Logger.LogInformation("Creating incident: {Title} (Severity: {Severity})", request.Title, request.Severity);
+                _logger.LogInformation("Creating incident: {Title} (Severity: {Severity})", request.Title, request.Severity);
 
                 var incident = await _incidentService.CreateIncidentAsync(
                     request.Title,
@@ -67,7 +67,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error creating incident: {Title}", request.Title);
+                _logger.LogError(ex, "Error creating incident: {Title}", request.Title);
                 return StatusCode(500, new { error = "Failed to create incident", details = ex.Message });
             }
         }
@@ -94,7 +94,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error getting incident: {IncidentId}", id);
+                _logger.LogError(ex, "Error getting incident: {IncidentId}", id);
                 return StatusCode(500, new { error = "Failed to get incident", details = ex.Message });
             }
         }
@@ -114,7 +114,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error getting active incidents");
+                _logger.LogError(ex, "Error getting active incidents");
                 return StatusCode(500, new { error = "Failed to get active incidents", details = ex.Message });
             }
         }
@@ -140,7 +140,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error getting incident history");
+                _logger.LogError(ex, "Error getting incident history");
                 return StatusCode(500, new { error = "Failed to get incident history", details = ex.Message });
             }
         }
@@ -169,7 +169,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error acknowledging incident: {IncidentId}", id);
+                _logger.LogError(ex, "Error acknowledging incident: {IncidentId}", id);
                 return StatusCode(500, new { error = "Failed to acknowledge incident", details = ex.Message });
             }
         }
@@ -198,7 +198,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error updating incident status: {IncidentId}", id);
+                _logger.LogError(ex, "Error updating incident status: {IncidentId}", id);
                 return StatusCode(500, new { error = "Failed to update incident status", details = ex.Message });
             }
         }
@@ -227,7 +227,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error resolving incident: {IncidentId}", id);
+                _logger.LogError(ex, "Error resolving incident: {IncidentId}", id);
                 return StatusCode(500, new { error = "Failed to resolve incident", details = ex.Message });
             }
         }
@@ -256,7 +256,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error adding incident update: {IncidentId}", id);
+                _logger.LogError(ex, "Error adding incident update: {IncidentId}", id);
                 return StatusCode(500, new { error = "Failed to add incident update", details = ex.Message });
             }
         }
@@ -278,7 +278,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error getting incident metrics");
+                _logger.LogError(ex, "Error getting incident metrics");
                 return StatusCode(500, new { error = "Failed to get incident metrics", details = ex.Message });
             }
         }
@@ -306,7 +306,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error creating post-mortem for incident: {IncidentId}", id);
+                _logger.LogError(ex, "Error creating post-mortem for incident: {IncidentId}", id);
                 return StatusCode(500, new { error = "Failed to create post-mortem", details = ex.Message });
             }
         }
@@ -353,7 +353,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error triggering maritime emergency: {VesselId}, {EmergencyType}", request.VesselId, request.EmergencyType);
+                _logger.LogError(ex, "Error triggering maritime emergency: {VesselId}, {EmergencyType}", request.VesselId, request.EmergencyType);
                 return StatusCode(500, new { error = "Failed to trigger maritime emergency", details = ex.Message });
             }
         }
@@ -386,7 +386,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error triggering environmental compliance incident: {VesselId}, {ViolationType}", request.VesselId, request.ViolationType);
+                _logger.LogError(ex, "Error triggering environmental compliance incident: {VesselId}, {ViolationType}", request.VesselId, request.ViolationType);
                 return StatusCode(500, new { error = "Failed to trigger environmental compliance incident", details = ex.Message });
             }
         }
@@ -418,7 +418,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error triggering system outage incident: {ServiceName}, {OutageType}", request.ServiceName, request.OutageType);
+                _logger.LogError(ex, "Error triggering system outage incident: {ServiceName}, {OutageType}", request.ServiceName, request.OutageType);
                 return StatusCode(500, new { error = "Failed to trigger system outage incident", details = ex.Message });
             }
         }
@@ -438,7 +438,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error getting current on-call team");
+                _logger.LogError(ex, "Error getting current on-call team");
                 return StatusCode(500, new { error = "Failed to get current on-call team", details = ex.Message });
             }
         }
@@ -464,7 +464,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error testing PagerDuty integration");
+                _logger.LogError(ex, "Error testing PagerDuty integration");
                 return StatusCode(500, new { error = "PagerDuty integration test failed", details = ex.Message });
             }
         }
@@ -490,7 +490,7 @@ namespace MaritimeIQ.Platform.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error testing escalation chain");
+                _logger.LogError(ex, "Error testing escalation chain");
                 return StatusCode(500, new { error = "Escalation chain test failed", details = ex.Message });
             }
         }

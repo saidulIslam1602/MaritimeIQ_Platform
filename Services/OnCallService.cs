@@ -64,7 +64,7 @@ namespace MaritimeIQ.Platform.Services
 
                 if (currentSchedule != null && _engineers.TryGetValue(currentSchedule.EngineerId, out var engineer))
                 {
-                    Logger.LogInformation("Current {Role} on-call engineer: {EngineerName} ({Email})", role, engineer.Name, engineer.Email);
+                    _logger.LogInformation("Current {Role} on-call engineer: {EngineerName} ({Email})", role, engineer.Name, engineer.Email);
                     return engineer;
                 }
 
@@ -92,7 +92,7 @@ namespace MaritimeIQ.Platform.Services
                 if (manager != null && !team.Any(e => e.Id == manager.Id)) team.Add(manager);
 
                 return team;
-            });
+            }, nameof(GetOnCallTeamAsync));
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace MaritimeIQ.Platform.Services
                 // Validate engineer exists
                 if (!_engineers.ContainsKey(schedule.EngineerId))
                 {
-                    Logger.LogError("Cannot create schedule entry: Engineer {EngineerId} not found", schedule.EngineerId);
+                    _logger.LogError("Cannot create schedule entry: Engineer {EngineerId} not found", schedule.EngineerId);
                     return false;
                 }
 
@@ -155,13 +155,13 @@ namespace MaritimeIQ.Platform.Services
 
                 if (overlapping)
                 {
-                    Logger.LogError("Cannot create schedule entry: Overlapping schedule found for role {Role}", schedule.Role);
+                    _logger.LogError("Cannot create schedule entry: Overlapping schedule found for role {Role}", schedule.Role);
                     return false;
                 }
 
                 _schedules[schedule.Id] = schedule;
                 
-                Logger.LogInformation("Schedule entry created: {ScheduleId} - {EngineerName} ({Role}) from {StartTime} to {EndTime}", 
+                _logger.LogInformation("Schedule entry created: {ScheduleId} - {EngineerName} ({Role}) from {StartTime} to {EndTime}", 
                     schedule.Id, 
                     _engineers[schedule.EngineerId].Name, 
                     schedule.Role, 
@@ -191,14 +191,14 @@ namespace MaritimeIQ.Platform.Services
                 
                 if (!_schedules.ContainsKey(scheduleId))
                 {
-                    Logger.LogError("Cannot update schedule entry: Schedule {ScheduleId} not found", scheduleId);
+                    _logger.LogError("Cannot update schedule entry: Schedule {ScheduleId} not found", scheduleId);
                     return false;
                 }
 
                 updatedSchedule.Id = scheduleId; // Ensure ID consistency
                 _schedules[scheduleId] = updatedSchedule;
                 
-                Logger.LogInformation("Schedule entry updated: {ScheduleId}", scheduleId);
+                _logger.LogInformation("Schedule entry updated: {ScheduleId}", scheduleId);
                 return true;
             });
         }
@@ -217,7 +217,7 @@ namespace MaritimeIQ.Platform.Services
                 {
                     var nextEngineer = escalationChain[currentIndex + 1];
                     
-                    Logger.LogInformation("Escalating from {CurrentEngineer} to {NextEngineer}", 
+                    _logger.LogInformation("Escalating from {CurrentEngineer} to {NextEngineer}", 
                         escalationChain[currentIndex].Name, nextEngineer.Name);
 
                     _telemetryClient.TrackEvent("OnCallEscalation", new Dictionary<string, string>
@@ -273,7 +273,7 @@ namespace MaritimeIQ.Platform.Services
             {
                 if (!_engineers.TryGetValue(engineerId, out var engineer))
                 {
-                    Logger.LogError("Cannot notify engineer: Engineer {EngineerId} not found", engineerId);
+                    _logger.LogError("Cannot notify engineer: Engineer {EngineerId} not found", engineerId);
                     return false;
                 }
 
@@ -283,7 +283,7 @@ namespace MaritimeIQ.Platform.Services
                 // - SMS/Phone for critical alerts
                 // - Email for non-urgent notifications
 
-                Logger.LogInformation("Notifying engineer {EngineerName} ({Email}): {Message} [Priority: {Priority}]", 
+                _logger.LogInformation("Notifying engineer {EngineerName} ({Email}): {Message} [Priority: {Priority}]", 
                     engineer.Name, engineer.Email, message, priority);
 
                 _telemetryClient.TrackEvent("OnCallNotification", new Dictionary<string, string>
@@ -310,7 +310,7 @@ namespace MaritimeIQ.Platform.Services
                 
                 _engineers[engineer.Id] = engineer;
                 
-                Logger.LogInformation("Engineer registered: {EngineerName} ({Email})", engineer.Name, engineer.Email);
+                _logger.LogInformation("Engineer registered: {EngineerName} ({Email})", engineer.Name, engineer.Email);
                 return true;
             });
         }
@@ -326,14 +326,14 @@ namespace MaritimeIQ.Platform.Services
                 
                 if (!_engineers.ContainsKey(engineerId))
                 {
-                    Logger.LogError("Cannot update engineer: Engineer {EngineerId} not found", engineerId);
+                    _logger.LogError("Cannot update engineer: Engineer {EngineerId} not found", engineerId);
                     return false;
                 }
 
                 updatedEngineer.Id = engineerId; // Ensure ID consistency
                 _engineers[engineerId] = updatedEngineer;
                 
-                Logger.LogInformation("Engineer updated: {EngineerName}", updatedEngineer.Name);
+                _logger.LogInformation("Engineer updated: {EngineerName}", updatedEngineer.Name);
                 return true;
             });
         }
@@ -369,13 +369,13 @@ namespace MaritimeIQ.Platform.Services
         {
             return await ExecuteOperationAsync(async () =>
             {
-                Logger.LogInformation("Testing escalation chain...");
+                _logger.LogInformation("Testing escalation chain...");
                 
                 var chain = await GetEscalationChainAsync();
                 
                 if (!chain.Any())
                 {
-                    Logger.LogError("Escalation test failed: No engineers in escalation chain");
+                    _logger.LogError("Escalation test failed: No engineers in escalation chain");
                     return false;
                 }
 
@@ -384,14 +384,14 @@ namespace MaritimeIQ.Platform.Services
                     var notified = await NotifyOnCallEngineerAsync(engineer.Id, "Escalation chain test - please acknowledge", "test");
                     if (!notified)
                     {
-                        Logger.LogError("Escalation test failed: Could not notify {EngineerName}", engineer.Name);
+                        _logger.LogError("Escalation test failed: Could not notify {EngineerName}", engineer.Name);
                         return false;
                     }
                     
                     await Task.Delay(500); // Brief delay between notifications
                 }
 
-                Logger.LogInformation("Escalation chain test completed successfully. Notified {Count} engineers", chain.Count);
+                _logger.LogInformation("Escalation chain test completed successfully. Notified {Count} engineers", chain.Count);
                 return true;
             });
         }

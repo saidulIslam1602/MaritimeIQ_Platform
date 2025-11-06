@@ -61,7 +61,7 @@ namespace MaritimeIQ.Platform.Services
                 };
 
                 return dashboard;
-            });
+            }, nameof(GetDashboardDataAsync));
         }
 
         /// <summary>
