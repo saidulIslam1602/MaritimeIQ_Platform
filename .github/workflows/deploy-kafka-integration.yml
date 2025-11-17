@@ -30,12 +30,14 @@ jobs:
       - name: Publish
         run: dotnet publish ./Maritime_DataEngineering_Plaatform.sln --configuration Release --output ./publish --no-build
       
-      - name: Login to Azure Container Registry
-        uses: azure/docker-login@v1
+      - name: Azure Login
+        uses: azure/login@v1
         with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Login to Azure Container Registry
+        run: |
+          az acr login --name $(echo ${{ secrets.ACR_LOGIN_SERVER }} | cut -d'.' -f1)
       
       - name: Build Docker image
         run: |
