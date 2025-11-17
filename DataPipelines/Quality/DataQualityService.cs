@@ -24,7 +24,7 @@ namespace MaritimeIQ.Platform.DataPipelines.Quality
             _logger = logger;
             _configuration = configuration;
             
-            _qualityTimer = new Timer(ExecuteQualityChecks, null, TimeSpan.Zero, TimeSpan.FromMinutes(2));
+            _qualityTimer = new Timer(async state => await ExecuteQualityChecks(state), null, TimeSpan.Zero, TimeSpan.FromMinutes(2));
             
             _logger.LogInformation("🔍 Data Quality Service initialized");
         }
@@ -62,7 +62,7 @@ namespace MaritimeIQ.Platform.DataPipelines.Quality
             await Task.CompletedTask;
         }
 
-        private async void ExecuteQualityChecks(object? state)
+        private async Task ExecuteQualityChecks(object? state)
         {
             try
             {

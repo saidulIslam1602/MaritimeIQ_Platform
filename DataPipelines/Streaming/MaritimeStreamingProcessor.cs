@@ -33,7 +33,7 @@ namespace MaritimeIQ.Platform.DataPipelines.Streaming
             _logger = logger;
             _configuration = configuration;
             
-            _streamingTimer = new Timer(ProcessStreamingData, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+            _streamingTimer = new Timer(async state => await ProcessStreamingData(state), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
             
             _logger.LogInformation("🌊 Maritime Streaming Processor initialized");
         }
@@ -73,7 +73,7 @@ namespace MaritimeIQ.Platform.DataPipelines.Streaming
             await Task.CompletedTask;
         }
 
-        private async void ProcessStreamingData(object? state)
+        private async Task ProcessStreamingData(object? state)
         {
             try
             {

@@ -208,14 +208,16 @@ namespace MaritimeIQ.Platform.Services
             {
                 await Task.CompletedTask;
                 
+                var summary = new FleetAnalyticsModels.BenchmarkingSummary
+                {
+                    BenchmarkPeriod = timeRange.ToString() ?? string.Empty,
+                    OverallRanking = 83.7,
+                    CompetitivePosition = "Top 30%"
+                };
+                
                 return new FleetBenchmarkingAnalytics
                 {
-                    Summary = new FleetAnalyticsModels.BenchmarkingSummary
-                    {
-                        BenchmarkPeriod = timeRange.ToString(),
-                        OverallRanking = 83.7,
-                        CompetitivePosition = "Top 30%"
-                    }
+                    Summary = summary
                 };
             }, nameof(GetFleetBenchmarkingAnalyticsAsync));
         }

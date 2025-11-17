@@ -6,7 +6,8 @@
 # Uses official Microsoft .NET 8 runtime for optimal performance
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 8080  # HTTP port for API endpoints
+# HTTP port for API endpoints
+EXPOSE 8080
 
 # Stage 2: Build environment with .NET 8 SDK
 # Includes all build tools and dependencies for compilation
@@ -34,8 +35,10 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Environment configuration for production deployment
-ENV ASPNETCORE_URLS=http://0.0.0.0:8080    # Bind to all interfaces for container networking
-ENV ASPNETCORE_ENVIRONMENT=Production       # Production environment settings
+# Bind to all interfaces for container networking
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080
+# Production environment settings
+ENV ASPNETCORE_ENVIRONMENT=Production
 
 # Application entry point
 # Starts the MaritimeIQ Platform API server

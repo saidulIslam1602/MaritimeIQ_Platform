@@ -30,7 +30,7 @@ namespace MaritimeIQ.Platform.DataPipelines.ETL
             _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "Server=localhost;Database=MaritimeIQ;Integrated Security=true;";
             
-            _processingTimer = new Timer(ProcessETLJobs, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
+            _processingTimer = new Timer(async state => await ProcessETLJobs(state), null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
             
             _logger.LogInformation("🏭 MaritimeETL Service initialized");
         }
@@ -72,7 +72,7 @@ namespace MaritimeIQ.Platform.DataPipelines.ETL
                 recordsProcessed, vesselsProcessed);
         }
 
-        private async void ProcessETLJobs(object? state)
+        private async Task ProcessETLJobs(object? state)
         {
             try
             {
