@@ -1,0 +1,438 @@
+# Dependency Injection Pattern
+
+## 1. What is Dependency Injection?
+
+**Dependency Injection (DI)** is a design pattern that implements Inversion of Control (IoC), where dependencies are provided to a class rather than the class creating them itself.
+
+**Key Principle**: Depend on abstractions (interfaces), not concrete implementations
+
+### Traditional Approach
+```csharp
+public class VesselService
+{
+    private readonly Database _database = new Database();  // ❌ Tight coupling
+    
+    public Vessel GetVessel(int id)
+    {
+        return _database.GetVessel(id);
+    }
+}
+```
+- Tight coupling
+- Difficult to test
+- Hard to change implementations
+- Violates dependency inversion principle
+
+### Dependency Injection
+```csharp
+public class VesselService
+{
+    private readonly IVesselRepository _repository;  // ✅ Depends on interface
+    
+    public VesselService(IVesselRepository repository)  // ✅ Injected via constructor
+    {
+        _repository = repository;
+    }
+    
+    public Vessel GetVessel(int id)
+    {
+        return _repository.GetById(id);
+    }
+}
+```
+- Loose coupling
+- Easy to test (mock dependencies)
+- Easy to change implementations
+- Follows dependency inversion principle
+
+---
+
+## 2. Service Lifetimes
+
+### Singleton
+
+**One instance for application lifetime**
+
+```csharp
+builder.Services.AddSingleton<IMaritimeDataService, MaritimeDataService>();
+```
+
+**When to Use**:
+- Stateless services
+- Configuration services
+- Caches
+- Expensive to create
+
+**Example**:
+```csharp
+// Same instance returned every time
+var service1 = serviceProvider.GetService<IMaritimeDataService>();
+var service2 = serviceProvider.GetService<IMaritimeDataService>();
+// service1 == service2 (same instance)
+```
+
+### Scoped
+
+**One instance per HTTP request (or scope)**
+
+```csharp
+builder.Services.AddScoped<IVesselService, VesselService>();
+```
+
+**When to Use**:
+- Most services
+- Services that need request context
+- Services with request-scoped state
+
+**Example**:
+```csharp
+// Different instance per request
+// Request 1: service1
+// Request 2: service2
+// service1 != service2 (different instances)
+```
+
+### Transient
+
+**New instance each time**
+
+```csharp
+builder.Services.AddTransient<IUtilityService, UtilityService>();
+```
+
+**When to Use**:
+- Lightweight services
+- Stateless utilities
+- Services that should not be shared
+
+**Example**:
+```csharp
+// New instance each time
+var service1 = serviceProvider.GetService<IUtilityService>();
+var service2 = serviceProvider.GetService<IUtilityService>();
+// service1 != service2 (different instances)
+```
+
+---
+
+## 3. Service Registration in MaritimeIQ
+
+### Program.cs Registration
+
+```csharp
+// Register core services
+builder.Services.AddScoped<IMaritimeDataService, MaritimeDataService>();
+builder.Services.AddScoped<IMonitoringService, MonitoringService>();
+builder.Services.AddScoped<ISafetyService, SafetyService>();
+
+// Register incident management services
+builder.Services.AddScoped<IPagerDutyService, PagerDutyService>();
+builder.Services.AddScoped<IIncidentManagementService, IncidentManagementService>();
+builder.Services.AddScoped<IOnCallService, OnCallService>();
+
+// Register Kafka services
+builder.Services.AddSingleton<KafkaProducerService>();
+builder.Services.AddHostedService<KafkaConsumerService>();
+
+// Register data pipeline services
+builder.Services.AddMaritimeDataPipelines(builder.Configuration);
+```
+
+### Extension Methods
+
+**Organized Service Registration**:
+```csharp
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddMaritimeDataPipelines(
+        this IServiceCollection services, 
+        IConfiguration configuration)
+    {
+        services.AddHostedService<MaritimeDataETLService>();
+        services.AddHostedService<MaritimeStreamingProcessor>();
+        services.AddHostedService<DataQualityService>();
+        return services;
+    }
+}
+```
+
+**Benefits**:
+- Organized registration
+- Reusable across projects
+- Cleaner Program.cs
+- Easier to maintain
+
+---
+
+## 4. Constructor Injection
+
+### Preferred Pattern
+
+**Constructor Injection** (recommended):
+```csharp
+public class VesselService : BaseMaritimeService, IVesselService
+{
+    private readonly IVesselRepository _repository;
+    private readonly ILogger<VesselService> _logger;
+
+    public VesselService(
+        IVesselRepository repository,
+        ILogger<VesselService> logger)
+        : base(logger)
+    {
+        _repository = repository;
+        _logger = logger;
+    }
+}
+```
+
+**Benefits**:
+- Dependencies are explicit
+- Required dependencies are enforced
+- Easy to test (pass mocks)
+- Clear dependencies
+
+### Property Injection (Avoid)
+
+**Property Injection** (not recommended):
+```csharp
+public class VesselService
+{
+    [Inject]  // ❌ Not recommended
+    public IVesselRepository Repository { get; set; }
+}
+```
+
+**Why Avoid**:
+- Dependencies are hidden
+- Optional dependencies (can be null)
+- Harder to test
+- Less explicit
+
+---
+
+## 5. Interface-Based Design
+
+### Service Interfaces
+
+**Define Interfaces**:
+```csharp
+public interface IMaritimeDataService
+{
+    IReadOnlyList<Vessel> GetFleet();
+    Vessel? GetVessel(int vesselId);
+    FleetStatusSummary GetFleetStatus();
+}
+```
+
+**Implement Services**:
+```csharp
+public class MaritimeDataService : IMaritimeDataService
+{
+    // Implementation
+}
+```
+
+**Register Interface-Implementation Pair**:
+```csharp
+builder.Services.AddScoped<IMaritimeDataService, MaritimeDataService>();
+```
+
+**Benefits**:
+- Loose coupling
+- Easy to mock for testing
+- Multiple implementations possible
+- Clear contracts
+
+---
+
+## 6. Dependency Resolution
+
+### Automatic Resolution
+
+**Framework Resolves Dependencies**:
+```csharp
+// Controller constructor
+public VesselController(
+    ILogger<VesselController> logger,
+    IMaritimeDataService maritimeDataService)  // ✅ Automatically resolved
+    : base(logger)
+{
+    _maritimeDataService = maritimeDataService;
+}
+```
+
+**Service Constructor**:
+```csharp
+public MaritimeDataService(
+    ILogger<MaritimeDataService> logger)  // ✅ Automatically resolved
+{
+    _logger = logger;
+}
+```
+
+### Manual Resolution (Avoid)
+
+**Service Locator Pattern** (not recommended):
+```csharp
+var service = serviceProvider.GetService<IVesselService>();  // ❌ Avoid
+```
+
+**Why Avoid**:
+- Hides dependencies
+- Harder to test
+- Less explicit
+- Violates dependency inversion
+
+---
+
+## 7. Configuration Injection
+
+### IConfiguration Injection
+
+```csharp
+public class KafkaProducerService
+{
+    private readonly KafkaConfiguration _config;
+
+    public KafkaProducerService(
+        ILogger<KafkaProducerService> logger,
+        IOptions<KafkaConfiguration> config)  // ✅ Configuration injected
+    {
+        _logger = logger;
+        _config = config.Value;
+    }
+}
+```
+
+**Configuration Registration**:
+```csharp
+builder.Services.Configure<KafkaConfiguration>(
+    builder.Configuration.GetSection("Kafka"));
+```
+
+**Benefits**:
+- Type-safe configuration
+- Centralized configuration
+- Easy to test
+- Environment-specific configs
+
+---
+
+## 8. Best Practices
+
+### ✅ Do
+
+1. **Use Constructor Injection**: Preferred pattern
+2. **Define Interfaces**: For all services
+3. **Use Appropriate Lifetimes**: Singleton, Scoped, Transient
+4. **Register in Program.cs**: Centralized registration
+5. **Use Extension Methods**: For organized registration
+6. **Inject ILogger**: For logging
+7. **Inject IConfiguration**: For configuration
+8. **Use Options Pattern**: For typed configuration
+
+### ❌ Don't
+
+1. **Don't Use Service Locator**: Avoid GetService()
+2. **Don't Use Property Injection**: Use constructor injection
+3. **Don't Create Dependencies**: Let DI create them
+4. **Don't Mix Lifetimes**: Be consistent
+5. **Don't Skip Interfaces**: Always define interfaces
+6. **Don't Create Circular Dependencies**: Avoid cycles
+7. **Don't Ignore Disposal**: Implement IDisposable when needed
+
+---
+
+## 9. Testing with Dependency Injection
+
+### Mocking Dependencies
+
+```csharp
+[Fact]
+public async Task GetVessel_ReturnsVessel()
+{
+    // Arrange
+    var mockRepository = new Mock<IVesselRepository>();
+    mockRepository.Setup(r => r.GetById(1))
+        .ReturnsAsync(new Vessel { Id = 1, Name = "Test Vessel" });
+    
+    var logger = new Mock<ILogger<VesselService>>();
+    var service = new VesselService(mockRepository.Object, logger.Object);
+
+    // Act
+    var result = await service.GetVesselAsync(1);
+
+    // Assert
+    Assert.NotNull(result);
+    Assert.Equal("Test Vessel", result.Name);
+}
+```
+
+**Benefits**:
+- Easy to test
+- Isolated unit tests
+- Fast execution
+- Clear test setup
+
+---
+
+## 10. Common Patterns
+
+### Pattern 1: Service Registration
+
+```csharp
+// Register interface-implementation pair
+builder.Services.AddScoped<IService, Service>();
+```
+
+### Pattern 2: Configuration Registration
+
+```csharp
+// Register configuration
+builder.Services.Configure<Config>(configuration.GetSection("Config"));
+```
+
+### Pattern 3: Extension Methods
+
+```csharp
+// Organized registration
+builder.Services.AddMaritimeServices();
+```
+
+### Pattern 4: Factory Pattern
+
+```csharp
+// Factory for complex creation
+builder.Services.AddScoped<IServiceFactory, ServiceFactory>();
+```
+
+---
+
+## 11. Summary
+
+**Dependency Injection Pattern**:
+
+**Key Concepts**:
+- **Constructor Injection**: Preferred pattern
+- **Service Lifetimes**: Singleton, Scoped, Transient
+- **Interface-Based**: Depend on abstractions
+- **Service Registration**: Centralized in Program.cs
+- **Automatic Resolution**: Framework resolves dependencies
+
+**MaritimeIQ Implementation**:
+- Interface-based service design
+- Constructor injection
+- Appropriate service lifetimes
+- Configuration injection
+- Extension methods for organization
+
+**Benefits**:
+- Loose coupling
+- Testability
+- Maintainability
+- Flexibility
+- Clear dependencies
+
+**Key Takeaway**: Dependency injection enables loose coupling and testability by inverting control of dependencies. MaritimeIQ uses constructor injection with interface-based design, appropriate service lifetimes, and centralized registration in Program.cs, enabling maintainable and testable code.
+

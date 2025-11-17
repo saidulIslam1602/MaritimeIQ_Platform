@@ -1,13 +1,12 @@
 {
-  "name": "aisdataeventhub",
-  "type": "Microsoft.DataFactory/factories/linkedservices",
-  "properties": {
-    "type": "AzureEventHub",
-    "typeProperties": {
-      "connectionString": {
-        "type": "SecureString",
-        "value": "PLACEHOLDER_EVENTHUB_CONNECTION_STRING"
-      }
-    }
-  }
+ "name": "aisdataeventhub",
+ "type": "Microsoft.DataFactory/factories/linkedservices",
+ "properties": {
+ "type": "AzureEventHub",
+ "typeProperties": {
+ "connectionString": {
+ "type": "SecureString",
+ "value": "PLACEHOLDER_EVENTHUB_CONNECTION_STRING"}
+ }
+ }
 }

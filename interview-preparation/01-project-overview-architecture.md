@@ -8,99 +8,99 @@ The MaritimeIQ Platform is a comprehensive real-time maritime operations managem
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           PRESENTATION LAYER                                    │
+│ PRESENTATION LAYER │
 ├─────────────────────────────────────────────────────────────────────────────────┤
-│  Next.js 14 Dashboard (Azure Static Web Apps)                                  │
-│  - Real-time maritime data visualization                                        │
-│  - Custom React hooks for data management                                       │
-│  - TypeScript for type safety                                                   │
-│  - Responsive design for multiple devices                                       │
+│ Next.js 14 Dashboard (Azure Static Web Apps) │
+│ - Real-time maritime data visualization │
+│ - Custom React hooks for data management │
+│ - TypeScript for type safety │
+│ - Responsive design for multiple devices │
 └─────────────────────────────────────────────────────────────────────────────────┘
-                                        │
-                                        ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           API GATEWAY LAYER                                     │
+│ API GATEWAY LAYER │
 ├─────────────────────────────────────────────────────────────────────────────────┤
-│  .NET 8 Web API (Azure Container Apps)                                         │
-│  - 22+ specialized controllers (including KafkaIntegrationController)          │
-│  - BaseMaritimeController for common functionality                             │
-│  - Swagger/OpenAPI documentation                                                │
-│  - JWT authentication & authorization                                           │
+│ .NET 8 Web API (Azure Container Apps) │
+│ - 22+ specialized controllers (including KafkaIntegrationController) │
+│ - BaseMaritimeController for common functionality │
+│ - Swagger/OpenAPI documentation │
+│ - JWT authentication & authorization │
 └─────────────────────────────────────────────────────────────────────────────────┘
-                                        │
-                                        ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                         BUSINESS LOGIC LAYER                                    │
+│ BUSINESS LOGIC LAYER │
 ├─────────────────────────────────────────────────────────────────────────────────┤
-│  Maritime Services (15+ specialized services)                                   │
-│  - KafkaProducerService / KafkaConsumerService (NEW)                           │
-│  - AIS Processing Service                                                       │
-│  - Environmental Monitoring Service                                             │
-│  - Route Optimization Service                                                   │
-│  - BaseMaritimeService for common patterns                                     │
+│ Maritime Services (15+ specialized services) │
+│ - KafkaProducerService / KafkaConsumerService (NEW) │
+│ - AIS Processing Service │
+│ - Environmental Monitoring Service │
+│ - Route Optimization Service │
+│ - BaseMaritimeService for common patterns │
 └─────────────────────────────────────────────────────────────────────────────────┘
-                    │                                   │
-                    ▼                                   ▼
-┌─────────────────────────────────┐    ┌────────────────────────────────────────┐
-│   STREAMING LAYER (NEW)         │    │   DATA PIPELINE LAYER                  │
-├─────────────────────────────────┤    ├────────────────────────────────────────┤
-│  Apache Kafka                   │    │  C# Data Pipelines                     │
-│  - 500+ msgs/sec throughput     │    │  - MaritimeDataETLService              │
-│  - Exactly-once semantics       │    │  - MaritimeStreamingProcessor          │
-│  - 12 partitions per topic      │    │  - DataQualityService                  │
-│  - Snappy compression           │    │  - PipelineOrchestrationService        │
-│  Topics:                        │    │                                        │
-│  • maritime.ais.data            │    │  Azure Functions                       │
-│  • maritime.environmental       │    │  - AIS Processing Function             │
-│  • maritime.alerts              │    │  - Environmental Monitoring Function   │
-│  • maritime.voyage.events       │    │  - Route Optimization Function         │
-└─────────────────────────────────┘    └────────────────────────────────────────┘
-                    │                                   │
-                    └───────────────┬───────────────────┘
-                                    ▼
+ │ │
+ ▼ ▼
+┌─────────────────────────────────┐ ┌────────────────────────────────────────┐
+│ STREAMING LAYER (NEW) │ │ DATA PIPELINE LAYER │
+├─────────────────────────────────┤ ├────────────────────────────────────────┤
+│ Apache Kafka │ │ C# Data Pipelines │
+│ - 500+ msgs/sec throughput │ │ - MaritimeDataETLService │
+│ - Exactly-once semantics │ │ - MaritimeStreamingProcessor │
+│ - 12 partitions per topic │ │ - DataQualityService │
+│ - Snappy compression │ │ - PipelineOrchestrationService │
+│ Topics: │ │ │
+│ • maritime.ais.data │ │ Azure Functions │
+│ • maritime.environmental │ │ - AIS Processing Function │
+│ • maritime.alerts │ │ - Environmental Monitoring Function │
+│ • maritime.voyage.events │ │ - Route Optimization Function │
+└─────────────────────────────────┘ └────────────────────────────────────────┘
+ │ │
+ └───────────────┬───────────────────┘
+ ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                    DATA LAKEHOUSE LAYER (NEW)                                   │
+│ DATA LAKEHOUSE LAYER (NEW) │
 ├─────────────────────────────────────────────────────────────────────────────────┤
-│  Azure Databricks with Delta Lake                                              │
-│  - Bronze Layer: Raw data ingestion (Kafka streams + batch)                    │
-│  - Silver Layer: Cleaned & validated data                                       │
-│  - Gold Layer: Business-level aggregations                                      │
-│  - ML Models: Predictive maintenance (85%+ accuracy)                           │
-│  - Auto-scaling: 2-16 worker nodes                                              │
-│  - ACID transactions + Time Travel                                              │
+│ Azure Databricks with Delta Lake │
+│ - Bronze Layer: Raw data ingestion (Kafka streams + batch) │
+│ - Silver Layer: Cleaned & validated data │
+│ - Gold Layer: Business-level aggregations │
+│ - ML Models: Predictive maintenance (85%+ accuracy) │
+│ - Auto-scaling: 2-16 worker nodes │
+│ - ACID transactions + Time Travel │
 └─────────────────────────────────────────────────────────────────────────────────┘
-                                        │
-                                        ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                    BATCH PROCESSING LAYER (NEW)                                 │
+│ BATCH PROCESSING LAYER (NEW) │
 ├─────────────────────────────────────────────────────────────────────────────────┤
-│  PySpark Batch Analytics (Python 3.10+)                                        │
-│  - Voyage Analytics: Process 1M+ voyages with route performance                │
-│  - Emission Analytics: IMO 2030 compliance monitoring                          │
-│  - Fleet Aggregations: Daily/weekly/monthly KPIs                               │
-│  - Processing: 10M+ records/hour on distributed clusters                       │
-│  - CLI Tools: maritime-voyages, maritime-emissions                             │
+│ PySpark Batch Analytics (Python 3.10+) │
+│ - Voyage Analytics: Process 1M+ voyages with route performance │
+│ - Emission Analytics: IMO 2030 compliance monitoring │
+│ - Fleet Aggregations: Daily/weekly/monthly KPIs │
+│ - Processing: 10M+ records/hour on distributed clusters │
+│ - CLI Tools: maritime-voyages, maritime-emissions │
 └─────────────────────────────────────────────────────────────────────────────────┘
-                                        │
-                                        ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           DATA STORAGE LAYER                                    │
+│ DATA STORAGE LAYER │
 ├─────────────────────────────────────────────────────────────────────────────────┤
-│  Azure SQL Database (Transactional data)                                       │
-│  Delta Lake (Data lakehouse - Bronze/Silver/Gold)                              │
-│  Azure Event Hubs (Real-time streaming - legacy)                               │
-│  Azure Service Bus (Message queuing)                                           │
-│  Azure Key Vault (Secrets management)                                          │
-│  Azure Storage (Documents, checkpoints, Delta Lake storage)                    │
+│ Azure SQL Database (Transactional data) │
+│ Delta Lake (Data lakehouse - Bronze/Silver/Gold) │
+│ Azure Event Hubs (Real-time streaming - legacy) │
+│ Azure Service Bus (Message queuing) │
+│ Azure Key Vault (Secrets management) │
+│ Azure Storage (Documents, checkpoints, Delta Lake storage) │
 └─────────────────────────────────────────────────────────────────────────────────┘
-                                        │
-                                        ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                       MONITORING & OBSERVABILITY                                │
+│ MONITORING & OBSERVABILITY │
 ├─────────────────────────────────────────────────────────────────────────────────┤
-│  Application Insights (Logs, metrics, traces)                                  │
-│  Custom Dashboards (Kafka lag, Databricks job status, API performance)        │
-│  Alerting (SLA violations, data quality issues, stream failures)              │
+│ Application Insights (Logs, metrics, traces) │
+│ Custom Dashboards (Kafka lag, Databricks job status, API performance) │
+│ Alerting (SLA violations, data quality issues, stream failures) │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -110,35 +110,35 @@ The MaritimeIQ Platform is a comprehensive real-time maritime operations managem
 - **Technology**: Next.js 14 with TypeScript
 - **Deployment**: Azure Static Web Apps
 - **Key Features**:
-  - Server-side rendering for performance
-  - Custom React hooks for maritime operations
-  - Real-time data visualization
-  - Responsive design
+ - Server-side rendering for performance
+ - Custom React hooks for maritime operations
+ - Real-time data visualization
+ - Responsive design
 
 #### B. API Gateway Layer
 - **Technology**: .NET 8 Web API
 - **Deployment**: Azure Container Apps / Docker / Kubernetes
 - **Architecture**: Controller-Service pattern with base classes
 - **Controllers**: 22+ specialized controllers including:
-  - `KafkaIntegrationController` - Publish AIS/environmental data to Kafka streams
-  - `DataPipelineController` - Trigger ETL jobs, monitor pipeline status
-  - `FleetAnalyticsController` - Query fleet performance from Databricks
+ - `KafkaIntegrationController` - Publish AIS/environmental data to Kafka streams
+ - `DataPipelineController` - Trigger ETL jobs, monitor pipeline status
+ - `FleetAnalyticsController` - Query fleet performance from Databricks
 - **Key Features**:
-  - RESTful API design
-  - Swagger/OpenAPI documentation
-  - Centralized error handling via BaseMaritimeController
-  - Comprehensive logging and monitoring
+ - RESTful API design
+ - Swagger/OpenAPI documentation
+ - Centralized error handling via BaseMaritimeController
+ - Comprehensive logging and monitoring
 
 #### C. Business Logic Layer
 - **Pattern**: Service-oriented architecture with dependency injection
 - **Base Classes**: BaseMaritimeService for common functionality
 - **Key Services**:
-  - **KafkaProducerService**: High-throughput producer (500+ msgs/sec, idempotence, Snappy compression)
-  - **KafkaConsumerService**: Background consumer with manual offset management
-  - **AIS Processing Service**: Real-time vessel tracking
-  - **Environmental Monitoring Service**: CO2/NOx/SOx emission monitoring
-  - **Route Optimization Service**: AI-driven route planning
-  - **Fleet Analytics Service**: Performance metrics and benchmarking
+ - **KafkaProducerService**: High-throughput producer (500+ msgs/sec, idempotence, Snappy compression)
+ - **KafkaConsumerService**: Background consumer with manual offset management
+ - **AIS Processing Service**: Real-time vessel tracking
+ - **Environmental Monitoring Service**: CO2/NOx/SOx emission monitoring
+ - **Route Optimization Service**: AI-driven route planning
+ - **Fleet Analytics Service**: Performance metrics and benchmarking
 
 #### D. Streaming Layer (NEW)
 - **Technology**: Apache Kafka with Confluent platform
@@ -147,55 +147,55 @@ The MaritimeIQ Platform is a comprehensive real-time maritime operations managem
 - **Partitioning**: 12 partitions per topic for parallel processing
 - **Compression**: Snappy (30-40% bandwidth reduction)
 - **Topics**:
-  - `maritime.ais.data` - AIS vessel positions
-  - `maritime.environmental.sensors` - Emission & battery data
-  - `maritime.alerts` - Safety and compliance alerts
-  - `maritime.voyage.events` - Voyage lifecycle events
+ - `maritime.ais.data` - AIS vessel positions
+ - `maritime.environmental.sensors` - Emission & battery data
+ - `maritime.alerts` - Safety and compliance alerts
+ - `maritime.voyage.events` - Voyage lifecycle events
 - **Configuration**: Idempotent producer, acks=all, manual offset commits
 
 #### E. Data Pipeline Layer
 - **Technology**: C# background services + Azure Functions
 - **C# Data Pipelines**:
-  - **MaritimeDataETLService**: Batch ETL with transaction management, bulk SQL operations
-  - **MaritimeStreamingProcessor**: Real-time Event Hub processing, circuit breaker patterns
-  - **DataQualityService**: Statistical validation, anomaly detection, automated remediation
-  - **PipelineOrchestrationService**: CRON-based scheduling, dependency management
-  - **DataPipelineMonitoringService**: SLA tracking with Application Insights
+ - **MaritimeDataETLService**: Batch ETL with transaction management, bulk SQL operations
+ - **MaritimeStreamingProcessor**: Real-time Event Hub processing, circuit breaker patterns
+ - **DataQualityService**: Statistical validation, anomaly detection, automated remediation
+ - **PipelineOrchestrationService**: CRON-based scheduling, dependency management
+ - **DataPipelineMonitoringService**: SLA tracking with Application Insights
 - **Azure Functions**: Event-driven processing for AIS, environmental, and route optimization
 
 #### F. Data Lakehouse Layer (NEW)
 - **Technology**: Azure Databricks with Delta Lake
 - **Architecture**: Medallion (Bronze-Silver-Gold)
-  - **Bronze**: Raw data ingestion from Kafka + batch sources
-  - **Silver**: Cleaned, validated, deduplicated data
-  - **Gold**: Business-level aggregations, KPIs, ML features
+ - **Bronze**: Raw data ingestion from Kafka + batch sources
+ - **Silver**: Cleaned, validated, deduplicated data
+ - **Gold**: Business-level aggregations, KPIs, ML features
 - **Features**:
-  - ACID transactions on data lake storage
-  - Time travel for auditing and rollback
-  - Auto-scaling clusters (2-16 worker nodes)
-  - ML models for predictive maintenance (85%+ accuracy)
-  - Integration with MLflow for model versioning
+ - ACID transactions on data lake storage
+ - Time travel for auditing and rollback
+ - Auto-scaling clusters (2-16 worker nodes)
+ - ML models for predictive maintenance (85%+ accuracy)
+ - Integration with MLflow for model versioning
 - **Notebooks**:
-  - `01_Maritime_Data_Ingestion.py` - Batch & streaming ingestion
-  - `02_Maritime_Data_Processing.py` - Analytics, ML training, KPI generation
+ - `01_Maritime_Data_Ingestion.py` - Batch & streaming ingestion
+ - `02_Maritime_Data_Processing.py` - Analytics, ML training, KPI generation
 
 #### G. Batch Processing Layer (NEW)
 - **Technology**: PySpark 3.5+ (Python 3.10+)
 - **Processing Capacity**: 10M+ records/hour on distributed clusters
 - **Jobs**:
-  - **Voyage Analytics** (`batch_processing_voyages.py`): Route performance, efficiency metrics, delay analysis
-  - **Emission Analytics** (`emission_analytics.py`): IMO 2030 compliance, rolling averages, trend detection
+ - **Voyage Analytics** (`batch_processing_voyages.py`): Route performance, efficiency metrics, delay analysis
+ - **Emission Analytics** (`emission_analytics.py`): IMO 2030 compliance, rolling averages, trend detection
 - **CLI Tools**:
-  - `maritime-voyages` - Process historical voyage data
-  - `maritime-emissions` - Analyze emission compliance
+ - `maritime-voyages` - Process historical voyage data
+ - `maritime-emissions` - Analyze emission compliance
 - **Optimizations**: Adaptive query execution, dynamic partition coalescing, broadcast joins
 
 #### H. Data Storage Layer
 - **Primary Database**: Azure SQL Database (transactional OLTP)
 - **Data Lakehouse**: Delta Lake on Azure Storage (analytical OLAP)
 - **Streaming**: 
-  - Apache Kafka (primary real-time streaming)
-  - Azure Event Hubs (legacy/backup streaming)
+ - Apache Kafka (primary real-time streaming)
+ - Azure Event Hubs (legacy/backup streaming)
 - **Messaging**: Azure Service Bus (queuing, pub/sub)
 - **Secrets**: Azure Key Vault (connection strings, API keys, certificates)
 - **Files**: Azure Blob Storage (documents, checkpoints, Delta Lake storage)
@@ -213,15 +213,15 @@ The MaritimeIQ Platform is a comprehensive real-time maritime operations managem
 // Example implementation in BaseMaritimeService
 public abstract class BaseMaritimeService : IBaseMaritimeService
 {
-    protected readonly ILogger Logger;
-    protected readonly IConfiguration Configuration;
-    
-    protected async Task<T> ExecuteOperationAsync<T>(
-        Func<Task<T>> operation, 
-        string operationName)
-    {
-        // Common error handling and logging
-    }
+ protected readonly ILogger Logger;
+ protected readonly IConfiguration Configuration;
+ 
+ protected async Task<T> ExecuteOperationAsync<T>(
+ Func<Task<T>> operation, 
+ string operationName)
+ {
+ // Common error handling and logging
+ }
 }
 ```
 
@@ -241,12 +241,12 @@ builder.Services.AddScoped<IBaseMaritimeService, BaseMaritimeService>();
 ```csharp
 public abstract class BaseMaritimeController : ControllerBase
 {
-    protected async Task<IActionResult> ExecuteOperationAsync<T>(
-        Func<Task<T>> operation, 
-        string operationName)
-    {
-        // Template for all controller operations
-    }
+ protected async Task<IActionResult> ExecuteOperationAsync<T>(
+ Func<Task<T>> operation, 
+ string operationName)
+ {
+ // Template for all controller operations
+ }
 }
 ```
 
@@ -265,30 +265,30 @@ public abstract class BaseMaritimeController : ControllerBase
 // KafkaProducerService - High-throughput producer
 public async Task PublishAISDataAsync(AISVesselData aisData)
 {
-    var message = new Message<string, string>
-    {
-        Key = aisData.MMSI,  // Partition by vessel for ordering
-        Value = JsonSerializer.Serialize(aisData),
-        Timestamp = new Timestamp(aisData.Timestamp),
-        Headers = new Headers
-        {
-            { "source", Encoding.UTF8.GetBytes("maritime-platform") },
-            { "event-type", Encoding.UTF8.GetBytes("ais-position") }
-        }
-    };
-    
-    var result = await _producer.ProduceAsync(_config.AISDataTopic, message);
+ var message = new Message<string, string>
+ {
+ Key = aisData.MMSI, // Partition by vessel for ordering
+ Value = JsonSerializer.Serialize(aisData),
+ Timestamp = new Timestamp(aisData.Timestamp),
+ Headers = new Headers
+ {
+ { "source", Encoding.UTF8.GetBytes("maritime-platform") },
+ { "event-type", Encoding.UTF8.GetBytes("ais-position") }
+ }
+ };
+ 
+ var result = await _producer.ProduceAsync(_config.AISDataTopic, message);
 }
 
 // KafkaConsumerService - Background consumer
 protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 {
-    while (!stoppingToken.IsCancellationRequested)
-    {
-        var consumeResult = _consumer.Consume(stoppingToken);
-        await ProcessMessageAsync(consumeResult.Message);
-        _consumer.Commit(consumeResult);  // Manual offset management
-    }
+ while (!stoppingToken.IsCancellationRequested)
+ {
+ var consumeResult = _consumer.Consume(stoppingToken);
+ await ProcessMessageAsync(consumeResult.Message);
+ _consumer.Commit(consumeResult); // Manual offset management
+ }
 }
 ```
 
@@ -302,20 +302,20 @@ protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 ```python
 # Bronze Layer - Raw ingestion
 bronze_df = spark.readStream \
-    .format("kafka") \
-    .option("subscribe", "maritime.ais.data") \
-    .load()
+ .format("kafka") \
+ .option("subscribe", "maritime.ais.data") \
+ .load()
 bronze_df.writeStream.format("delta").save("/bronze/ais")
 
 # Silver Layer - Cleaned data
 silver_df = spark.read.format("delta").load("/bronze/ais") \
-    .filter(col("latitude").between(-90, 90)) \
-    .dropDuplicates(["mmsi", "timestamp"])
+ .filter(col("latitude").between(-90, 90)) \
+ .dropDuplicates(["mmsi", "timestamp"])
 silver_df.write.format("delta").mode("overwrite").save("/silver/ais")
 
 # Gold Layer - Business aggregations
 gold_df = silver_df.groupBy("vessel_id", window("timestamp", "1 day")) \
-    .agg(avg("speed"), count("*").alias("position_count"))
+ .agg(avg("speed"), count("*").alias("position_count"))
 gold_df.write.format("delta").mode("append").save("/gold/daily_metrics")
 ```
 
@@ -329,14 +329,14 @@ gold_df.write.format("delta").mode("append").save("/gold/daily_metrics")
 ```csharp
 public class MaritimeDataETLService : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            await ProcessETLBatchAsync(stoppingToken);
-            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
-        }
-    }
+ protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+ {
+ while (!stoppingToken.IsCancellationRequested)
+ {
+ await ProcessETLBatchAsync(stoppingToken);
+ await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+ }
+ }
 }
 ```
 
@@ -548,23 +548,23 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 // BaseMaritimeController.cs
 protected async Task<IActionResult> ExecuteOperationAsync<T>(
-    Func<Task<T>> operation, 
-    string operationName)
+ Func<Task<T>> operation, 
+ string operationName)
 {
-    var stopwatch = Stopwatch.StartNew();
-    try
-    {
-        _logger.LogInformation("Starting operation: {OperationName}", operationName);
-        var result = await operation();
-        _logger.LogInformation("Completed operation: {OperationName} in {ElapsedMs}ms", 
-            operationName, stopwatch.ElapsedMilliseconds);
-        return HandleSuccess(result);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error in operation: {OperationName}", operationName);
-        return HandleException(ex, operationName);
-    }
+ var stopwatch = Stopwatch.StartNew();
+ try
+ {
+ _logger.LogInformation("Starting operation: {OperationName}", operationName);
+ var result = await operation();
+ _logger.LogInformation("Completed operation: {OperationName} in {ElapsedMs}ms", 
+ operationName, stopwatch.ElapsedMilliseconds);
+ return HandleSuccess(result);
+ }
+ catch (Exception ex)
+ {
+ _logger.LogError(ex, "Error in operation: {OperationName}", operationName);
+ return HandleException(ex, operationName);
+ }
 }
 ```
 
@@ -578,8 +578,8 @@ protected async Task<IActionResult> ExecuteOperationAsync<T>(
 #### Kafka Monitoring
 ```csharp
 // Custom metrics for Kafka producer
-_logger.LogInformation("📡 Published to partition {Partition} at offset {Offset}, lag: {Lag}ms",
-    result.Partition.Value, result.Offset.Value, result.Latency.TotalMilliseconds);
+_logger.LogInformation("Published to partition {Partition} at offset {Offset}, lag: {Lag}ms",
+ result.Partition.Value, result.Offset.Value, result.Latency.TotalMilliseconds);
 ```
 
 **Kafka Metrics Tracked**:
@@ -596,8 +596,8 @@ _logger.LogInformation("📡 Published to partition {Partition} at offset {Offse
 #### Databricks Monitoring
 ```python
 # Job completion logging
-logger.info(f"✅ Batch job completed: {record_count:,} records in {duration:.2f}s")
-logger.info(f"📊 Processing rate: {records_per_sec:,.0f} records/second")
+logger.info(f"Batch job completed: {record_count:,} records in {duration:.2f}s")
+logger.info(f"Processing rate: {records_per_sec:,.0f} records/second")
 ```
 
 **Databricks Metrics Tracked**:
@@ -616,23 +616,23 @@ logger.info(f"📊 Processing rate: {records_per_sec:,.0f} records/second")
 // Comprehensive health checks including Kafka
 public async Task<bool> HealthCheckAsync()
 {
-    try
-    {
-        // Check Kafka connectivity
-        var kafkaHealthy = await _kafkaProducer.ProduceTestMessageAsync();
-        
-        // Check database connectivity
-        var dbHealthy = await _context.Database.CanConnectAsync();
-        
-        // Check Databricks API
-        var databricksHealthy = await CheckDatabricksAPIAsync();
-        
-        return kafkaHealthy && dbHealthy && databricksHealthy;
-    }
-    catch
-    {
-        return false;
-    }
+ try
+ {
+ // Check Kafka connectivity
+ var kafkaHealthy = await _kafkaProducer.ProduceTestMessageAsync();
+ 
+ // Check database connectivity
+ var dbHealthy = await _context.Database.CanConnectAsync();
+ 
+ // Check Databricks API
+ var databricksHealthy = await CheckDatabricksAPIAsync();
+ 
+ return kafkaHealthy && dbHealthy && databricksHealthy;
+ }
+ catch
+ {
+ return false;
+ }
 }
 ```
 
@@ -663,61 +663,61 @@ public async Task<bool> HealthCheckAsync()
 ### Key Questions You Should Be Ready For:
 
 1. **"Walk me through the architecture of your maritime platform."**
-   - Start with the high-level diagram
-   - Explain each layer's responsibility
-   - Highlight the data flow between components
+ - Start with the high-level diagram
+ - Explain each layer's responsibility
+ - Highlight the data flow between components
 
 2. **"Why did you choose .NET 8 over other frameworks?"**
-   - Performance characteristics
-   - Azure integration
-   - Type safety
-   - Ecosystem maturity
+ - Performance characteristics
+ - Azure integration
+ - Type safety
+ - Ecosystem maturity
 
 3. **"How does your system handle real-time data processing?"**
-   - Kafka for high-throughput streaming (500+ msgs/sec, exactly-once semantics)
-   - Databricks structured streaming for real-time analytics
-   - Azure Functions for event-driven processing
-   - KafkaConsumerService background service for continuous processing
+ - Kafka for high-throughput streaming (500+ msgs/sec, exactly-once semantics)
+ - Databricks structured streaming for real-time analytics
+ - Azure Functions for event-driven processing
+ - KafkaConsumerService background service for continuous processing
 
 4. **"Why did you choose Apache Kafka over Azure Event Hubs?"**
-   - Exactly-once semantics critical for maritime safety data
-   - 7+ day retention for audit compliance and reprocessing
-   - Fine-grained partitioning control (MMSI-based ordering)
-   - Industry-standard with rich ecosystem (Kafka Connect, Confluent)
-   - More cost-effective at high throughput (500+ msgs/sec)
+ - Exactly-once semantics critical for maritime safety data
+ - 7+ day retention for audit compliance and reprocessing
+ - Fine-grained partitioning control (MMSI-based ordering)
+ - Industry-standard with rich ecosystem (Kafka Connect, Confluent)
+ - More cost-effective at high throughput (500+ msgs/sec)
 
 5. **"Explain your data lakehouse architecture."**
-   - Medallion architecture: Bronze (raw) → Silver (cleaned) → Gold (aggregated)
-   - Delta Lake provides ACID transactions on data lake storage
-   - Time travel for auditing and rollback capabilities
-   - Unified batch and streaming processing on Databricks
-   - ML model training directly on data without separate ETL
+ - Medallion architecture: Bronze (raw) → Silver (cleaned) → Gold (aggregated)
+ - Delta Lake provides ACID transactions on data lake storage
+ - Time travel for auditing and rollback capabilities
+ - Unified batch and streaming processing on Databricks
+ - ML model training directly on data without separate ETL
 
 6. **"How do you process 10M+ records per hour with PySpark?"**
-   - Distributed processing across 2-16 auto-scaling worker nodes
-   - Adaptive query execution optimizes joins and shuffles at runtime
-   - Dynamic partition coalescing prevents small file problem
-   - Broadcast joins for small dimension tables
-   - Z-ordering and data skipping on Delta tables
+ - Distributed processing across 2-16 auto-scaling worker nodes
+ - Adaptive query execution optimizes joins and shuffles at runtime
+ - Dynamic partition coalescing prevents small file problem
+ - Broadcast joins for small dimension tables
+ - Z-ordering and data skipping on Delta tables
 
 7. **"What's your approach to data quality in the pipeline?"**
-   - Bronze layer preserves raw data for auditing
-   - Silver layer applies validation rules, deduplication, schema checks
-   - DataQualityService in C# performs statistical validation
-   - Automated alerts for quality violations
-   - Time travel allows rollback of bad data
+ - Bronze layer preserves raw data for auditing
+ - Silver layer applies validation rules, deduplication, schema checks
+ - DataQualityService in C# performs statistical validation
+ - Automated alerts for quality violations
+ - Time travel allows rollback of bad data
 
 4. **"What design patterns did you implement and why?"**
-   - Repository pattern for data access
-   - Template method for base controllers
-   - Observer pattern for events
-   - Dependency injection for loose coupling
+ - Repository pattern for data access
+ - Template method for base controllers
+ - Observer pattern for events
+ - Dependency injection for loose coupling
 
 5. **"How would you scale this system to handle 10x more traffic?"**
-   - Horizontal scaling with Container Apps
-   - Database read replicas
-   - Caching strategies
-   - Event Hubs partitioning
+ - Horizontal scaling with Container Apps
+ - Database read replicas
+ - Caching strategies
+ - Event Hubs partitioning
 
 ### Technical Deep-Dive Preparation:
 

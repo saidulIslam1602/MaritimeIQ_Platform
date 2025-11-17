@@ -1,67 +1,63 @@
 name: Build and Test
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+ push:
+ branches: [main]
+ workflow_dispatch:
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-      
-      - name: Restore dependencies
-        run: dotnet restore ./Maritime_DataEngineering_Plaatform.sln
-      
-      - name: Build
-        run: dotnet build ./Maritime_DataEngineering_Plaatform.sln --configuration Release --no-restore
-      
-      - name: Test
-        run: dotnet test ./Maritime_DataEngineering_Plaatform.sln --no-build --configuration Release --verbosity normal
-      
-      - name: Publish
-        run: dotnet publish ./Maritime_DataEngineering_Plaatform.sln --configuration Release --output ./publish --no-build
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+ build-and-test:
+ runs-on: ubuntu-latest
+ 
+ steps:
+ - name: Checkout code
+ uses: actions/checkout@v3
+ 
+ - name: Setup .NET
+ uses: actions/setup-dotnet@v3
+ with:
+ dotnet-version: '8.0.x'- name: Restore dependencies
+ run: dotnet restore ./Maritime_DataEngineering_Plaatform.sln
+ 
+ - name: Build
+ run: dotnet build ./Maritime_DataEngineering_Plaatform.sln --configuration Release --no-restore
+ 
+ - name: Test
+ run: dotnet test ./Maritime_DataEngineering_Plaatform.sln --no-build --configuration Release --verbosity normal
+ 
+ - name: Publish
+ run: dotnet publish ./Maritime_DataEngineering_Plaatform.sln --configuration Release --output ./publish --no-build
+ 
+ - name: Set up Docker Buildx
+ uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
-        run: |
-          docker build -t maritimeiq-platform:${{ github.sha }} .
-          docker tag maritimeiq-platform:${{ github.sha }} maritimeiq-platform:latest
-          echo "Docker image built successfully"
-      
-  # Azure deployment disabled - configure AZURE_CREDENTIALS secret to enable
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: build-and-test
-  #   if: false
-  #   
-  #   steps:
-  #     - name: Azure Login
-  #       uses: azure/login@v1
-  #       with:
-  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
-  #     
-  #     - name: Login to ACR
-  #       run: az acr login --name maritimeregistry70396
-  #     
-  #     - name: Push Docker image
-  #       run: |
-  #         docker push maritimeregistry70396.azurecr.io/maritimeiq-platform:${{ github.sha }}
-  #         docker push maritimeregistry70396.azurecr.io/maritimeiq-platform:latest
-  #     
-  #     - name: Deploy to Azure Container Apps
-  #       run: |
-  #         az containerapp update \
-  #           --name maritime-platform \
-  #           --resource-group maritime-platform-rg \
-  #           --image maritimeregistry70396.azurecr.io/maritimeiq-platform:${{ github.sha }}
+ - name: Build Docker image
+ run: |
+ docker build -t maritimeiq-platform:${{ github.sha }} .
+ docker tag maritimeiq-platform:${{ github.sha }} maritimeiq-platform:latest
+ echo "Docker image built successfully"# Azure deployment disabled - configure AZURE_CREDENTIALS secret to enable
+ # deploy:
+ # runs-on: ubuntu-latest
+ # needs: build-and-test
+ # if: false
+ # 
+ # steps:
+ # - name: Azure Login
+ # uses: azure/login@v1
+ # with:
+ # creds: ${{ secrets.AZURE_CREDENTIALS }}
+ # 
+ # - name: Login to ACR
+ # run: az acr login --name maritimeregistry70396
+ # 
+ # - name: Push Docker image
+ # run: |
+ # docker push maritimeregistry70396.azurecr.io/maritimeiq-platform:${{ github.sha }}
+ # docker push maritimeregistry70396.azurecr.io/maritimeiq-platform:latest
+ # 
+ # - name: Deploy to Azure Container Apps
+ # run: |
+ # az containerapp update \
+ # --name maritime-platform \
+ # --resource-group maritime-platform-rg \
+ # --image maritimeregistry70396.azurecr.io/maritimeiq-platform:${{ github.sha }}

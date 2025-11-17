@@ -37,10 +37,10 @@ docker run -p 8080:8080 maritime-platform
 ```
 
 ### Benefits
-- ✅ No cloud costs
-- ✅ Works on any machine with Docker
-- ✅ Easy to share with research team
-- ✅ Isolated environment
+- No cloud costs
+- Works on any machine with Docker
+- Easy to share with research team
+- Isolated environment
 
 ---
 

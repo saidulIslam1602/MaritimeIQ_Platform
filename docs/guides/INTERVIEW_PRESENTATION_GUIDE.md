@@ -1,6 +1,6 @@
-# 🚢 AZURE MARITIME PLATFORM - INTERVIEW SHOWCASE GUIDE
+# AZURE MARITIME PLATFORM - INTERVIEW SHOWCASE GUIDE
 
-## 🎯 **INTERVIEW PRESENTATION STRATEGY**
+## **INTERVIEW PRESENTATION STRATEGY**
 
 This guide helps you present your Azure Maritime Platform professionally during your interview to make a strong impression.
 
@@ -8,7 +8,7 @@ This guide helps you present your Azure Maritime Platform professionally during 
 
 ## 📋 **PRE-INTERVIEW CHECKLIST**
 
-### ✅ **30 Minutes Before Interview**
+### **30 Minutes Before Interview**
 ```bash
 # 1. Deploy the platform
 ./deploy-azure-interview.sh deploy
@@ -20,7 +20,7 @@ python3 demo-data-generator.py
 ./deploy-azure-interview.sh status
 ```
 
-### ✅ **Have These URLs Ready**
+### **Have These URLs Ready**
 - **Maritime Platform**: `https://maritime-platform-[id].azurecontainerapps.io`
 - **Azure Portal**: `https://portal.azure.com`
 - **Application Insights**: Direct link to your App Insights dashboard
@@ -46,26 +46,25 @@ python3 demo-data-generator.py
 "Let me walk you through the architecture:
 
 🔹 REAL-TIME DATA INGESTION
-   → Azure Event Hub ingests maritime sensor data
-   → Handles 10,000+ messages per second
-   → Partitioned for parallel processing
+ → Azure Event Hub ingests maritime sensor data
+ → Handles 10,000+ messages per second
+ → Partitioned for parallel processing
 
 🔹 STREAM PROCESSING
-   → Azure Stream Analytics processes data in real-time
-   → Complex event processing for anomaly detection
-   → Sub-second latency for critical alerts
+ → Azure Stream Analytics processes data in real-time
+ → Complex event processing for anomaly detection
+ → Sub-second latency for critical alerts
 
 🔹 CONTAINERIZED APPLICATION
-   → Azure Container Apps with auto-scaling
-   → Serverless scaling from 0 to 50 instances
-   → Pay-per-use model for cost optimization
+ → Azure Container Apps with auto-scaling
+ → Serverless scaling from 0 to 50 instances
+ → Pay-per-use model for cost optimization
 
 🔹 DATA STORAGE & ANALYTICS
-   → Azure SQL Database for operational data
-   → Blob Storage for historical analysis
-   → Application Insights for telemetry
-"
-```
+ → Azure SQL Database for operational data
+ → Blob Storage for historical analysis
+ → Application Insights for telemetry
+"```
 
 ### **3. Live Demo - Real-Time Processing (5 minutes)**
 
@@ -109,20 +108,20 @@ python3 demo-data-generator.py
 ### **5. Technical Excellence Points (2 minutes)**
 
 **Modern Architecture Patterns:**
-- ✅ **Microservices**: Containerized, independently scalable
-- ✅ **Event-Driven**: Pub/sub messaging patterns
-- ✅ **Serverless**: Auto-scaling, pay-per-use
-- ✅ **Cloud-Native**: Built for Azure from ground up
+- **Microservices**: Containerized, independently scalable
+- **Event-Driven**: Pub/sub messaging patterns
+- **Serverless**: Auto-scaling, pay-per-use
+- **Cloud-Native**: Built for Azure from ground up
 
 **DevOps & Operations:**
-- ✅ **Infrastructure as Code**: ARM templates
-- ✅ **Monitoring & Alerting**: Full observability
-- ✅ **Security**: Zero-trust security model
-- ✅ **Disaster Recovery**: Multi-region deployment ready
+- **Infrastructure as Code**: ARM templates
+- **Monitoring & Alerting**: Full observability
+- **Security**: Zero-trust security model
+- **Disaster Recovery**: Multi-region deployment ready
 
 ---
 
-## 💡 **ANSWERING TECHNICAL QUESTIONS**
+## **ANSWERING TECHNICAL QUESTIONS**
 
 ### **Q: "Why Azure over AWS or Google Cloud?"**
 **A:** *"Azure provides the best integration for maritime industry compliance, superior hybrid cloud capabilities for Norwegian companies, and cost-effective pricing for European deployments. The seamless integration between services like Event Hub and Stream Analytics reduces development time significantly."*
@@ -138,7 +137,7 @@ python3 demo-data-generator.py
 
 ---
 
-## 🎯 **IMPRESSIVE TALKING POINTS**
+## **IMPRESSIVE TALKING POINTS**
 
 ### **Real-World Impact:**
 - *"This platform can optimize fuel consumption by 15% through route optimization"*
@@ -157,13 +156,13 @@ python3 demo-data-generator.py
 
 ---
 
-## 🚀 **CLOSING STATEMENT**
+## **CLOSING STATEMENT**
 
 > *"This platform demonstrates my ability to architect and implement enterprise-scale solutions on Azure, with focus on real-time processing, cost optimization, and operational excellence. It showcases both technical depth in cloud technologies and understanding of business value - exactly what modern organizations need for their digital transformation initiatives."*
 
 ---
 
-## 📊 **QUICK STATS TO MEMORIZE**
+## **QUICK STATS TO MEMORIZE**
 
 - **Processing Capacity**: 10,000 messages/second
 - **Latency**: Sub-second processing
@@ -176,7 +175,7 @@ python3 demo-data-generator.py
 
 ---
 
-## 🔥 **EMERGENCY DEMO BACKUP**
+## **EMERGENCY DEMO BACKUP**
 
 If live demo fails:
 1. Show Azure Portal resources
@@ -189,7 +188,7 @@ If live demo fails:
 
 ---
 
-## 🎖️ **SUCCESS INDICATORS**
+## **SUCCESS INDICATORS**
 
 **You'll know you're impressing them when they ask:**
 - Technical depth questions about Stream Analytics
@@ -198,4 +197,4 @@ If live demo fails:
 - Security and compliance approaches
 - Integration with existing systems
 
-**Good luck with your interview! 🚀**
+**Good luck with your interview! **

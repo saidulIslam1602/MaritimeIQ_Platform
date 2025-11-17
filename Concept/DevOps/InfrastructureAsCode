@@ -1,0 +1,480 @@
+# Infrastructure as Code (IaC)
+
+## 1. What is Infrastructure as Code?
+
+**Infrastructure as Code (IaC)** is the practice of managing and provisioning infrastructure through machine-readable definition files, rather than manual configuration.
+
+**Key Principle**: Define infrastructure in code, version control it, and deploy it automatically
+
+### Traditional Approach
+```
+1. Manual server setup
+2. Manual configuration
+3. Manual deployment
+4. Inconsistent environments
+5. Difficult to reproduce
+```
+
+### Infrastructure as Code
+```
+1. Define infrastructure in code
+2. Version control
+3. Automated deployment
+4. Consistent environments
+5. Reproducible
+```
+
+---
+
+## 2. Why Infrastructure as Code?
+
+### Benefits
+
+**1. Version Control**:
+- Track all infrastructure changes
+- Review before applying
+- Rollback capabilities
+- Team collaboration
+
+**2. Reproducibility**:
+- Same infrastructure every time
+- No manual configuration drift
+- Consistent environments
+- Easy disaster recovery
+
+**3. Automation**:
+- Automated deployments
+- CI/CD integration
+- Policy enforcement
+- Compliance checks
+
+**4. Documentation**:
+- Code is documentation
+- Self-documenting infrastructure
+- Clear resource relationships
+- Easy onboarding
+
+**5. Cost Optimization**:
+- Right-sized resources
+- Automated scaling
+- Lifecycle management
+- Cost tracking
+
+---
+
+## 3. Azure: ARM Templates
+
+### What are ARM Templates?
+
+**ARM (Azure Resource Manager) Templates** are JSON files that define Azure infrastructure declaratively.
+
+**Key Features**:
+- JSON-based syntax
+- Parameterization
+- Template linking
+- Resource dependencies
+- Idempotent operations
+
+### ARM Template Structure
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appName": {
+      "type": "string",
+      "defaultValue": "maritime-platform",
+      "metadata": {
+        "description": "Name of the application"
+      }
+    },
+    "sqlAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "SQL Server admin password"
+      }
+    }
+  },
+  "variables": {
+    "sqlName": "[concat('sql-', parameters('appName'))]",
+    "sqlDb": "[concat(parameters('appName'), '-db')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2021-11-01",
+      "name": "[variables('sqlName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "administratorLogin": "maritime-admin",
+        "administratorLoginPassword": "[parameters('sqlAdminPassword')]"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2021-11-01",
+      "name": "[concat(variables('sqlName'), '/', variables('sqlDb'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlName'))]"
+      ],
+      "properties": {
+        "collation": "SQL_Latin1_General_CP1_CI_AS"
+      }
+    }
+  ],
+  "outputs": {
+    "sqlServerName": {
+      "type": "string",
+      "value": "[variables('sqlName')]"
+    }
+  }
+}
+```
+
+### ARM Template Components
+
+**Parameters**: Input values for customization
+**Variables**: Reusable values
+**Resources**: Infrastructure to create
+**Outputs**: Values returned after deployment
+
+### Deploying ARM Templates
+
+```bash
+# Deploy template
+az deployment group create \
+  --resource-group maritime-rg \
+  --template-file azure-infrastructure.json \
+  --parameters appName=maritime-platform sqlAdminPassword=SecurePassword123!
+
+# Validate template
+az deployment group validate \
+  --resource-group maritime-rg \
+  --template-file azure-infrastructure.json
+```
+
+---
+
+## 4. AWS: Terraform
+
+### What is Terraform?
+
+**Terraform** is an open-source IaC tool that uses HCL (HashiCorp Configuration Language) to define infrastructure.
+
+**Key Features**:
+- HCL-based syntax
+- Multi-cloud support
+- State management
+- Modules for reusability
+- Plan before apply
+
+### Terraform Configuration Structure
+
+```hcl
+# variables.tf
+variable "app_name" {
+  type        = string
+  default     = "maritime-platform"
+  description = "Name of the application"
+}
+
+variable "sql_admin_password" {
+  type        = string
+  sensitive   = true
+  description = "SQL Server admin password"
+}
+
+# main.tf
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+# RDS instance
+resource "aws_db_instance" "main" {
+  identifier     = "${var.app_name}-db"
+  engine         = "postgres"
+  engine_version = "15.3"
+  instance_class = "db.t3.medium"
+  
+  allocated_storage     = 100
+  max_allocated_storage = 500
+  
+  db_name  = "maritime"
+  username = "maritime_admin"
+  password = var.sql_admin_password
+  
+  backup_retention_period = 7
+  skip_final_snapshot    = false
+}
+
+# Outputs
+output "db_endpoint" {
+  value       = aws_db_instance.main.endpoint
+  description = "RDS instance endpoint"
+}
+```
+
+### Terraform Components
+
+**Variables**: Input values
+**Resources**: Infrastructure to create
+**Outputs**: Values returned after apply
+**Providers**: Cloud platform plugins
+**Modules**: Reusable components
+
+### Deploying with Terraform
+
+```bash
+# Initialize Terraform
+terraform init
+
+# Plan deployment
+terraform plan -out=tfplan
+
+# Apply deployment
+terraform apply tfplan
+
+# Destroy infrastructure
+terraform destroy
+```
+
+---
+
+## 5. Comparison: ARM vs Terraform
+
+### Syntax
+
+**ARM (JSON)**:
+```json
+{
+  "type": "Microsoft.Sql/servers",
+  "name": "[variables('sqlName')]",
+  "properties": {
+    "administratorLogin": "maritime-admin"
+  }
+}
+```
+
+**Terraform (HCL)**:
+```hcl
+resource "aws_db_instance" "main" {
+  identifier = "${var.app_name}-db"
+  engine     = "postgres"
+  username   = "maritime_admin"
+}
+```
+
+**Comparison**:
+- **ARM**: JSON-based, verbose
+- **Terraform**: HCL-based, more readable
+- **Learning**: Terraform is easier to read and write
+
+---
+
+### State Management
+
+**ARM**:
+- State managed by Azure Resource Manager
+- No explicit state file
+- Automatic dependency tracking
+
+**Terraform**:
+- State stored in file or remote (S3)
+- Explicit state management
+- Manual dependency tracking
+
+**Comparison**:
+- **ARM**: Simpler, Azure-specific
+- **Terraform**: More control, multi-cloud
+
+---
+
+### Parameterization
+
+**ARM**:
+```json
+"parameters": {
+  "appName": {
+    "type": "string",
+    "defaultValue": "maritime-platform"
+  }
+}
+```
+
+**Terraform**:
+```hcl
+variable "app_name" {
+  type    = string
+  default = "maritime-platform"
+}
+```
+
+**Comparison**:
+- **ARM**: JSON-based parameters
+- **Terraform**: HCL-based variables
+- **Learning**: Similar concepts, different syntax
+
+---
+
+## 6. Multi-Environment Strategy
+
+### Environment Types
+
+**Development**:
+- Smaller instances
+- Reduced backup retention
+- Lower cost
+- Testing environment
+
+**Staging**:
+- Medium instances
+- Standard backup retention
+- Production-like setup
+- Pre-production testing
+
+**Production**:
+- Larger instances
+- Extended backup retention
+- Deletion protection
+- Enhanced monitoring
+
+### ARM Multi-Environment
+
+```json
+{
+  "parameters": {
+    "environment": {
+      "type": "string",
+      "allowedValues": ["dev", "staging", "prod"],
+      "defaultValue": "dev"
+    }
+  },
+  "variables": {
+    "instanceSize": "[if(equals(parameters('environment'), 'prod'), 'Standard_D4s_v3', 'Standard_D2s_v3')]",
+    "backupRetention": "[if(equals(parameters('environment'), 'prod'), 30, 7)]"
+  }
+}
+```
+
+### Terraform Multi-Environment
+
+```hcl
+variable "environment" {
+  type        = string
+  default     = "dev"
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "Environment must be dev, staging, or prod."
+  }
+}
+
+locals {
+  instance_size = var.environment == "prod" ? "db.r6g.xlarge" : "db.t3.medium"
+  backup_retention = var.environment == "prod" ? 30 : 7
+}
+
+resource "aws_db_instance" "main" {
+  instance_class      = local.instance_size
+  backup_retention_period = local.backup_retention
+  deletion_protection = var.environment == "prod"
+}
+```
+
+---
+
+## 7. Best Practices
+
+### ✅ Do
+
+1. **Version Control**: Store all IaC in version control
+2. **Parameterize**: Use parameters/variables for customization
+3. **Modularize**: Break into reusable modules/templates
+4. **Document**: Document all parameters and resources
+5. **Test**: Validate before deploying
+6. **Review**: Code review infrastructure changes
+7. **Tag Resources**: Tag for cost tracking and organization
+8. **Use Modules**: Reuse common patterns
+
+### ❌ Don't
+
+1. **Don't Hardcode**: Avoid hardcoded values
+2. **Don't Skip Validation**: Always validate templates
+3. **Don't Ignore State**: Manage state properly
+4. **Don't Skip Testing**: Test in dev first
+5. **Don't Forget Security**: Secure sensitive parameters
+6. **Don't Ignore Costs**: Monitor resource costs
+
+---
+
+## 8. MaritimeIQ Examples
+
+### Azure Deployment
+
+```bash
+# Deploy infrastructure
+az deployment group create \
+  --resource-group maritime-rg \
+  --template-file deployment/azure/azure-infrastructure.json \
+  --parameters \
+    appName=maritime-platform \
+    uniqueId=maritime-001 \
+    sqlAdminPassword=SecurePassword123!
+
+# Deploy application
+az containerapp create \
+  --name maritime-api \
+  --resource-group maritime-rg \
+  --image maritimecr.azurecr.io/maritime-api:latest \
+  --environment maritime-env
+```
+
+### AWS Deployment
+
+```bash
+# Initialize Terraform
+cd deployment/aws
+terraform init
+
+# Plan deployment
+terraform plan -var="app_name=maritime-platform" -out=tfplan
+
+# Apply deployment
+terraform apply tfplan
+
+# Deploy application
+aws eks update-kubeconfig --name maritime-eks
+kubectl apply -f k8s/maritime-api.yaml
+```
+
+---
+
+## 9. Summary
+
+**Infrastructure as Code**:
+
+**Key Concepts**:
+- **ARM Templates**: Azure's JSON-based IaC
+- **Terraform**: Multi-cloud HCL-based IaC
+- **Parameterization**: Customize for environments
+- **State Management**: Track infrastructure state
+- **Multi-Environment**: Dev, staging, prod strategies
+
+**Benefits**:
+- Version control
+- Reproducibility
+- Automation
+- Documentation
+- Cost optimization
+
+**Key Takeaway**: Infrastructure as Code enables reproducible, version-controlled infrastructure deployment. Azure uses ARM Templates (JSON), while AWS uses Terraform (HCL). Both provide similar capabilities with different syntax and approaches. Understanding both enables multi-cloud deployment and better architecture decisions.
+

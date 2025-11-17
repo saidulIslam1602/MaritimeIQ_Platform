@@ -32,20 +32,20 @@ This document describes the comprehensive real-time data ingestion and analytics
 ```sql
 -- Environmental Compliance Monitoring
 SELECT
-    vesselId,
-    AVG(environmental.co2Level) as avgCO2,
-    MAX(environmental.co2Level) as maxCO2,
-    System.Timestamp() as windowEnd
+ vesselId,
+ AVG(environmental.co2Level) as avgCO2,
+ MAX(environmental.co2Level) as maxCO2,
+ System.Timestamp() as windowEnd
 FROM [maritime-telemetry]
 WHERE environmental.co2Level > 1200
 GROUP BY vesselId, TumblingWindow(minute, 5)
 
--- Fuel Efficiency Analytics  
+-- Fuel Efficiency Analytics 
 SELECT
-    vesselId,
-    AVG(environmental.fuelConsumption / position.speed) as fuelEfficiencyRatio,
-    AVG(position.speed) as avgSpeed,
-    System.Timestamp() as windowEnd
+ vesselId,
+ AVG(environmental.fuelConsumption / position.speed) as fuelEfficiencyRatio,
+ AVG(position.speed) as avgSpeed,
+ System.Timestamp() as windowEnd
 FROM [maritime-telemetry]
 WHERE position.speed > 0
 GROUP BY vesselId, TumblingWindow(hour, 1)
@@ -70,23 +70,22 @@ GROUP BY vesselId, TumblingWindow(hour, 1)
 **Features**:
 ```typescript
 interface AnalyticsMetrics {
-  kpis: {
-    fuelEfficiency: number
-    emissionReduction: number
-    onTimePerformance: number
-    passengerSatisfaction: number
-  }
-  trends: Array<{
-    name: string
-    value: number
-    change: number
-    trend: 'up' | 'down' | 'stable'
-  }>
-  predictions: {
-    fuelConsumption: number[]
-    co2Emissions: number[]
-    routeOptimization: number[]
-  }
+ kpis: {
+ fuelEfficiency: number
+ emissionReduction: number
+ onTimePerformance: number
+ passengerSatisfaction: number
+ }
+ trends: Array<{
+ name: string
+ value: number
+ change: number
+ trend: 'up'| 'down'| 'stable'}>
+ predictions: {
+ fuelConsumption: number[]
+ co2Emissions: number[]
+ routeOptimization: number[]
+ }
 }
 ```
 
@@ -108,7 +107,7 @@ const { data: envData } = useRealTimeEnvironmentalData()
 
 **Real-time Visualization** (`components/RealTimeVisualization.tsx`)
 - **Live Charts**: Area charts with real-time data updates
-- **KPI Cards**: Live metrics with trend indicators  
+- **KPI Cards**: Live metrics with trend indicators 
 - **Predictive Overlays**: Future predictions on time series
 - **Performance Monitoring**: Connection status and update timestamps
 
@@ -122,9 +121,9 @@ const { data: envData } = useRealTimeEnvironmentalData()
 
 ```
 Maritime Vessels → AIS/Sensors → Event Hubs → Stream Analytics → Cosmos DB
-                                    ↓
+ ↓
 WebSocket Service ← Maritime API ← Processed Data
-                                    ↓
+ ↓
 Dashboard Components ← Real-time Updates ← Analytics Engine
 ```
 
@@ -179,11 +178,7 @@ chmod +x deployment/azure/deploy-realtime-pipeline.sh
 
 ### 2. Environment Configuration
 ```env
-AZURE_EVENTHUB_CONNECTION_STRING="Endpoint=sb://..."
-AZURE_EVENTHUB_NAME="maritime-telemetry"
-AZURE_COSMOSDB_CONNECTION_STRING="AccountEndpoint=https://..."
-AZURE_COSMOSDB_DATABASE="MaritimeData"
-```
+AZURE_EVENTHUB_CONNECTION_STRING="Endpoint=sb://..."AZURE_EVENTHUB_NAME="maritime-telemetry"AZURE_COSMOSDB_CONNECTION_STRING="AccountEndpoint=https://..."AZURE_COSMOSDB_DATABASE="MaritimeData"```
 
 ### 3. Dashboard Deployment
 ```bash

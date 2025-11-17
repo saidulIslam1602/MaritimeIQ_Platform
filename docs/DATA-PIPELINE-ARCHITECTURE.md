@@ -1,6 +1,6 @@
 # MaritimeIQ Platform - Enterprise Data Pipeline Architecture
 
-## 🏗️ **Industry-Ready C# Data Engineering Implementation**
+## **Industry-Ready C# Data Engineering Implementation**
 
 This document showcases the comprehensive C# data pipeline architecture implemented for the MaritimeIQ Platform, demonstrating enterprise-level data engineering capabilities and best practices.
 
@@ -13,59 +13,59 @@ This document showcases the comprehensive C# data pipeline architecture implemen
 
 ---
 
-## 🎯 **Architecture Overview**
+## **Architecture Overview**
 
 ### **Modern Data Engineering Stack (C# Focused)**
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    REAL-TIME INGESTION LAYER                   │
+│ REAL-TIME INGESTION LAYER │
 ├─────────────────────────────────────────────────────────────────┤
-│  🌊 MaritimeStreamingProcessor.cs                              │
-│  ├─ Event Hub Consumer (C# async/await mastery)               │
-│  ├─ Real-time Anomaly Detection                               │
-│  ├─ Circuit Breaker Pattern Implementation                     │
-│  └─ Back-pressure Handling with Channels                      │
+│ MaritimeStreamingProcessor.cs │
+│ ├─ Event Hub Consumer (C# async/await mastery) │
+│ ├─ Real-time Anomaly Detection │
+│ ├─ Circuit Breaker Pattern Implementation │
+│ └─ Back-pressure Handling with Channels │
 └─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    PROCESSING & TRANSFORMATION                  │
+│ PROCESSING & TRANSFORMATION │
 ├─────────────────────────────────────────────────────────────────┤
-│  ⚙️ MaritimeDataETLService.cs                                   │
-│  ├─ Parallel ETL Processing                                   │
-│  ├─ Bulk Operations with SqlBulkCopy                          │
-│  ├─ Transaction Management                                     │
-│  ├─ Advanced SQL with Geospatial Functions                    │
-│  └─ Concurrent Collections (ConcurrentDictionary/Queue)       │
+│ MaritimeDataETLService.cs │
+│ ├─ Parallel ETL Processing │
+│ ├─ Bulk Operations with SqlBulkCopy │
+│ ├─ Transaction Management │
+│ ├─ Advanced SQL with Geospatial Functions │
+│ └─ Concurrent Collections (ConcurrentDictionary/Queue) │
 └─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    DATA QUALITY & GOVERNANCE                   │
+│ DATA QUALITY & GOVERNANCE │
 ├─────────────────────────────────────────────────────────────────┤
-│  🔍 DataQualityService.cs                                      │
-│  ├─ Statistical Data Profiling                                │
-│  ├─ Rule-based Validation Engine                              │
-│  ├─ Data Drift Detection                                      │
-│  ├─ Automated Remediation                                     │
-│  └─ Comprehensive Quality Scoring                             │
+│ DataQualityService.cs │
+│ ├─ Statistical Data Profiling │
+│ ├─ Rule-based Validation Engine │
+│ ├─ Data Drift Detection │
+│ ├─ Automated Remediation │
+│ └─ Comprehensive Quality Scoring │
 └─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    ORCHESTRATION & MONITORING                  │
+│ ORCHESTRATION & MONITORING │
 ├─────────────────────────────────────────────────────────────────┤
-│  🎭 PipelineOrchestrationService.cs                            │
-│  ├─ DAG (Directed Acyclic Graph) Execution                    │
-│  ├─ Dependency Resolution & Topological Sorting               │
-│  ├─ CRON-based Scheduling                                     │
-│  └─ Resource Management & Auto-scaling                        │
-│                                                               │
-│  📊 DataPipelineMonitoringService.cs                           │
-│  ├─ Real-time Health Monitoring                               │
-│  ├─ SLA Tracking & Alerting                                   │
-│  ├─ Application Insights Integration                           │
-│  └─ Performance Counter Collection                            │
+│ 🎭 PipelineOrchestrationService.cs │
+│ ├─ DAG (Directed Acyclic Graph) Execution │
+│ ├─ Dependency Resolution & Topological Sorting │
+│ ├─ CRON-based Scheduling │
+│ └─ Resource Management & Auto-scaling │
+│ │
+│ DataPipelineMonitoringService.cs │
+│ ├─ Real-time Health Monitoring │
+│ ├─ SLA Tracking & Alerting │
+│ ├─ Application Insights Integration │
+│ └─ Performance Counter Collection │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -73,7 +73,7 @@ This document showcases the comprehensive C# data pipeline architecture implemen
 
 ## 🧩 **Core Components**
 
-### **1. MaritimeStreamingProcessor.cs** 🌊
+### **1. MaritimeStreamingProcessor.cs** 
 **Enterprise Real-time Streaming Engine**
 
 **Advanced C# Features Demonstrated:**
@@ -88,23 +88,23 @@ This document showcases the comprehensive C# data pipeline architecture implemen
 // Real-time anomaly detection with statistical analysis
 private async Task DetectPositionAnomaliesAsync(VesselPositionEvent positionEvent)
 {
-    var vesselHistory = await GetRecentVesselHistoryAsync(positionEvent.VesselId, TimeSpan.FromHours(24));
-    
-    if (vesselHistory.Count > 10)
-    {
-        var avgSpeed = vesselHistory.Average(h => h.Speed);
-        var speedStdDev = CalculateStandardDeviation(vesselHistory.Select(h => h.Speed));
-        var speedZScore = Math.Abs(positionEvent.Speed - avgSpeed) / Math.Max(speedStdDev, 0.1);
-        
-        if (speedZScore > 2.5) // 2.5 sigma threshold
-        {
-            await GenerateAnomalyAlertAsync(positionEvent, "Speed anomaly detected", speedZScore);
-        }
-    }
+ var vesselHistory = await GetRecentVesselHistoryAsync(positionEvent.VesselId, TimeSpan.FromHours(24));
+ 
+ if (vesselHistory.Count > 10)
+ {
+ var avgSpeed = vesselHistory.Average(h => h.Speed);
+ var speedStdDev = CalculateStandardDeviation(vesselHistory.Select(h => h.Speed));
+ var speedZScore = Math.Abs(positionEvent.Speed - avgSpeed) / Math.Max(speedStdDev, 0.1);
+ 
+ if (speedZScore > 2.5) // 2.5 sigma threshold
+ {
+ await GenerateAnomalyAlertAsync(positionEvent, "Speed anomaly detected", speedZScore);
+ }
+ }
 }
 ```
 
-### **2. MaritimeDataETLService.cs** ⚙️
+### **2. MaritimeDataETLService.cs** 
 **High-Performance ETL Processing Engine**
 
 **Enterprise Patterns Implemented:**
@@ -117,28 +117,27 @@ private async Task DetectPositionAnomaliesAsync(VesselPositionEvent positionEven
 **Advanced Features:**
 ```csharp
 // Complex geospatial ETL with data quality scoring
-var processingQuery = @"
-    WITH VesselPositionEnriched AS (
-        SELECT 
-            VesselId, Latitude, Longitude, Speed,
-            geography::Point(Latitude, Longitude, 4326) AS Position,
-            LAG(geography::Point(Latitude, Longitude, 4326)) OVER (
-                PARTITION BY VesselId ORDER BY Timestamp
-            ) AS PreviousPosition,
-            CASE 
-                WHEN Latitude BETWEEN 58.0 AND 71.0 AND Longitude BETWEEN 4.0 AND 31.0 
-                     AND Speed BETWEEN 0 AND 40 THEN 1.0
-                ELSE 0.7
-            END AS DataQualityScore
-        FROM RawAISData WHERE ProcessedFlag = 0
-    )
-    INSERT INTO ProcessedVesselPositions (...)
-    SELECT ..., Position.STDistance(PreviousPosition) / 1852.0 AS DistanceTraveledNM
-    FROM VesselPositionEnriched;
+var processingQuery = @"WITH VesselPositionEnriched AS (
+ SELECT 
+ VesselId, Latitude, Longitude, Speed,
+ geography::Point(Latitude, Longitude, 4326) AS Position,
+ LAG(geography::Point(Latitude, Longitude, 4326)) OVER (
+ PARTITION BY VesselId ORDER BY Timestamp
+ ) AS PreviousPosition,
+ CASE 
+ WHEN Latitude BETWEEN 58.0 AND 71.0 AND Longitude BETWEEN 4.0 AND 31.0 
+ AND Speed BETWEEN 0 AND 40 THEN 1.0
+ ELSE 0.7
+ END AS DataQualityScore
+ FROM RawAISData WHERE ProcessedFlag = 0
+ )
+ INSERT INTO ProcessedVesselPositions (...)
+ SELECT ..., Position.STDistance(PreviousPosition) / 1852.0 AS DistanceTraveledNM
+ FROM VesselPositionEnriched;
 ";
 ```
 
-### **3. DataQualityService.cs** 🔍
+### **3. DataQualityService.cs** 
 **Comprehensive Data Quality Management**
 
 **Professional Data Quality Features:**
@@ -169,32 +168,32 @@ var processingQuery = @"
 ```csharp
 private List<string> TopologicalSort(Dictionary<string, List<string>> graph)
 {
-    var result = new List<string>();
-    var visited = new HashSet<string>();
-    var visiting = new HashSet<string>();
-    
-    void Visit(string node)
-    {
-        if (visiting.Contains(node))
-            throw new InvalidOperationException($"Circular dependency detected: {node}");
-        
-        if (visited.Contains(node)) return;
-        
-        visiting.Add(node);
-        foreach (var dependent in graph[node])
-            Visit(dependent);
-        
-        visiting.Remove(node);
-        visited.Add(node);
-        result.Insert(0, node);
-    }
-    
-    foreach (var node in graph.Keys) Visit(node);
-    return result;
+ var result = new List<string>();
+ var visited = new HashSet<string>();
+ var visiting = new HashSet<string>();
+ 
+ void Visit(string node)
+ {
+ if (visiting.Contains(node))
+ throw new InvalidOperationException($"Circular dependency detected: {node}");
+ 
+ if (visited.Contains(node)) return;
+ 
+ visiting.Add(node);
+ foreach (var dependent in graph[node])
+ Visit(dependent);
+ 
+ visiting.Remove(node);
+ visited.Add(node);
+ result.Insert(0, node);
+ }
+ 
+ foreach (var node in graph.Keys) Visit(node);
+ return result;
 }
 ```
 
-### **5. CircuitBreaker.cs** 🛡️
+### **5. CircuitBreaker.cs** 
 **Enterprise Fault Tolerance Implementation**
 
 **Resilience Patterns:**
@@ -206,7 +205,7 @@ private List<string> TopologicalSort(Dictionary<string, List<string>> graph)
 
 ---
 
-## 🚀 **Advanced Features**
+## **Advanced Features**
 
 ### **Real-time Analytics Engine**
 - **Statistical Anomaly Detection**: Z-score analysis for outlier detection
@@ -222,13 +221,13 @@ private List<string> TopologicalSort(Dictionary<string, List<string>> graph)
 
 ### **Enterprise Integration**
 - **Application Insights**: Deep telemetry and observability
-- **Health Checks**: ASP.NET Core health check integration  
+- **Health Checks**: ASP.NET Core health check integration 
 - **Configuration Management**: Flexible, environment-specific settings
 - **Dependency Injection**: Professional service registration patterns
 
 ---
 
-## 📊 **Performance & Monitoring**
+## **Performance & Monitoring**
 
 ### **Key Performance Indicators**
 - **Throughput**: 250+ events/second processing capacity
@@ -245,32 +244,32 @@ private List<string> TopologicalSort(Dictionary<string, List<string>> graph)
 
 ---
 
-## 💼 **Industry Standards Demonstrated**
+## **Industry Standards Demonstrated**
 
 ### **Enterprise Patterns**
-✅ **Microservices Architecture**: Independently deployable components  
-✅ **Event-driven Design**: Reactive programming with Events and Channels  
-✅ **SOLID Principles**: Clean, maintainable, testable code  
-✅ **Domain-Driven Design**: Maritime domain expertise modeling  
-✅ **Fault Tolerance**: Circuit breakers, retries, and graceful degradation  
+ **Microservices Architecture**: Independently deployable components 
+ **Event-driven Design**: Reactive programming with Events and Channels 
+ **SOLID Principles**: Clean, maintainable, testable code 
+ **Domain-Driven Design**: Maritime domain expertise modeling 
+ **Fault Tolerance**: Circuit breakers, retries, and graceful degradation 
 
 ### **Data Engineering Best Practices**
-✅ **Data Lineage**: Complete data provenance tracking  
-✅ **Schema Evolution**: Backward-compatible data model changes  
-✅ **Data Governance**: Compliance, security, and access control  
-✅ **Performance Optimization**: Bulk operations and parallel processing  
-✅ **Quality Assurance**: Comprehensive validation and monitoring  
+ **Data Lineage**: Complete data provenance tracking 
+ **Schema Evolution**: Backward-compatible data model changes 
+ **Data Governance**: Compliance, security, and access control 
+ **Performance Optimization**: Bulk operations and parallel processing 
+ **Quality Assurance**: Comprehensive validation and monitoring 
 
 ### **DevOps & Observability**
-✅ **Structured Logging**: Comprehensive logging with correlation IDs  
-✅ **Metrics Collection**: Custom performance counters and telemetry  
-✅ **Health Monitoring**: Proactive health checks and alerting  
-✅ **Configuration Management**: Environment-specific settings  
-✅ **Resource Management**: Proper disposal and memory optimization  
+ **Structured Logging**: Comprehensive logging with correlation IDs 
+ **Metrics Collection**: Custom performance counters and telemetry 
+ **Health Monitoring**: Proactive health checks and alerting 
+ **Configuration Management**: Environment-specific settings 
+ **Resource Management**: Proper disposal and memory optimization 
 
 ---
 
-## 🎖️ **Professional Competencies Showcased**
+## **Professional Competencies Showcased**
 
 ### **Advanced C# Skills**
 - **Async/Await Expertise**: Complex asynchronous operations
@@ -295,18 +294,18 @@ private List<string> TopologicalSort(Dictionary<string, List<string>> graph)
 
 ---
 
-## 🌟 **Competitive Advantages for Job Applications**
+## **Competitive Advantages for Job Applications**
 
 This MaritimeIQ Platform data pipeline implementation demonstrates:
 
-1. **📈 Scale**: Handles 250+ events/second with 99.9% availability
-2. **🔬 Quality**: Industry-leading data quality with automated remediation
-3. **⚡ Performance**: Optimized for high-throughput, low-latency processing
-4. **🛡️ Reliability**: Enterprise fault tolerance with circuit breakers
-5. **📊 Observability**: Comprehensive monitoring and analytics
-6. **🔧 Maintainability**: Clean, testable, documented code
+1. ** Scale**: Handles 250+ events/second with 99.9% availability
+2. ** Quality**: Industry-leading data quality with automated remediation
+3. ** Performance**: Optimized for high-throughput, low-latency processing
+4. ** Reliability**: Enterprise fault tolerance with circuit breakers
+5. ** Observability**: Comprehensive monitoring and analytics
+6. ** Maintainability**: Clean, testable, documented code
 
-**Perfect for demonstrating C# expertise in data engineering roles!** 🚀
+**Perfect for demonstrating C# expertise in data engineering roles!** 
 
 ---
 

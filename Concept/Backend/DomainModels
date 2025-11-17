@@ -1,0 +1,385 @@
+# Domain Models and Data Structures
+
+## 1. What are Domain Models?
+
+**Domain Models** represent business entities and concepts in the application, encapsulating business logic and rules.
+
+**Key Principle**: Domain models represent the business domain, not just data structures
+
+### Data Structures vs Domain Models
+
+**Data Structures** (DTOs):
+```csharp
+public class VesselDto  // ❌ Just data
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Status { get; set; }
+}
+```
+
+**Domain Models**:
+```csharp
+public class Vessel  // ✅ Business entity with behavior
+{
+    public int Id { get; private set; }
+    public string Name { get; private set; }
+    public VesselStatus Status { get; private set; }
+    
+    public void Activate()  // ✅ Business logic
+    {
+        if (Status == VesselStatus.Active)
+            throw new InvalidOperationException("Vessel is already active");
+        
+        Status = VesselStatus.Active;
+    }
+}
+```
+
+---
+
+## 2. Entity vs Value Object
+
+### Entity
+
+**Entity**: Object with identity that persists over time
+
+**Characteristics**:
+- Has unique identity (ID)
+- Mutable (can change)
+- Compared by identity
+- Persisted in database
+
+**MaritimeIQ Example**:
+```csharp
+public class Vessel
+{
+    public int Id { get; private set; }  // ✅ Identity
+    public string Name { get; private set; }
+    public VesselStatus Status { get; private set; }
+    
+    // Entities are compared by ID
+    public override bool Equals(object? obj)
+    {
+        return obj is Vessel vessel && Id == vessel.Id;
+    }
+}
+```
+
+### Value Object
+
+**Value Object**: Immutable object defined by its attributes
+
+**Characteristics**:
+- No identity (compared by value)
+- Immutable (cannot change)
+- Compared by all attributes
+- Can be replaced
+
+**MaritimeIQ Example**:
+```csharp
+public class Position  // ✅ Value object
+{
+    public double Latitude { get; }
+    public double Longitude { get; }
+    
+    public Position(double latitude, double longitude)
+    {
+        if (latitude < -90 || latitude > 90)
+            throw new ArgumentException("Invalid latitude");
+        if (longitude < -180 || longitude > 180)
+            throw new ArgumentException("Invalid longitude");
+        
+        Latitude = latitude;
+        Longitude = longitude;
+    }
+    
+    // Value objects are compared by all attributes
+    public override bool Equals(object? obj)
+    {
+        return obj is Position position &&
+               Latitude == position.Latitude &&
+               Longitude == position.Longitude;
+    }
+}
+```
+
+---
+
+## 3. Domain Models in MaritimeIQ
+
+### Vessel Model
+
+```csharp
+public class Vessel
+{
+    public int Id { get; private set; }
+    public string Name { get; private set; }
+    public string IMONumber { get; private set; }
+    public VesselType Type { get; private set; }
+    public VesselStatus Status { get; private set; }
+    public Position? CurrentPosition { get; private set; }
+    
+    // Business logic
+    public void UpdatePosition(Position position)
+    {
+        if (position == null)
+            throw new ArgumentNullException(nameof(position));
+        
+        CurrentPosition = position;
+    }
+    
+    public void Activate()
+    {
+        if (Status == VesselStatus.Active)
+            throw new InvalidOperationException("Vessel is already active");
+        
+        Status = VesselStatus.Active;
+    }
+}
+```
+
+### AIS Message Model
+
+```csharp
+public class AISVesselData
+{
+    public string MMSI { get; set; }  // Maritime Mobile Service Identity
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }
+    public double Speed { get; set; }
+    public double Heading { get; set; }
+    public DateTime Timestamp { get; set; }
+    
+    // Validation
+    public bool IsValid()
+    {
+        return !string.IsNullOrEmpty(MMSI) &&
+               MMSI.Length == 9 &&
+               Latitude >= -90 && Latitude <= 90 &&
+               Longitude >= -180 && Longitude <= 180 &&
+               Speed >= 0 && Speed <= 40;
+    }
+}
+```
+
+### Environmental Data Model
+
+```csharp
+public class EnvironmentalSensorData
+{
+    public int VesselId { get; set; }
+    public DateTime MeasurementTime { get; set; }
+    public double CO2EmissionKg { get; set; }
+    public double NOxEmissionKg { get; set; }
+    public double SOxEmissionKg { get; set; }
+    public double FuelConsumptionLiters { get; set; }
+    
+    // Business logic
+    public bool IsCompliant()
+    {
+        return CO2EmissionKg <= 50.0 &&  // IMO 2030 targets
+               NOxEmissionKg <= 5.0 &&
+               SOxEmissionKg <= 1.5;
+    }
+}
+```
+
+---
+
+## 4. Data Transfer Objects (DTOs)
+
+### What are DTOs?
+
+**DTOs** are simple data structures used to transfer data between layers, without business logic.
+
+**Purpose**:
+- Transfer data across boundaries
+- Serialize/deserialize for APIs
+- Reduce coupling between layers
+- Optimize data transfer
+
+### MaritimeIQ DTOs
+
+```csharp
+// Request DTO
+public class CreateVesselRequest
+{
+    public string Name { get; set; }
+    public string IMONumber { get; set; }
+    public VesselType Type { get; set; }
+}
+
+// Response DTO
+public class VesselDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Status { get; set; }
+    public PositionDto? CurrentPosition { get; set; }
+}
+
+// Mapping
+public static class VesselMapper
+{
+    public static VesselDto ToDto(Vessel vessel)
+    {
+        return new VesselDto
+        {
+            Id = vessel.Id,
+            Name = vessel.Name,
+            Status = vessel.Status.ToString(),
+            CurrentPosition = vessel.CurrentPosition?.ToDto()
+        };
+    }
+}
+```
+
+---
+
+## 5. Domain Events
+
+### What are Domain Events?
+
+**Domain Events** represent something important that happened in the domain.
+
+**Purpose**:
+- Decouple components
+- Enable event-driven architecture
+- Support event sourcing
+- Audit trail
+
+### MaritimeIQ Domain Events
+
+```csharp
+public class VesselPositionUpdatedEvent
+{
+    public int VesselId { get; }
+    public Position NewPosition { get; }
+    public DateTime Timestamp { get; }
+    
+    public VesselPositionUpdatedEvent(int vesselId, Position newPosition)
+    {
+        VesselId = vesselId;
+        NewPosition = newPosition;
+        Timestamp = DateTime.UtcNow;
+    }
+}
+
+// Raise event
+public void UpdatePosition(Position position)
+{
+    CurrentPosition = position;
+    RaiseDomainEvent(new VesselPositionUpdatedEvent(Id, position));
+}
+```
+
+---
+
+## 6. Validation
+
+### Model Validation
+
+**Data Annotations**:
+```csharp
+public class CreateVesselRequest
+{
+    [Required]
+    [StringLength(100)]
+    public string Name { get; set; }
+    
+    [Required]
+    [RegularExpression(@"^\d{7}$")]
+    public string IMONumber { get; set; }
+    
+    [Range(1, 1000)]
+    public int PassengerCapacity { get; set; }
+}
+```
+
+**Fluent Validation**:
+```csharp
+public class VesselValidator : AbstractValidator<Vessel>
+{
+    public VesselValidator()
+    {
+        RuleFor(v => v.Name)
+            .NotEmpty()
+            .MaximumLength(100);
+        
+        RuleFor(v => v.IMONumber)
+            .NotEmpty()
+            .Matches(@"^\d{7}$");
+    }
+}
+```
+
+**Business Rule Validation**:
+```csharp
+public void Activate()
+{
+    // Business rule validation
+    if (Status == VesselStatus.Active)
+        throw new InvalidOperationException("Vessel is already active");
+    
+    if (CurrentPosition == null)
+        throw new InvalidOperationException("Vessel must have a position to activate");
+    
+    Status = VesselStatus.Active;
+}
+```
+
+---
+
+## 7. Best Practices
+
+### ✅ Do
+
+1. **Use Value Objects**: For immutable concepts
+2. **Encapsulate Business Logic**: In domain models
+3. **Use Private Setters**: For entities
+4. **Validate Business Rules**: In domain models
+5. **Use DTOs**: For data transfer
+6. **Raise Domain Events**: For important changes
+7. **Keep Models Focused**: Single responsibility
+8. **Use Enums**: For fixed sets of values
+
+### ❌ Don't
+
+1. **Don't Expose Mutable Collections**: Use read-only
+2. **Don't Put Infrastructure Logic**: In domain models
+3. **Don't Skip Validation**: Validate all inputs
+4. **Don't Use Anemic Models**: Add behavior
+5. **Don't Mix Concerns**: Separate DTOs from entities
+6. **Don't Ignore Immutability**: Use value objects
+7. **Don't Skip Domain Events**: For important changes
+
+---
+
+## 8. Summary
+
+**Domain Models**:
+
+**Key Concepts**:
+- **Entities**: Objects with identity
+- **Value Objects**: Immutable objects
+- **DTOs**: Data transfer objects
+- **Domain Events**: State change notifications
+- **Validation**: Business rule enforcement
+
+**MaritimeIQ Implementation**:
+- Rich domain models with behavior
+- Value objects for immutability
+- DTOs for data transfer
+- Domain events for decoupling
+- Validation in models
+
+**Benefits**:
+- Encapsulation
+- Business logic in models
+- Type safety
+- Maintainability
+- Testability
+
+**Key Takeaway**: Domain models represent business entities with behavior, not just data structures. MaritimeIQ uses rich domain models with business logic, value objects for immutability, and DTOs for data transfer, enabling maintainable and expressive code.
+

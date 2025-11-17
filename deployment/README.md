@@ -2,7 +2,7 @@
 
 This directory contains all deployment configurations and scripts for deploying the complete MaritimeIQ Platform to Azure.
 
-## 🚀 Quick Deployment
+## Quick Deployment
 
 To deploy the entire platform to your Azure subscription:
 
@@ -41,31 +41,31 @@ The deployment script creates the following Azure resources:
 - **IoT Hub**: Device connectivity
 - **Logic Apps**: Workflow automation
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     Azure Subscription                          │
+│ Azure Subscription │
 ├─────────────────────────────────────────────────────────────────┤
-│  Resource Group: maritime-platform-rg                          │
-│                                                                 │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  │   Container     │    │   Static Web    │    │   Azure         │
-│  │   Apps          │    │   Apps          │    │   Functions     │
-│  │   (API)         │    │   (Dashboard)   │    │   (Background)  │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘
-│           │                       │                       │      │
-│           └───────────────────────┼───────────────────────┘      │
-│                                   │                              │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  │   SQL Database  │    │   Event Hubs    │    │   Service Bus   │
-│  │                 │    │                 │    │                 │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘
-│                                                                 │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  │   Key Vault     │    │   Storage       │    │   App Insights  │
-│  │                 │    │   Account       │    │                 │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘
+│ Resource Group: maritime-platform-rg │
+│ │
+│ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│ │ Container │ │ Static Web │ │ Azure │
+│ │ Apps │ │ Apps │ │ Functions │
+│ │ (API) │ │ (Dashboard) │ │ (Background) │
+│ └─────────────────┘ └─────────────────┘ └─────────────────┘
+│ │ │ │ │
+│ └───────────────────────┼───────────────────────┘ │
+│ │ │
+│ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│ │ SQL Database │ │ Event Hubs │ │ Service Bus │
+│ │ │ │ │ │ │
+│ └─────────────────┘ └─────────────────┘ └─────────────────┘
+│ │
+│ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│ │ Key Vault │ │ Storage │ │ App Insights │
+│ │ │ │ Account │ │ │
+│ └─────────────────┘ └─────────────────┘ └─────────────────┘
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -73,21 +73,21 @@ The deployment script creates the following Azure resources:
 
 ```
 deployment/
-├── deploy-full-platform.sh     # Complete deployment script
+├── deploy-full-platform.sh # Complete deployment script
 ├── azure/
-│   ├── azure-infrastructure.json   # ARM template for Azure resources
-│   └── parameters.json             # Deployment parameters
+│ ├── azure-infrastructure.json # ARM template for Azure resources
+│ └── parameters.json # Deployment parameters
 ├── docker/
-│   ├── Dockerfile                  # API container configuration
-│   ├── docker-compose.yml          # Local development setup
-│   └── docker-compose.prod.yml     # Production configuration
-├── kubernetes/                     # K8s deployment (optional)
-├── data-factory/                   # Data pipeline definitions
-├── monitoring/                     # Monitoring configuration
-└── scripts/                        # Utility scripts
+│ ├── Dockerfile # API container configuration
+│ ├── docker-compose.yml # Local development setup
+│ └── docker-compose.prod.yml # Production configuration
+├── kubernetes/ # K8s deployment (optional)
+├── data-factory/ # Data pipeline definitions
+├── monitoring/ # Monitoring configuration
+└── scripts/ # Utility scripts
 ```
 
-## 🔧 Prerequisites
+## Prerequisites
 
 Before deploying, ensure you have:
 
@@ -97,7 +97,7 @@ Before deploying, ensure you have:
 4. **Azure subscription** with appropriate permissions
 5. **Resource creation rights** in your subscription
 
-## 🚀 Step-by-Step Deployment
+## Step-by-Step Deployment
 
 ### 1. Prepare Environment
 
@@ -117,10 +117,7 @@ Edit the configuration variables in `deploy-full-platform.sh` if needed:
 
 ```bash
 # Main configuration
-PLATFORM_NAME="maritime-platform"
-RESOURCE_GROUP="maritime-platform-rg"
-LOCATION="norwayeast"
-```
+PLATFORM_NAME="maritime-platform"RESOURCE_GROUP="maritime-platform-rg"LOCATION="norwayeast"```
 
 ### 3. Run Deployment
 
@@ -135,15 +132,15 @@ chmod +x deployment/deploy-full-platform.sh
 ### 4. Monitor Progress
 
 The script will:
-1. ✅ Check prerequisites
-2. ✅ Set up Azure authentication
-3. ✅ Deploy Azure infrastructure (ARM template)
-4. ✅ Build and deploy the API
-5. ✅ Build and deploy the dashboard
-6. ✅ Configure monitoring
-7. ✅ Display deployment summary
+1. Check prerequisites
+2. Set up Azure authentication
+3. Deploy Azure infrastructure (ARM template)
+4. Build and deploy the API
+5. Build and deploy the dashboard
+6. Configure monitoring
+7. Display deployment summary
 
-## 🔗 Post-Deployment Access
+## Post-Deployment Access
 
 After successful deployment, you'll receive:
 
@@ -174,18 +171,18 @@ cd maritime-dashboard && npm run build
 docker-compose -f deployment/docker/docker-compose.yml up
 
 # Or run components individually
-dotnet run  # API
-cd maritime-dashboard && npm run dev  # Dashboard
+dotnet run # API
+cd maritime-dashboard && npm run dev # Dashboard
 ```
 
-## 🔒 Security Considerations
+## Security Considerations
 
 - **SQL passwords** are auto-generated and stored in Key Vault
 - **API keys** are managed through Azure managed identity
 - **HTTPS** is enforced for all endpoints
 - **CORS** is configured for dashboard-API communication
 
-## 📊 Monitoring & Logging
+## Monitoring & Logging
 
 - **Application Insights** tracks performance and errors
 - **Azure Monitor** provides infrastructure metrics
@@ -197,18 +194,17 @@ cd maritime-dashboard && npm run dev  # Dashboard
 ### Common Issues
 
 1. **Authentication Error**
-   ```bash
-   az login
-   az account set --subscription "your-subscription-id"
-   ```
+ ```bash
+ az login
+ az account set --subscription "your-subscription-id"```
 
 2. **Resource Name Conflicts**
-   - Resource names include unique identifiers
-   - Check Azure portal for existing resources
+ - Resource names include unique identifiers
+ - Check Azure portal for existing resources
 
 3. **Permission Issues**
-   - Ensure you have Owner/Contributor role
-   - Contact your Azure administrator
+ - Ensure you have Owner/Contributor role
+ - Contact your Azure administrator
 
 ### Support Resources
 
@@ -232,4 +228,4 @@ npm run build
 
 ---
 
-**🚢 Ready to deploy your MaritimeIQ Platform to Azure? Run the deployment script and set sail!**
+** Ready to deploy your MaritimeIQ Platform to Azure? Run the deployment script and set sail!**

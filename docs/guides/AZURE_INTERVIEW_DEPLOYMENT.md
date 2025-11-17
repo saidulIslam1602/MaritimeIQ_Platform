@@ -10,17 +10,17 @@
 ## Architecture Overview
 ```
 Internet → Azure Front Door → Container Apps → Event Hub → Stream Analytics → Power BI
-                                    ↓
-                              Application Insights → Log Analytics → Dashboards
-                                    ↓
-                              Key Vault → SQL Database → Blob Storage
+ ↓
+ Application Insights → Log Analytics → Dashboards
+ ↓
+ Key Vault → SQL Database → Blob Storage
 ```
 
 ## Azure Services & Estimated Monthly Costs (NOK)
 
 ### Core Services (Essential)
 - **Azure Container Apps**: 200-300 NOK
-- **Azure SQL Database (Basic)**: 150-200 NOK  
+- **Azure SQL Database (Basic)**: 150-200 NOK 
 - **Azure Event Hub (Standard)**: 200-250 NOK
 - **Azure Stream Analytics**: 250-350 NOK
 - **Application Insights**: 100-150 NOK
@@ -60,18 +60,18 @@ Internet → Azure Front Door → Container Apps → Event Hub → Stream Analyt
 ## Interview Demonstration Points
 
 ### Technical Excellence
-✅ **Microservices Architecture**: Container Apps with auto-scaling
-✅ **Event-Driven Design**: Event Hub + Service Bus messaging
-✅ **Real-Time Processing**: Stream Analytics with sub-second latency
-✅ **DevOps Integration**: CI/CD with Azure DevOps
-✅ **Security Best Practices**: Key Vault, managed identities, RBAC
+ **Microservices Architecture**: Container Apps with auto-scaling
+ **Event-Driven Design**: Event Hub + Service Bus messaging
+ **Real-Time Processing**: Stream Analytics with sub-second latency
+ **DevOps Integration**: CI/CD with Azure DevOps
+ **Security Best Practices**: Key Vault, managed identities, RBAC
 
 ### Business Value
-✅ **Cost Optimization**: Auto-scaling reduces costs by 40%
-✅ **High Availability**: 99.95% SLA with multi-region deployment
-✅ **Real-Time Insights**: Maritime operations optimization
-✅ **Scalability**: Handles 10x traffic spikes automatically
-✅ **Compliance**: Maritime industry standards (GDPR, SOX)
+ **Cost Optimization**: Auto-scaling reduces costs by 40%
+ **High Availability**: 99.95% SLA with multi-region deployment
+ **Real-Time Insights**: Maritime operations optimization
+ **Scalability**: Handles 10x traffic spikes automatically
+ **Compliance**: Maritime industry standards (GDPR, SOX)
 
 ## Demo Scenarios for Interview
 

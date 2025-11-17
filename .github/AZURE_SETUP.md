@@ -11,16 +11,12 @@ The CI/CD pipeline is failing because the Azure Container Registry authenticatio
 ```bash
 # Set variables
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-RESOURCE_GROUP="maritime-platform-rg"
-ACR_NAME="maritimeregistry70396"
-SP_NAME="github-maritimeiq-sp"
-
-# Create service principal
+RESOURCE_GROUP="maritime-platform-rg"ACR_NAME="maritimeregistry70396"SP_NAME="github-maritimeiq-sp"# Create service principal
 az ad sp create-for-rbac \
-  --name $SP_NAME \
-  --role contributor \
-  --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP \
-  --sdk-auth
+ --name $SP_NAME \
+ --role contributor \
+ --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP \
+ --sdk-auth
 ```
 
 ### Step 2: Assign ACR Permissions
@@ -34,9 +30,9 @@ ACR_REGISTRY_ID=$(az acr show --name $ACR_NAME --query id -o tsv)
 
 # Assign AcrPush role to Service Principal
 az role assignment create \
-  --assignee $SP_APP_ID \
-  --scope $ACR_REGISTRY_ID \
-  --role AcrPush
+ --assignee $SP_APP_ID \
+ --scope $ACR_REGISTRY_ID \
+ --role AcrPush
 ```
 
 ### Step 3: Configure GitHub Secrets
@@ -46,17 +42,16 @@ Add the following secrets to your GitHub repository (Settings > Secrets and vari
 1. **AZURE_CREDENTIALS**: The entire JSON output from Step 1, formatted as:
 ```json
 {
-  "clientId": "<APP_ID>",
-  "clientSecret": "<PASSWORD>",
-  "subscriptionId": "<SUBSCRIPTION_ID>",
-  "tenantId": "<TENANT_ID>",
-  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
-  "resourceManagerEndpointUrl": "https://management.azure.com/",
-  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
-  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
-  "galleryEndpointUrl": "https://gallery.azure.com/",
-  "managementEndpointUrl": "https://management.core.windows.net/"
-}
+ "clientId": "<APP_ID>",
+ "clientSecret": "<PASSWORD>",
+ "subscriptionId": "<SUBSCRIPTION_ID>",
+ "tenantId": "<TENANT_ID>",
+ "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+ "resourceManagerEndpointUrl": "https://management.azure.com/",
+ "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+ "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+ "galleryEndpointUrl": "https://gallery.azure.com/",
+ "managementEndpointUrl": "https://management.core.windows.net/"}
 ```
 
 2. **ACR_LOGIN_SERVER**: `maritimeregistry70396.azurecr.io`
@@ -114,13 +109,13 @@ az acr check-name --name maritimeregistry70396
 The workflows now use:
 ```yaml
 - name: Azure Login
-  uses: azure/login@v1
-  with:
-    creds: ${{ secrets.AZURE_CREDENTIALS }}
+ uses: azure/login@v1
+ with:
+ creds: ${{ secrets.AZURE_CREDENTIALS }}
 
 - name: Log in to Azure Container Registry
-  run: |
-    az acr login --name maritimeregistry70396
+ run: |
+ az acr login --name maritimeregistry70396
 ```
 
 This method is more secure and recommended by Microsoft for GitHub Actions integration.

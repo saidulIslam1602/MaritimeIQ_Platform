@@ -6,7 +6,6 @@
 	"$comment": "Full schema: https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json",
 	"allOf": [
 		{
-			"$ref": "../arm-template-slim.json"
-		}
+			"$ref": "../arm-template-slim.json"}
 	]
 }

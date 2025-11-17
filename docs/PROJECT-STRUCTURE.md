@@ -7,38 +7,38 @@ This document describes the organized folder structure of the MaritimeIQ Platfor
 ## 📁 Root Directory Structure
 
 ```
-├── src/                          # Source code (core application)
-│   ├── Controllers/              # REST API controllers
-│   ├── Services/                 # Business logic services
-│   ├── Models/                   # Data models and DTOs
-│   ├── Data/                     # Data access layer
-│   └── Functions/                # Original Azure Functions (excluded from build)
-├── config/                       # Configuration files
-│   ├── appsettings.json          # Development configuration
-│   └── appsettings.Production.json # Production configuration
-├── deployment/                   # Deployment configurations
-│   ├── docker/                   # Docker-related files
-│   │   ├── Dockerfile            # Container definition
-│   │   ├── docker-compose.yml    # Development environment
-│   │   ├── docker-compose.prod.yml # Production environment
-│   │   └── nginx.conf            # Web server configuration
-│   └── kubernetes/               # Kubernetes manifests
-│       └── maritimeiq-platform-deployment.yaml
-├── devops/                       # DevOps and automation
-│   ├── pipelines/                # CI/CD pipeline definitions
-│   │   └── azure-pipelines-enhanced.yml
-│   └── scripts/                  # Deployment and automation scripts
-│       └── deploy-maritimeiq-platform.sh
-├── analytics/                    # Analytics and reporting
-│   ├── powerbi/                  # Power BI configurations
-│   │   └── maritimeiq-workspace-config.json
-│   └── stream-analytics/         # Stream Analytics queries
-│       └── maritimeiq-maritime-analytics.sql
-├── docs/                         # Documentation
-└── bin/, obj/                    # Build artifacts (auto-generated)
+├── src/ # Source code (core application)
+│ ├── Controllers/ # REST API controllers
+│ ├── Services/ # Business logic services
+│ ├── Models/ # Data models and DTOs
+│ ├── Data/ # Data access layer
+│ └── Functions/ # Original Azure Functions (excluded from build)
+├── config/ # Configuration files
+│ ├── appsettings.json # Development configuration
+│ └── appsettings.Production.json # Production configuration
+├── deployment/ # Deployment configurations
+│ ├── docker/ # Docker-related files
+│ │ ├── Dockerfile # Container definition
+│ │ ├── docker-compose.yml # Development environment
+│ │ ├── docker-compose.prod.yml # Production environment
+│ │ └── nginx.conf # Web server configuration
+│ └── kubernetes/ # Kubernetes manifests
+│ └── maritimeiq-platform-deployment.yaml
+├── devops/ # DevOps and automation
+│ ├── pipelines/ # CI/CD pipeline definitions
+│ │ └── azure-pipelines-enhanced.yml
+│ └── scripts/ # Deployment and automation scripts
+│ └── deploy-maritimeiq-platform.sh
+├── analytics/ # Analytics and reporting
+│ ├── powerbi/ # Power BI configurations
+│ │ └── maritimeiq-workspace-config.json
+│ └── stream-analytics/ # Stream Analytics queries
+│ └── maritimeiq-maritime-analytics.sql
+├── docs/ # Documentation
+└── bin/, obj/ # Build artifacts (auto-generated)
 ```
 
-## 🎯 Folder Purposes
+## Folder Purposes
 
 ### `/config/`
 **Purpose**: Centralized configuration management
@@ -67,14 +67,14 @@ This document describes the organized folder structure of the MaritimeIQ Platfor
 - Architecture diagrams
 - Deployment guides
 
-## 🔧 Build Configuration
+## Build Configuration
 
 The project file (`MaritimeIQ.Platform.csproj`) has been updated to:
 - Copy configuration files from `/config/` to output directory
 - Exclude the `/Functions/` folder from compilation
 - Maintain compatibility with the organized structure
 
-## 🚀 Usage
+## Usage
 
 ### Development
 ```bash

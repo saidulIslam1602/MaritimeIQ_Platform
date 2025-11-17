@@ -32,13 +32,13 @@
 // .NET 8 performance advantages demonstrated
 public async Task<IActionResult> ProcessHighVolumeAIS([FromBody] AISMessage[] messages)
 {
-    // Parallel processing with excellent memory management
-    var results = await messages.AsParallel()
-        .WithDegreeOfParallelism(Environment.ProcessorCount)
-        .Select(async message => await ProcessAISMessageAsync(message))
-        .ToArrayAsync();
-    
-    return Ok(results);
+ // Parallel processing with excellent memory management
+ var results = await messages.AsParallel()
+ .WithDegreeOfParallelism(Environment.ProcessorCount)
+ .Select(async message => await ProcessAISMessageAsync(message))
+ .ToArrayAsync();
+ 
+ return Ok(results);
 }
 ```
 
@@ -59,15 +59,15 @@ public async Task<IActionResult> ProcessHighVolumeAIS([FromBody] AISMessage[] me
 // Compile-time safety prevents runtime errors
 public class AISMessage
 {
-    [Required]
-    [StringLength(9, MinimumLength = 9)]
-    public string MMSI { get; set; } = string.Empty;
-    
-    [Range(-90, 90)]
-    public double Latitude { get; set; }
-    
-    [Range(-180, 180)]
-    public double Longitude { get; set; }
+ [Required]
+ [StringLength(9, MinimumLength = 9)]
+ public string MMSI { get; set; } = string.Empty;
+ 
+ [Range(-90, 90)]
+ public double Latitude { get; set; }
+ 
+ [Range(-180, 180)]
+ public double Longitude { get; set; }
 }
 ```
 
@@ -128,21 +128,21 @@ COMMIT TRANSACTION;
 ```sql
 -- Maritime domain requires complex analytical queries
 WITH VesselRouteAnalysis AS (
-    SELECT 
-        v.Id,
-        v.Name,
-        COUNT(r.Id) as TotalRoutes,
-        AVG(r.FuelConsumption) as AvgFuelConsumption,
-        AVG(DATEDIFF(minute, r.DepartureTime, r.ArrivalTime)) as AvgTripDuration
-    FROM Vessels v
-    LEFT JOIN Routes r ON v.Id = r.VesselId
-    WHERE r.DepartureTime >= DATEADD(month, -3, GETUTCDATE())
-    GROUP BY v.Id, v.Name
+ SELECT 
+ v.Id,
+ v.Name,
+ COUNT(r.Id) as TotalRoutes,
+ AVG(r.FuelConsumption) as AvgFuelConsumption,
+ AVG(DATEDIFF(minute, r.DepartureTime, r.ArrivalTime)) as AvgTripDuration
+ FROM Vessels v
+ LEFT JOIN Routes r ON v.Id = r.VesselId
+ WHERE r.DepartureTime >= DATEADD(month, -3, GETUTCDATE())
+ GROUP BY v.Id, v.Name
 ),
 EfficiencyRanking AS (
-    SELECT *,
-        ROW_NUMBER() OVER (ORDER BY AvgFuelConsumption ASC, AvgTripDuration ASC) as EfficiencyRank
-    FROM VesselRouteAnalysis
+ SELECT *,
+ ROW_NUMBER() OVER (ORDER BY AvgFuelConsumption ASC, AvgTripDuration ASC) as EfficiencyRank
+ FROM VesselRouteAnalysis
 )
 SELECT * FROM EfficiencyRanking WHERE EfficiencyRank <= 5;
 ```
@@ -152,10 +152,10 @@ SELECT * FROM EfficiencyRanking WHERE EfficiencyRank <= 5;
 #### Data Relationships Matter
 ```
 Vessels (1) ←→ (M) Routes (M) ←→ (M) Waypoints
-    ↓                 ↓
-Positions (M)    RouteOptimizations (M)
-    ↓                 ↓
-AIS_Messages (M)  EnvironmentalData (M)
+ ↓ ↓
+Positions (M) RouteOptimizations (M)
+ ↓ ↓
+AIS_Messages (M) EnvironmentalData (M)
 ```
 
 #### Regulatory Compliance
@@ -192,18 +192,18 @@ AIS_Messages (M)  EnvironmentalData (M)
 ```typescript
 // Next.js getServerSideProps for SEO and performance
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { vesselId } = context.params!;
-  
-  // Pre-fetch critical data on server
-  const vesselData = await fetch(`${API_URL}/api/vessel/${vesselId}`);
-  const vessel = await vesselData.json();
-  
-  return {
-    props: {
-      vessel,
-      // Pre-rendered HTML improves initial load time
-    },
-  };
+ const { vesselId } = context.params!;
+ 
+ // Pre-fetch critical data on server
+ const vesselData = await fetch(`${API_URL}/api/vessel/${vesselId}`);
+ const vessel = await vesselData.json();
+ 
+ return {
+ props: {
+ vessel,
+ // Pre-rendered HTML improves initial load time
+ },
+ };
 }
 ```
 
@@ -211,22 +211,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 ```typescript
 // End-to-end type safety from API to UI
 interface VesselPosition {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  speed?: number;
-  heading?: number;
-  timestamp: string;
+ id: number;
+ name: string;
+ latitude: number;
+ longitude: number;
+ speed?: number;
+ heading?: number;
+ timestamp: string;
 }
 
 // API response types ensure consistency
 const useVesselData = (): {
-  data: VesselPosition[] | null;
-  error: string | null;
-  isLoading: boolean;
+ data: VesselPosition[] | null;
+ error: string | null;
+ isLoading: boolean;
 } => {
-  // Implementation with full type safety
+ // Implementation with full type safety
 };
 ```
 
@@ -234,11 +234,11 @@ const useVesselData = (): {
 ```javascript
 // next.config.js - Optimized for Azure Static Web Apps
 module.exports = {
-  output: 'export', // Static HTML generation
-  trailingSlash: true,
-  images: {
-    unoptimized: true // Required for static export
-  }
+ output: 'export', // Static HTML generation
+ trailingSlash: true,
+ images: {
+ unoptimized: true // Required for static export
+ }
 };
 ```
 
@@ -268,17 +268,17 @@ module.exports = {
 // Event Hub Function - Auto-scaling and cost-effective
 [Function("ProcessAISStream")]
 public async Task ProcessAISStream(
-    [EventHubTrigger("ais-data", Connection = "EventHubConnection")] 
-    EventData[] events)
+ [EventHubTrigger("ais-data", Connection = "EventHubConnection")] 
+ EventData[] events)
 {
-    // Process up to 100 events in parallel
-    await Parallel.ForEachAsync(events, new ParallelOptions
-    {
-        MaxDegreeOfParallelism = Environment.ProcessorCount * 2
-    }, async (eventData, ct) =>
-    {
-        await ProcessSingleAISEvent(eventData);
-    });
+ // Process up to 100 events in parallel
+ await Parallel.ForEachAsync(events, new ParallelOptions
+ {
+ MaxDegreeOfParallelism = Environment.ProcessorCount * 2
+ }, async (eventData, ct) =>
+ {
+ await ProcessSingleAISEvent(eventData);
+ });
 }
 ```
 
@@ -297,7 +297,7 @@ Event Hubs Standard (2 TU): $22/month
 
 Kafka on AKS:
 + 3 node cluster: $200/month
-+ Storage: $30/month  
++ Storage: $30/month 
 + Load balancer: $25/month
 + Management overhead: 20+ hours/month
 = Total: $255/month + significant operational cost
@@ -338,56 +338,54 @@ Kafka on AKS:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: maritime-api
+ name: maritime-api
 spec:
-  replicas: 1
-  template:
-    spec:
-      containers:
-      - name: api
-        image: maritimecr.azurecr.io/maritime-api:latest
-        resources:
-          requests:
-            cpu: 0.25
-            memory: 0.5Gi
-          limits:
-            cpu: 1.0
-            memory: 2Gi
-        env:
-        - name: ConnectionStrings__DefaultConnection
-          valueFrom:
-            secretKeyRef:
-              name: db-connection
-              key: connection-string
+ replicas: 1
+ template:
+ spec:
+ containers:
+ - name: api
+ image: maritimecr.azurecr.io/maritime-api:latest
+ resources:
+ requests:
+ cpu: 0.25
+ memory: 0.5Gi
+ limits:
+ cpu: 1.0
+ memory: 2Gi
+ env:
+ - name: ConnectionStrings__DefaultConnection
+ valueFrom:
+ secretKeyRef:
+ name: db-connection
+ key: connection-string
 ```
 
 #### Auto-scaling Configuration
 ```json
 {
-  "scale": {
-    "minReplicas": 1,
-    "maxReplicas": 10,
-    "rules": [
-      {
-        "name": "http-scaling",
-        "http": {
-          "metadata": {
-            "concurrentRequests": "30"
-          }
-        }
-      },
-      {
-        "name": "cpu-scaling", 
-        "custom": {
-          "type": "cpu",
-          "metadata": {
-            "type": "Utilization",
-            "value": "70"
-          }
-        }
-      }
-    ]
-  }
+ "scale": {
+ "minReplicas": 1,
+ "maxReplicas": 10,
+ "rules": [
+ {
+ "name": "http-scaling",
+ "http": {
+ "metadata": {
+ "concurrentRequests": "30"}
+ }
+ },
+ {
+ "name": "cpu-scaling", 
+ "custom": {
+ "type": "cpu",
+ "metadata": {
+ "type": "Utilization",
+ "value": "70"}
+ }
+ }
+ ]
+ }
 }
 ```
 
@@ -414,26 +412,25 @@ spec:
 [ApiController]
 public abstract class BaseMaritimeController : ControllerBase
 {
-    protected async Task<IActionResult> ExecuteOperationAsync<T>(
-        Func<Task<T>> operation, 
-        string operationName)
-    {
-        // Common error handling, logging, and response formatting
-    }
+ protected async Task<IActionResult> ExecuteOperationAsync<T>(
+ Func<Task<T>> operation, 
+ string operationName)
+ {
+ // Common error handling, logging, and response formatting
+ }
 }
 
 public class AISController : BaseMaritimeController
 {
-    private readonly AISProcessingService _aisService;
-    
-    [HttpGet("analytics")]
-    public async Task<IActionResult> GetAnalytics()
-    {
-        return await ExecuteOperationAsync(
-            () => _aisService.GetAnalyticsAsync(),
-            "GetAISAnalytics"
-        );
-    }
+ private readonly AISProcessingService _aisService;
+ 
+ [HttpGet("analytics")]
+ public async Task<IActionResult> GetAnalytics()
+ {
+ return await ExecuteOperationAsync(
+ () => _aisService.GetAnalyticsAsync(),
+ "GetAISAnalytics");
+ }
 }
 ```
 
@@ -458,17 +455,17 @@ public class AISController : BaseMaritimeController
 // Would result in duplication
 app.MapPost("/api/ais/process", async (AISMessage[] messages, AISService service) =>
 {
-    try
-    {
-        // Error handling code repeated in every endpoint
-        var result = await service.ProcessAsync(messages);
-        return Results.Ok(result);
-    }
-    catch (Exception ex)
-    {
-        // Repeated error handling
-        return Results.Problem(ex.Message);
-    }
+ try
+ {
+ // Error handling code repeated in every endpoint
+ var result = await service.ProcessAsync(messages);
+ return Results.Ok(result);
+ }
+ catch (Exception ex)
+ {
+ // Repeated error handling
+ return Results.Problem(ex.Message);
+ }
 });
 ```
 
@@ -479,7 +476,7 @@ public class GetAISAnalyticsQuery : IRequest<AISAnalytics> { }
 
 public class GetAISAnalyticsHandler : IRequestHandler<GetAISAnalyticsQuery, AISAnalytics>
 {
-    // Additional abstraction layer not needed for current complexity
+ // Additional abstraction layer not needed for current complexity
 }
 ```
 
@@ -491,33 +488,33 @@ public class GetAISAnalyticsHandler : IRequestHandler<GetAISAnalyticsQuery, AISA
 // Event publishing
 public class AISProcessingService
 {
-    public async Task ProcessAISDataAsync(AISMessage[] messages)
-    {
-        // Process messages
-        var processedData = await ProcessMessages(messages);
-        
-        // Publish events for downstream processing
-        await _eventHub.SendEventAsync("ais-processed", processedData);
-        
-        // Trigger collision detection if needed
-        var riskEvents = processedData.Where(HasCollisionRisk);
-        if (riskEvents.Any())
-        {
-            await _eventHub.SendEventAsync("collision-risk", riskEvents);
-        }
-    }
+ public async Task ProcessAISDataAsync(AISMessage[] messages)
+ {
+ // Process messages
+ var processedData = await ProcessMessages(messages);
+ 
+ // Publish events for downstream processing
+ await _eventHub.SendEventAsync("ais-processed", processedData);
+ 
+ // Trigger collision detection if needed
+ var riskEvents = processedData.Where(HasCollisionRisk);
+ if (riskEvents.Any())
+ {
+ await _eventHub.SendEventAsync("collision-risk", riskEvents);
+ }
+ }
 }
 
 // Event consumption
 [Function("ProcessCollisionRisk")]
 public async Task ProcessCollisionRisk(
-    [EventHubTrigger("collision-risk")] EventData[] events)
+ [EventHubTrigger("collision-risk")] EventData[] events)
 {
-    foreach (var eventData in events)
-    {
-        // Immediate collision risk processing
-        await HandleCollisionRisk(eventData);
-    }
+ foreach (var eventData in events)
+ {
+ // Immediate collision risk processing
+ await HandleCollisionRisk(eventData);
+ }
 }
 ```
 
@@ -548,15 +545,15 @@ public async Task ProcessCollisionRisk(
 // Direct approach - simpler and more maintainable
 public class MaritimeDataService : BaseMaritimeService
 {
-    private readonly MaritimeDbContext _context;
-    
-    public async Task<List<Vessel>> GetActiveVesselsAsync()
-    {
-        return await _context.Vessels
-            .Where(v => v.Status == VesselStatus.InService)
-            .Include(v => v.CurrentPosition)
-            .ToListAsync();
-    }
+ private readonly MaritimeDbContext _context;
+ 
+ public async Task<List<Vessel>> GetActiveVesselsAsync()
+ {
+ return await _context.Vessels
+ .Where(v => v.Status == VesselStatus.InService)
+ .Include(v => v.CurrentPosition)
+ .ToListAsync();
+ }
 }
 
 // Repository pattern would add unnecessary abstraction:
@@ -580,15 +577,15 @@ public class MaritimeDataService : BaseMaritimeService
 // Managed Identity configuration
 public static void ConfigureAuthentication(IServiceCollection services, IConfiguration config)
 {
-    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.Authority = $"https://login.microsoftonline.com/{config["AzureAd:TenantId"]}";
-            options.Audience = config["AzureAd:ClientId"];
-        });
+ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+ .AddJwtBearer(options =>
+ {
+ options.Authority = $"https://login.microsoftonline.com/{config["AzureAd:TenantId"]}";
+ options.Audience = config["AzureAd:ClientId"];
+ });
 
-    // Managed Identity for service-to-service communication
-    services.AddSingleton<TokenCredential>(_ => new DefaultAzureCredential());
+ // Managed Identity for service-to-service communication
+ services.AddSingleton<TokenCredential>(_ => new DefaultAzureCredential());
 }
 ```
 
@@ -614,24 +611,24 @@ public static void ConfigureAuthentication(IServiceCollection services, IConfigu
 // Key Vault integration
 public static void ConfigureKeyVault(WebApplicationBuilder builder)
 {
-    var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
-    if (!string.IsNullOrEmpty(keyVaultUri))
-    {
-        var credential = new DefaultAzureCredential();
-        builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
-    }
+ var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
+ if (!string.IsNullOrEmpty(keyVaultUri))
+ {
+ var credential = new DefaultAzureCredential();
+ builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
+ }
 }
 
 // Usage in services
 public class DatabaseService
 {
-    private readonly string _connectionString;
-    
-    public DatabaseService(IConfiguration config)
-    {
-        // Automatically retrieved from Key Vault
-        _connectionString = config["ConnectionStrings:Database"];
-    }
+ private readonly string _connectionString;
+ 
+ public DatabaseService(IConfiguration config)
+ {
+ // Automatically retrieved from Key Vault
+ _connectionString = config["ConnectionStrings:Database"];
+ }
 }
 ```
 
@@ -651,29 +648,29 @@ public class DatabaseService
 // Application-level caching
 public class CachedMaritimeDataService : BaseMaritimeService
 {
-    private readonly IMemoryCache _cache;
-    private readonly MaritimeDataService _dataService;
-    
-    public async Task<FleetData> GetFleetDataAsync()
-    {
-        return await _cache.GetOrCreateAsync("fleet-data", async entry =>
-        {
-            entry.SlidingExpiration = TimeSpan.FromMinutes(5);
-            return await _dataService.GetFleetDataAsync();
-        });
-    }
+ private readonly IMemoryCache _cache;
+ private readonly MaritimeDataService _dataService;
+ 
+ public async Task<FleetData> GetFleetDataAsync()
+ {
+ return await _cache.GetOrCreateAsync("fleet-data", async entry =>
+ {
+ entry.SlidingExpiration = TimeSpan.FromMinutes(5);
+ return await _dataService.GetFleetDataAsync();
+ });
+ }
 }
 
 // Database-level query optimization
 public async Task<List<VesselPosition>> GetRecentPositionsAsync(string mmsi)
 {
-    return await _context.Positions
-        .Where(p => p.MMSI == mmsi)
-        .Where(p => p.Timestamp > DateTime.UtcNow.AddHours(-2))
-        .OrderByDescending(p => p.Timestamp)
-        .Take(100)
-        .AsNoTracking() // Read-only optimization
-        .ToListAsync();
+ return await _context.Positions
+ .Where(p => p.MMSI == mmsi)
+ .Where(p => p.Timestamp > DateTime.UtcNow.AddHours(-2))
+ .OrderByDescending(p => p.Timestamp)
+ .Take(100)
+ .AsNoTracking() // Read-only optimization
+ .ToListAsync();
 }
 ```
 
@@ -696,16 +693,16 @@ INCLUDE (Latitude, Longitude, Speed, Heading);
 -- Partitioned tables for large datasets
 CREATE PARTITION FUNCTION PF_AISMessages (datetime2)
 AS RANGE RIGHT FOR VALUES 
-    ('2024-01-01', '2024-02-01', '2024-03-01', '2024-04-01');
+ ('2024-01-01', '2024-02-01', '2024-03-01', '2024-04-01');
 
 CREATE PARTITION SCHEME PS_AISMessages
 AS PARTITION PF_AISMessages
 TO (AIS_Jan, AIS_Feb, AIS_Mar, AIS_Apr);
 
 CREATE TABLE AISMessages (
-    Id bigint IDENTITY(1,1),
-    Timestamp datetime2 NOT NULL,
-    -- other columns
+ Id bigint IDENTITY(1,1),
+ Timestamp datetime2 NOT NULL,
+ -- other columns
 ) ON PS_AISMessages(Timestamp);
 ```
 
@@ -725,11 +722,11 @@ CREATE TABLE AISMessages (
 # Deployment script architecture
 deployment/
 ├── shared/
-│   └── azure-common.sh      # Shared utilities
+│ └── azure-common.sh # Shared utilities
 ├── azure/
-│   └── azure-infrastructure.json  # ARM template
-├── deploy-all.sh           # Master deployment script
-└── deploy.sh              # Application deployment
+│ └── azure-infrastructure.json # ARM template
+├── deploy-all.sh # Master deployment script
+└── deploy.sh # Application deployment
 ```
 
 **Why ARM Over Alternatives:**
@@ -754,33 +751,33 @@ deployment/
 # .github/workflows/deploy.yml
 name: Deploy Maritime Platform
 on:
-  push:
-    branches: [main]
+ push:
+ branches: [main]
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Deploy Infrastructure
-      run: |
-        ./deployment/deploy-all.sh
-    
-    - name: Deploy Application
-      run: |
-        docker build -t ${{ env.REGISTRY }}/maritime-api:${{ github.sha }} .
-        docker push ${{ env.REGISTRY }}/maritime-api:${{ github.sha }}
-        
-        az containerapp update \
-          --name maritime-api \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --image ${{ env.REGISTRY }}/maritime-api:${{ github.sha }}
+ deploy:
+ runs-on: ubuntu-latest
+ steps:
+ - uses: actions/checkout@v4
+ 
+ - name: Azure Login
+ uses: azure/login@v1
+ with:
+ creds: ${{ secrets.AZURE_CREDENTIALS }}
+ 
+ - name: Deploy Infrastructure
+ run: |
+ ./deployment/deploy-all.sh
+ 
+ - name: Deploy Application
+ run: |
+ docker build -t ${{ env.REGISTRY }}/maritime-api:${{ github.sha }} .
+ docker push ${{ env.REGISTRY }}/maritime-api:${{ github.sha }}
+ 
+ az containerapp update \
+ --name maritime-api \
+ --resource-group ${{ env.RESOURCE_GROUP }} \
+ --image ${{ env.REGISTRY }}/maritime-api:${{ github.sha }}
 ```
 
 **Benefits:**
@@ -796,34 +793,34 @@ jobs:
 ### Key Decision-Making Questions:
 
 1. **"Why did you choose .NET over Node.js for this maritime platform?"**
-   - Performance requirements for real-time AIS processing
-   - Azure ecosystem integration benefits
-   - Type safety for critical maritime operations
-   - Existing team expertise and development speed
+ - Performance requirements for real-time AIS processing
+ - Azure ecosystem integration benefits
+ - Type safety for critical maritime operations
+ - Existing team expertise and development speed
 
 2. **"Explain your database choice and schema design decisions."**
-   - ACID compliance for maritime safety data
-   - Complex analytical query requirements
-   - Regulatory compliance and audit trails
-   - Performance optimization with proper indexing
+ - ACID compliance for maritime safety data
+ - Complex analytical query requirements
+ - Regulatory compliance and audit trails
+ - Performance optimization with proper indexing
 
 3. **"Walk me through your caching strategy."**
-   - Multi-layer approach (application, database, CDN)
-   - Cache invalidation strategies
-   - Performance vs consistency trade-offs
-   - Monitoring and cache hit rates
+ - Multi-layer approach (application, database, CDN)
+ - Cache invalidation strategies
+ - Performance vs consistency trade-offs
+ - Monitoring and cache hit rates
 
 4. **"How did you decide on your microservices vs monolith approach?"**
-   - Started with modular monolith for faster development
-   - Event-driven architecture for loose coupling
-   - Functions for compute-intensive processing
-   - Evolution path to microservices
+ - Started with modular monolith for faster development
+ - Event-driven architecture for loose coupling
+ - Functions for compute-intensive processing
+ - Evolution path to microservices
 
 5. **"Justify your security architecture decisions."**
-   - Azure AD for enterprise integration
-   - Managed identities for service authentication
-   - Key Vault for secrets management
-   - Network security and access controls
+ - Azure AD for enterprise integration
+ - Managed identities for service authentication
+ - Key Vault for secrets management
+ - Network security and access controls
 
 ### Technical Trade-off Analysis:
 

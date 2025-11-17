@@ -13,21 +13,21 @@ using System.Text.Json.Serialization;
 
 static TokenCredential ResolveKeyVaultCredential(IConfiguration configuration)
 {
-    var clientId = configuration["KeyVault:ClientId"];
-    var clientSecret = configuration["KeyVault:ClientSecret"];
-    var tenantId = configuration["KeyVault:TenantId"];
-    var useManagedIdentity = configuration.GetValue("KeyVault:UseManagedIdentity", true);
+ var clientId = configuration["KeyVault:ClientId"];
+ var clientSecret = configuration["KeyVault:ClientSecret"];
+ var tenantId = configuration["KeyVault:TenantId"];
+ var useManagedIdentity = configuration.GetValue("KeyVault:UseManagedIdentity", true);
 
-    if (!useManagedIdentity &&
-        !string.IsNullOrWhiteSpace(clientId) &&
-        !string.IsNullOrWhiteSpace(clientSecret) &&
-        !string.IsNullOrWhiteSpace(tenantId))
-    {
-        return new ClientSecretCredential(tenantId, clientId, clientSecret);
-    }
+ if (!useManagedIdentity &&
+ !string.IsNullOrWhiteSpace(clientId) &&
+ !string.IsNullOrWhiteSpace(clientSecret) &&
+ !string.IsNullOrWhiteSpace(tenantId))
+ {
+ return new ClientSecretCredential(tenantId, clientId, clientSecret);
+ }
 
 #pragma warning disable AZC0102
-    return new DefaultAzureCredential();
+ return new DefaultAzureCredential();
 #pragma warning restore AZC0102
 }
 
@@ -36,14 +36,14 @@ var builder = WebApplication.CreateBuilder(args);
 var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
 if (!string.IsNullOrWhiteSpace(keyVaultUri))
 {
-    var credential = ResolveKeyVaultCredential(builder.Configuration);
-    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
+ var credential = ResolveKeyVaultCredential(builder.Configuration);
+ builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
 }
 
 // Add services to the container
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+ options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 builder.Services.AddEndpointsApiExplorer();
 
@@ -59,7 +59,7 @@ builder.Services.AddScoped<IMonitoringService, MonitoringService>();
 builder.Services.AddScoped<IApiManagementService, ApiManagementService>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 
-// Register core services that are properly implemented  
+// Register core services that are properly implemented 
 builder.Services.AddScoped<ISafetyService, SafetyService>();
 
 // Register incident management and on-call services
@@ -78,7 +78,7 @@ builder.Services.ConfigureDataPipelineOptions(builder.Configuration);
 
 // Register Kafka integration services
 builder.Services.Configure<MaritimeIQ.Platform.Services.KafkaConfiguration>(
-    builder.Configuration.GetSection("Kafka"));
+ builder.Configuration.GetSection("Kafka"));
 builder.Services.AddSingleton<MaritimeIQ.Platform.Services.KafkaProducerService>();
 builder.Services.AddHostedService<MaritimeIQ.Platform.Services.KafkaConsumerService>();
 
@@ -93,12 +93,11 @@ builder.Services.AddHostedService<MaritimeIQ.Platform.Services.KafkaConsumerServ
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "MaritimeIQ Platform",
-        Version = "v2.0",
-        Description = "Comprehensive maritime operations platform with AI-powered analytics, real-time monitoring, IoT integration, and Power BI reporting for coastal fleet operations."
-    });
+ c.SwaggerDoc("v1", new OpenApiInfo
+ {
+ Title = "MaritimeIQ Platform",
+ Version = "v2.0",
+ Description = "Comprehensive maritime operations platform with AI-powered analytics, real-time monitoring, IoT integration, and Power BI reporting for coastal fleet operations."});
 });
 
 // Add HTTP clients for external services
@@ -122,31 +121,31 @@ builder.Services.Configure<MaritimeIQ.Platform.Services.CognitiveServicesConfigu
 // Register Azure services
 builder.Services.AddScoped<MaritimeIQ.Platform.Services.IIoTHubService>(serviceProvider =>
 {
-    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.IoTHubConfiguration>>().Value;
-    var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.IoTHubService>>();
-    return new MaritimeIQ.Platform.Services.IoTHubService(config, logger);
+ var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.IoTHubConfiguration>>().Value;
+ var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.IoTHubService>>();
+ return new MaritimeIQ.Platform.Services.IoTHubService(config, logger);
 });
 
 builder.Services.AddScoped<MaritimeIQ.Platform.Services.IEventHubService>(serviceProvider =>
 {
-    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.EventHubConfiguration>>().Value;
-    var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.EventHubService>>();
-    return new MaritimeIQ.Platform.Services.EventHubService(config, logger);
+ var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.EventHubConfiguration>>().Value;
+ var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.EventHubService>>();
+ return new MaritimeIQ.Platform.Services.EventHubService(config, logger);
 });
 
 builder.Services.AddScoped<MaritimeIQ.Platform.Services.IServiceBusService>(serviceProvider =>
 {
-    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.ServiceBusConfiguration>>().Value;
-    var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.ServiceBusService>>();
-    var client = new Azure.Messaging.ServiceBus.ServiceBusClient(config.ConnectionString);
-    return new MaritimeIQ.Platform.Services.ServiceBusService(client, config, logger);
+ var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.ServiceBusConfiguration>>().Value;
+ var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.ServiceBusService>>();
+ var client = new Azure.Messaging.ServiceBus.ServiceBusClient(config.ConnectionString);
+ return new MaritimeIQ.Platform.Services.ServiceBusService(client, config, logger);
 });
 
 builder.Services.AddScoped<MaritimeIQ.Platform.Services.ICognitiveServicesService>(serviceProvider =>
 {
-    var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.CognitiveServicesConfiguration>>().Value;
-    var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.CognitiveServicesService>>();
-    return new MaritimeIQ.Platform.Services.CognitiveServicesService(config, logger);
+ var config = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<MaritimeIQ.Platform.Services.CognitiveServicesConfiguration>>().Value;
+ var logger = serviceProvider.GetRequiredService<ILogger<MaritimeIQ.Platform.Services.CognitiveServicesService>>();
+ return new MaritimeIQ.Platform.Services.CognitiveServicesService(config, logger);
 });
 
 // Platform integrations
@@ -155,27 +154,27 @@ builder.Services.Configure<KeyVaultConfiguration>(keyVaultSection);
 
 if (!string.IsNullOrWhiteSpace(keyVaultSection["VaultUri"]))
 {
-    builder.Services.AddSingleton<IKeyVaultService, KeyVaultService>();
+ builder.Services.AddSingleton<IKeyVaultService, KeyVaultService>();
 }
 
 builder.Services.AddScoped<IPowerBIWorkspaceService, PowerBIWorkspaceService>();
 
 // Add health checks for Azure services
 builder.Services.AddHealthChecks()
-    .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy())
-    .AddCheck("database", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Database connection ready"))
-    .AddCheck("azure-services", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Azure services ready"));
+ .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy())
+ .AddCheck("database", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Database connection ready"))
+ .AddCheck("azure-services", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Azure services ready"));
 
 // Add CORS for Maritime web applications
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("MaritimePolicy", policy =>
-    {
-        policy.WithOrigins("https://maritimeiq-platform.azurewebsites.net", "https://localhost:5001")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
+ options.AddPolicy("MaritimePolicy", policy =>
+ {
+ policy.WithOrigins("https://maritimeiq-platform.azurewebsites.net", "https://localhost:5001")
+ .AllowAnyMethod()
+ .AllowAnyHeader()
+ .AllowCredentials();
+ });
 });
 
 var app = builder.Build();
@@ -185,25 +184,25 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MaritimeIQ Platform v2.0");
-    c.RoutePrefix = "swagger"; // Serve Swagger UI at /swagger
+ c.SwaggerEndpoint("/swagger/v1/swagger.json", "MaritimeIQ Platform v2.0");
+ c.RoutePrefix = "swagger"; // Serve Swagger UI at /swagger
 });
 
 if (!app.Environment.IsDevelopment())
 {
-    // Production error handling
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
+ // Production error handling
+ app.UseExceptionHandler("/Error");
+ app.UseHsts();
 }
 
 // Add security headers
 app.Use(async (context, next) =>
 {
-    context.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
-    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
-    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
-    await next();
+ context.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
+ context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+ context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+ context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+ await next();
 });
 
 app.UseHttpsRedirection();
@@ -220,73 +219,71 @@ app.MapControllers();
 // Enhanced health check endpoint
 app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
 {
-    ResponseWriter = async (context, report) =>
-    {
-        context.Response.ContentType = "application/json";
-        var response = new
-        {
-            status = report.Status.ToString(),
-            checks = report.Entries.Select(x => new
-            {
-                name = x.Key,
-                status = x.Value.Status.ToString(),
-                description = x.Value.Description,
-                duration = x.Value.Duration.TotalMilliseconds
-            }),
-            totalDuration = report.TotalDuration.TotalMilliseconds,
-            timestamp = DateTime.UtcNow
-        };
-        await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(response));
-    }
+ ResponseWriter = async (context, report) =>
+ {
+ context.Response.ContentType = "application/json";
+ var response = new
+ {
+ status = report.Status.ToString(),
+ checks = report.Entries.Select(x => new
+ {
+ name = x.Key,
+ status = x.Value.Status.ToString(),
+ description = x.Value.Description,
+ duration = x.Value.Duration.TotalMilliseconds
+ }),
+ totalDuration = report.TotalDuration.TotalMilliseconds,
+ timestamp = DateTime.UtcNow
+ };
+ await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(response));
+ }
 });
 
 // Add detailed health checks for development
 if (app.Environment.IsDevelopment())
 {
-    app.MapHealthChecks("/health/ready");
-    app.MapHealthChecks("/health/live");
+ app.MapHealthChecks("/health/ready");
+ app.MapHealthChecks("/health/live");
 }
 
 // Main API endpoints
 app.MapGet("/", () => new
 {
-    Message = "MaritimeIQ Operations API",
-    Description = "Comprehensive maritime service for vessel management, route planning, and safety monitoring",
-    Timestamp = DateTime.UtcNow,
-    Version = "2.0.0",
-    Framework = ".NET 8.0",
-    Environment = app.Environment.EnvironmentName,
-    Services = new string[]
-    {
-        "Vessel Management",
-        "Route Planning", 
-        "Safety Monitoring",
-        "IoT Sensor Integration",
-        "Weather Services",
-        "Emergency Response",
-        "AI-Powered Analytics",
-        "Power BI Integration",
-        "Real-time Monitoring"
-    }
+ Message = "MaritimeIQ Operations API",
+ Description = "Comprehensive maritime service for vessel management, route planning, and safety monitoring",
+ Timestamp = DateTime.UtcNow,
+ Version = "2.0.0",
+ Framework = ".NET 8.0",
+ Environment = app.Environment.EnvironmentName,
+ Services = new string[]
+ {
+ "Vessel Management",
+ "Route Planning", 
+ "Safety Monitoring",
+ "IoT Sensor Integration",
+ "Weather Services",
+ "Emergency Response",
+ "AI-Powered Analytics",
+ "Power BI Integration",
+ "Real-time Monitoring"}
 });
 
 app.MapGet("/api/status", () => new
 {
-    Status = "Operational",
-    Timestamp = DateTime.UtcNow,
-    Platform = "MaritimeIQ Platform",
-    Version = "2.0.0",
-    Uptime = TimeSpan.FromMilliseconds(Environment.TickCount64),
-    ActiveServices = new string[]
-    {
-        "AIS Processing",
-        "Environmental Monitoring", 
-        "Passenger Notifications",
-        "Route Optimization",
-        "IoT Hub Integration",
-        "Cognitive Services",
-        "Power BI Analytics"
-    }
+ Status = "Operational",
+ Timestamp = DateTime.UtcNow,
+ Platform = "MaritimeIQ Platform",
+ Version = "2.0.0",
+ Uptime = TimeSpan.FromMilliseconds(Environment.TickCount64),
+ ActiveServices = new string[]
+ {
+ "AIS Processing",
+ "Environmental Monitoring", 
+ "Passenger Notifications",
+ "Route Optimization",
+ "IoT Hub Integration",
+ "Cognitive Services",
+ "Power BI Analytics"}
 });
 
 app.Run();

@@ -1,0 +1,775 @@
+# AWS DevOps - Complete Guide
+
+## 1. AWS Infrastructure Overview
+
+**AWS DevOps** combines development and operations practices with AWS cloud services to enable automated, scalable, and reliable infrastructure deployment.
+
+**Key Components**:
+- **Infrastructure as Code**: Terraform
+- **Container Orchestration**: EKS (Elastic Kubernetes Service)
+- **Serverless**: Lambda
+- **Data Services**: MSK (Managed Streaming for Kafka), Kinesis
+- **Storage**: S3, EFS
+- **Databases**: RDS (PostgreSQL, MySQL)
+- **Monitoring**: CloudWatch, X-Ray
+- **Security**: IAM, Secrets Manager
+
+---
+
+## 2. Terraform (Infrastructure as Code)
+
+### What is Terraform?
+
+**Terraform** is an open-source IaC tool that uses HCL (HashiCorp Configuration Language) to define infrastructure.
+
+### MaritimeIQ Terraform Structure
+
+```hcl
+# variables.tf
+variable "app_name" {
+  type        = string
+  default     = "maritime-platform"
+  description = "Name of the application"
+}
+
+variable "environment" {
+  type        = string
+  default     = "dev"
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "Environment must be dev, staging, or prod."
+  }
+}
+
+# main.tf
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+# VPC
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+  
+  name = "${var.app_name}-vpc"
+  cidr = "10.0.0.0/16"
+  
+  azs             = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+  
+  enable_nat_gateway = true
+  enable_vpn_gateway = false
+}
+
+# RDS
+resource "aws_db_instance" "main" {
+  identifier     = "${var.app_name}-db"
+  engine         = "postgres"
+  engine_version = "15.3"
+  instance_class = var.environment == "prod" ? "db.r6g.xlarge" : "db.t3.medium"
+  
+  allocated_storage     = 100
+  max_allocated_storage = 500
+  
+  db_name  = "maritime"
+  username = "maritime_admin"
+  password = var.db_password
+  
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  
+  backup_retention_period = var.environment == "prod" ? 30 : 7
+  deletion_protection     = var.environment == "prod"
+  
+  tags = {
+    Name        = "${var.app_name}-db"
+    Environment = var.environment
+  }
+}
+```
+
+### Deploying with Terraform
+
+```bash
+# Initialize Terraform
+terraform init
+
+# Plan deployment
+terraform plan -out=tfplan
+
+# Apply deployment
+terraform apply tfplan
+
+# Destroy infrastructure
+terraform destroy
+```
+
+---
+
+## 3. EKS (Elastic Kubernetes Service)
+
+### What is EKS?
+
+**EKS** is a managed Kubernetes service for running containerized applications.
+
+**Key Features**:
+- Managed Kubernetes control plane
+- Auto-scaling node groups
+- Integration with AWS services
+- High availability
+- Security and compliance
+
+### MaritimeIQ EKS Configuration
+
+```hcl
+# EKS Cluster
+resource "aws_eks_cluster" "main" {
+  name     = "${var.app_name}-eks"
+  role_arn = aws_iam_role.eks.arn
+  version  = "1.27"
+  
+  vpc_config {
+    subnet_ids              = module.vpc.private_subnets
+    endpoint_private_access = true
+    endpoint_public_access  = true
+  }
+  
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_cluster_policy,
+    aws_iam_role_policy_attachment.eks_service_policy,
+  ]
+  
+  tags = {
+    Name        = "${var.app_name}-eks"
+    Environment = var.environment
+  }
+}
+
+# EKS Node Group
+resource "aws_eks_node_group" "main" {
+  cluster_name    = aws_eks_cluster.main.name
+  node_group_name = "${var.app_name}-nodes"
+  node_role_arn   = aws_iam_role.eks_node.arn
+  subnet_ids      = module.vpc.private_subnets
+  
+  instance_types = ["t3.medium"]
+  capacity_type  = "ON_DEMAND"
+  
+  scaling_config {
+    desired_size = var.environment == "prod" ? 3 : 2
+    max_size     = 10
+    min_size     = 1
+  }
+  
+  update_config {
+    max_unavailable = 1
+  }
+  
+  tags = {
+    Name        = "${var.app_name}-nodes"
+    Environment = var.environment
+  }
+}
+```
+
+### Deploying to EKS
+
+```bash
+# Configure kubectl
+aws eks update-kubeconfig --name maritime-eks --region us-east-1
+
+# Deploy application
+kubectl apply -f k8s/maritime-api.yaml
+
+# Check status
+kubectl get pods
+kubectl get services
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maritime-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: maritime-api
+  template:
+    metadata:
+      labels:
+        app: maritime-api
+    spec:
+      containers:
+      - name: maritime-api
+        image: maritime-ecr.aws.com/maritime-api:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: maritime-secrets
+              key: sql-connection-string
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: maritime-api
+spec:
+  type: LoadBalancer
+  selector:
+    app: maritime-api
+  ports:
+  - port: 80
+    targetPort: 80
+```
+
+---
+
+## 4. AWS Lambda
+
+### What is Lambda?
+
+**AWS Lambda** is a serverless compute service for running code without managing servers.
+
+**Key Features**:
+- Event-driven execution
+- Pay-per-request pricing
+- Auto-scaling
+- Multiple trigger types
+- Multiple runtime support
+
+### MaritimeIQ Lambda Function
+
+```python
+import json
+import boto3
+
+def lambda_handler(event, context):
+    """
+    Process AIS data from Kinesis stream
+    """
+    kinesis = boto3.client('kinesis')
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('vessel-positions')
+    
+    for record in event['Records']:
+        # Decode Kinesis data
+        payload = json.loads(record['kinesis']['data'])
+        
+        # Process AIS message
+        vessel_id = payload['MMSI']
+        position = {
+            'vessel_id': vessel_id,
+            'latitude': payload['Latitude'],
+            'longitude': payload['Longitude'],
+            'timestamp': payload['Timestamp']
+        }
+        
+        # Store in DynamoDB
+        table.put_item(Item=position)
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Processed successfully')
+    }
+```
+
+### Deploying Lambda
+
+```bash
+# Package function
+zip function.zip lambda_function.py
+
+# Create function
+aws lambda create-function \
+  --function-name process-ais-data \
+  --runtime python3.11 \
+  --role arn:aws:iam::account:role/lambda-role \
+  --handler lambda_function.lambda_handler \
+  --zip-file fileb://function.zip
+
+# Update function
+aws lambda update-function-code \
+  --function-name process-ais-data \
+  --zip-file fileb://function.zip
+```
+
+---
+
+## 5. AWS MSK (Managed Streaming for Kafka)
+
+### What is MSK?
+
+**MSK** is a fully managed Apache Kafka service.
+
+**Key Features**:
+- Fully managed Kafka
+- High availability
+- Auto-scaling
+- Encryption
+- Monitoring
+
+### MaritimeIQ MSK Configuration
+
+```hcl
+# MSK Cluster
+resource "aws_msk_cluster" "main" {
+  cluster_name           = "${var.app_name}-kafka"
+  kafka_version          = "3.5.1"
+  number_of_broker_nodes = 3
+  
+  broker_node_group_info {
+    instance_type   = "kafka.m5.large"
+    ebs_volume_size = 100
+    client_subnets  = module.vpc.private_subnets
+    security_groups = [aws_security_group.msk.id]
+  }
+  
+  encryption_info {
+    encryption_at_rest_kms_key_id = aws_kms_key.msk.arn
+    encryption_in_transit {
+      client_broker = "TLS"
+      in_cluster    = true
+    }
+  }
+  
+  tags = {
+    Name        = "${var.app_name}-kafka"
+    Environment = var.environment
+  }
+}
+```
+
+### Using MSK
+
+```python
+from kafka import KafkaProducer, KafkaConsumer
+import json
+
+# Producer
+producer = KafkaProducer(
+    bootstrap_servers=['kafka-broker:9092'],
+    value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+    security_protocol='SSL'
+)
+
+producer.send('maritime.ais.data', {
+    'MMSI': '123456789',
+    'Latitude': 60.0,
+    'Longitude': 5.0,
+    'Timestamp': '2024-01-15T10:00:00Z'
+})
+
+# Consumer
+consumer = KafkaConsumer(
+    'maritime.ais.data',
+    bootstrap_servers=['kafka-broker:9092'],
+    group_id='maritime-processors',
+    value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+    security_protocol='SSL'
+)
+
+for message in consumer:
+    process_ais_message(message.value)
+```
+
+---
+
+## 6. AWS S3
+
+### What is S3?
+
+**S3** (Simple Storage Service) is object storage for any amount of data.
+
+**Key Features**:
+- Unlimited storage
+- Versioning
+- Lifecycle policies
+- Encryption
+- Access control
+
+### MaritimeIQ S3 Configuration
+
+```hcl
+# S3 Bucket
+resource "aws_s3_bucket" "maritime_data" {
+  bucket = "${var.app_name}-data-${var.environment}"
+  
+  tags = {
+    Name        = "${var.app_name}-data"
+    Environment = var.environment
+  }
+}
+
+# Lifecycle Policy
+resource "aws_s3_bucket_lifecycle_configuration" "maritime_data" {
+  bucket = aws_s3_bucket.maritime_data.id
+  
+  rule {
+    id     = "transition_to_ia"
+    status = "Enabled"
+    
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+    
+    transition {
+      days          = 90
+      storage_class = "GLACIER"
+    }
+  }
+  
+  rule {
+    id     = "delete_old_data"
+    status = "Enabled"
+    
+    expiration {
+      days = 365
+    }
+  }
+}
+```
+
+### Using S3
+
+```python
+import boto3
+
+s3 = boto3.client('s3')
+
+# Upload
+s3.upload_fileobj(
+    file_obj,
+    'maritime-data-dev',
+    'ais-data/2024/01/15/data.json'
+)
+
+# Download
+s3.download_fileobj(
+    'maritime-data-dev',
+    'ais-data/2024/01/15/data.json',
+    file_obj
+)
+
+# List objects
+response = s3.list_objects_v2(
+    Bucket='maritime-data-dev',
+    Prefix='ais-data/2024/01/15/'
+)
+```
+
+---
+
+## 7. AWS RDS
+
+### What is RDS?
+
+**RDS** (Relational Database Service) is a managed relational database service.
+
+**Key Features**:
+- Managed service
+- Multiple engines (PostgreSQL, MySQL, etc.)
+- High availability
+- Automated backups
+- Point-in-time restore
+
+### MaritimeIQ RDS Configuration
+
+```hcl
+# RDS Instance
+resource "aws_db_instance" "main" {
+  identifier     = "${var.app_name}-db"
+  engine         = "postgres"
+  engine_version = "15.3"
+  instance_class = var.environment == "prod" ? "db.r6g.xlarge" : "db.t3.medium"
+  
+  allocated_storage     = 100
+  max_allocated_storage = 500
+  
+  db_name  = "maritime"
+  username = "maritime_admin"
+  password = var.db_password
+  
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  
+  backup_retention_period = var.environment == "prod" ? 30 : 7
+  backup_window          = "03:00-04:00"
+  maintenance_window     = "mon:04:00-mon:05:00"
+  
+  deletion_protection = var.environment == "prod"
+  skip_final_snapshot = var.environment != "prod"
+  
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+  
+  tags = {
+    Name        = "${var.app_name}-db"
+    Environment = var.environment
+  }
+}
+```
+
+### Connecting to RDS
+
+```python
+import psycopg2
+
+conn = psycopg2.connect(
+    host="maritime-db.region.rds.amazonaws.com",
+    database="maritime",
+    user="maritime_admin",
+    password=password
+)
+
+cursor = conn.cursor()
+cursor.execute("SELECT * FROM vessels")
+results = cursor.fetchall()
+```
+
+---
+
+## 8. CloudWatch
+
+### What is CloudWatch?
+
+**CloudWatch** is a monitoring and observability service.
+
+**Key Features**:
+- Metrics collection
+- Log aggregation
+- Alarms and notifications
+- Dashboards
+- Insights
+
+### MaritimeIQ CloudWatch Configuration
+
+```hcl
+# CloudWatch Log Group
+resource "aws_cloudwatch_log_group" "maritime_api" {
+  name              = "/aws/eks/maritime-api"
+  retention_in_days = 30
+}
+
+# CloudWatch Alarm
+resource "aws_cloudwatch_metric_alarm" "high_error_rate" {
+  alarm_name          = "maritime-api-high-error-rate"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods    = "2"
+  metric_name         = "ErrorRate"
+  namespace           = "MaritimeIQ"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "5"
+  alarm_description   = "Alert when error rate exceeds 5%"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+}
+```
+
+### Using CloudWatch
+
+```python
+import boto3
+
+cloudwatch = boto3.client('cloudwatch')
+
+# Put custom metric
+cloudwatch.put_metric_data(
+    Namespace='MaritimeIQ',
+    MetricData=[
+        {
+            'MetricName': 'vessel.position.updates',
+            'Value': 100,
+            'Unit': 'Count',
+            'Timestamp': datetime.utcnow()
+        }
+    ]
+)
+
+# Get metrics
+response = cloudwatch.get_metric_statistics(
+    Namespace='MaritimeIQ',
+    MetricName='vessel.position.updates',
+    StartTime=datetime.utcnow() - timedelta(hours=1),
+    EndTime=datetime.utcnow(),
+    Period=300,
+    Statistics=['Sum']
+)
+```
+
+---
+
+## 9. AWS Secrets Manager
+
+### What is Secrets Manager?
+
+**Secrets Manager** is a service for storing and retrieving secrets.
+
+**Key Features**:
+- Secret storage
+- Automatic rotation
+- Encryption
+- Access control
+- Audit logging
+
+### MaritimeIQ Secrets Manager
+
+```hcl
+# Secret
+resource "aws_secretsmanager_secret" "db_password" {
+  name        = "${var.app_name}/db/password"
+  description = "Database password for MaritimeIQ"
+  
+  tags = {
+    Name        = "${var.app_name}-db-password"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "db_password" {
+  secret_id     = aws_secretsmanager_secret.db_password.id
+  secret_string = var.db_password
+}
+```
+
+### Using Secrets Manager
+
+```python
+import boto3
+import json
+
+secretsmanager = boto3.client('secretsmanager')
+
+# Get secret
+response = secretsmanager.get_secret_value(
+    SecretId='maritime-platform/db/password'
+)
+secret = json.loads(response['SecretString'])
+db_password = secret['password']
+```
+
+---
+
+## 10. Deployment Automation
+
+### Deployment Script
+
+```bash
+#!/bin/bash
+# deploy-aws-platform.sh
+
+set -e
+
+echo "🚀 Deploying MaritimeIQ Platform to AWS"
+
+# 1. Initialize Terraform
+cd infrastructure/terraform
+terraform init
+
+# 2. Plan deployment
+terraform plan -out=tfplan \
+  -var="app_name=maritime-platform" \
+  -var="environment=dev"
+
+# 3. Apply deployment
+terraform apply tfplan
+
+# 4. Configure kubectl
+aws eks update-kubeconfig \
+  --name maritime-eks \
+  --region us-east-1
+
+# 5. Deploy application
+kubectl apply -f ../k8s/maritime-api.yaml
+
+# 6. Deploy Lambda
+cd ../../functions
+zip function.zip lambda_function.py
+aws lambda update-function-code \
+  --function-name process-ais-data \
+  --zip-file fileb://function.zip
+
+echo "✅ Deployment completed!"
+```
+
+---
+
+## 11. Best Practices
+
+### ✅ Do
+
+1. **Use Terraform**: Infrastructure as Code
+2. **Use Modules**: Reusable components
+3. **Tag Resources**: For cost tracking
+4. **Use IAM Roles**: For authentication
+5. **Enable Monitoring**: CloudWatch
+6. **Secure Secrets**: Use Secrets Manager
+7. **Auto-Scale**: Configure auto-scaling
+8. **Backup**: Enable automated backups
+
+### ❌ Don't
+
+1. **Don't Hardcode**: Use variables
+2. **Don't Skip Validation**: Validate configurations
+3. **Don't Ignore Costs**: Monitor spending
+4. **Don't Skip Security**: Use IAM and Secrets Manager
+5. **Don't Ignore Monitoring**: Set up alarms
+
+---
+
+## 12. Summary
+
+**AWS DevOps**:
+
+**Key Services**:
+- **Terraform**: Infrastructure as Code
+- **EKS**: Managed Kubernetes
+- **Lambda**: Serverless compute
+- **MSK**: Managed Kafka
+- **S3**: Object storage
+- **RDS**: Managed database
+- **CloudWatch**: Monitoring
+- **Secrets Manager**: Secrets management
+
+**MaritimeIQ Implementation**:
+- Terraform for infrastructure
+- EKS for container orchestration
+- Lambda for event processing
+- MSK for data streaming
+- CloudWatch for monitoring
+
+**Key Takeaway**: AWS DevOps provides comprehensive services for infrastructure deployment, container orchestration, serverless computing, data services, and monitoring. MaritimeIQ uses Terraform, EKS, Lambda, MSK, and CloudWatch to provide a scalable, reliable platform for maritime operations.
+

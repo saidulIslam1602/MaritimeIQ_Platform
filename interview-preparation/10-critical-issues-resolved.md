@@ -26,25 +26,25 @@ Designing a comprehensive maritime data engineering platform that integrates mul
 ```
 MaritimeIQ Platform Architecture:
 ├── Data Ingestion Layer
-│   ├── Azure Event Hubs (Real-time streaming)
-│   ├── Apache Kafka (Message queuing)
-│   └── Azure IoT Hub (Device connectivity)
+│ ├── Azure Event Hubs (Real-time streaming)
+│ ├── Apache Kafka (Message queuing)
+│ └── Azure IoT Hub (Device connectivity)
 ├── Data Processing Layer
-│   ├── Azure Databricks (PySpark analytics)
-│   ├── Azure Stream Analytics (Real-time processing)
-│   └── Azure Data Factory (ETL pipelines)
+│ ├── Azure Databricks (PySpark analytics)
+│ ├── Azure Stream Analytics (Real-time processing)
+│ └── Azure Data Factory (ETL pipelines)
 ├── Application Layer
-│   ├── .NET 8 Web API (REST services)
-│   ├── Azure Functions (Event processing)
-│   └── React Dashboard (Frontend)
+│ ├── .NET 8 Web API (REST services)
+│ ├── Azure Functions (Event processing)
+│ └── React Dashboard (Frontend)
 ├── Data Storage Layer
-│   ├── Azure SQL Database (Transactional data)
-│   ├── Cosmos DB (Document storage)
-│   └── Azure Data Lake (Data warehouse)
+│ ├── Azure SQL Database (Transactional data)
+│ ├── Cosmos DB (Document storage)
+│ └── Azure Data Lake (Data warehouse)
 └── AI/ML Layer
-    ├── Azure Cognitive Services
-    ├── Custom ML models
-    └── Power BI (Analytics)
+ ├── Azure Cognitive Services
+ ├── Custom ML models
+ └── Power BI (Analytics)
 ```
 
 ### **Key Learning**
@@ -76,34 +76,34 @@ Implementing high-throughput real-time data streaming for maritime vessel positi
 // Kafka Producer with Idempotence
 public class KafkaProducerService
 {
-    private readonly IProducer<string, string> _producer;
-    
-    public async Task PublishAsync(string topic, string key, string message)
-    {
-        var kafkaMessage = new Message<string, string>
-        {
-            Key = key,
-            Value = message,
-            Headers = new Headers { new Header("timestamp", Encoding.UTF8.GetBytes(DateTime.UtcNow.ToString())) }
-        };
-        
-        await _producer.ProduceAsync(topic, kafkaMessage);
-    }
+ private readonly IProducer<string, string> _producer;
+ 
+ public async Task PublishAsync(string topic, string key, string message)
+ {
+ var kafkaMessage = new Message<string, string>
+ {
+ Key = key,
+ Value = message,
+ Headers = new Headers { new Header("timestamp", Encoding.UTF8.GetBytes(DateTime.UtcNow.ToString())) }
+ };
+ 
+ await _producer.ProduceAsync(topic, kafkaMessage);
+ }
 }
 
 // Event Hub Processor with Circuit Breaker
 public class MaritimeStreamingProcessor
 {
-    private readonly CircuitBreaker _circuitBreaker;
-    
-    public async Task ProcessEventsAsync(ProcessEventArgs eventArgs)
-    {
-        await _circuitBreaker.ExecuteAsync(async () =>
-        {
-            // Process maritime data with error handling
-            await ProcessMaritimeData(eventArgs.Data);
-        });
-    }
+ private readonly CircuitBreaker _circuitBreaker;
+ 
+ public async Task ProcessEventsAsync(ProcessEventArgs eventArgs)
+ {
+ await _circuitBreaker.ExecuteAsync(async () =>
+ {
+ // Process maritime data with error handling
+ await ProcessMaritimeData(eventArgs.Data);
+ });
+ }
 }
 ```
 
@@ -136,37 +136,37 @@ Implementing a scalable data lakehouse architecture using Azure Databricks and D
 # Databricks Notebook: Data Ingestion
 # Bronze Layer - Raw Data Ingestion
 raw_df = spark.readStream \
-    .format("eventhubs") \
-    .option("eventhubs.connectionString", connection_string) \
-    .load()
+ .format("eventhubs") \
+ .option("eventhubs.connectionString", connection_string) \
+ .load()
 
 # Data Quality Validation
 validated_df = raw_df.filter(
-    col("vessel_id").isNotNull() &
-    col("latitude").between(-90, 90) &
-    col("longitude").between(-180, 180) &
-    col("timestamp").isNotNull()
+ col("vessel_id").isNotNull() &
+ col("latitude").between(-90, 90) &
+ col("longitude").between(-180, 180) &
+ col("timestamp").isNotNull()
 )
 
 # Silver Layer - Cleaned Data
 cleaned_df = validated_df.withColumn("data_quality_score", 
-    when(col("speed") > 0, 1.0).otherwise(0.8)
+ when(col("speed") > 0, 1.0).otherwise(0.8)
 ).withColumn("processing_timestamp", current_timestamp())
 
 # Gold Layer - Aggregated Analytics
 fleet_analytics = cleaned_df.groupBy("vessel_id", "date") \
-    .agg(
-        avg("speed").alias("avg_speed"),
-        count("*").alias("position_updates"),
-        max("fuel_consumption").alias("max_fuel_consumption")
-    )
+ .agg(
+ avg("speed").alias("avg_speed"),
+ count("*").alias("position_updates"),
+ max("fuel_consumption").alias("max_fuel_consumption")
+ )
 
 # Write to Delta Lake with ACID transactions
 cleaned_df.writeStream \
-    .format("delta") \
-    .option("checkpointLocation", "/delta/checkpoints/maritime_silver") \
-    .trigger(processingTime="30 seconds") \
-    .start("/delta/maritime_silver")
+ .format("delta") \
+ .option("checkpointLocation", "/delta/checkpoints/maritime_silver") \
+ .trigger(processingTime="30 seconds") \
+ .start("/delta/maritime_silver")
 ```
 
 ### **Key Learning**
@@ -196,12 +196,12 @@ MSBUILD : error MSB1011: Specify which project or solution file to use because t
 
 ### **Solution Implemented**
 ```bash
-# ❌ Before (caused error)
+# Before (caused error)
 dotnet restore
 dotnet build
 dotnet publish
 
-# ✅ After (explicit solution file)
+# After (explicit solution file)
 dotnet restore ./Maritime_DataEngineering_Plaatform.sln
 dotnet build ./Maritime_DataEngineering_Plaatform.sln --configuration Release
 dotnet publish ./Maritime_DataEngineering_Plaatform.sln --configuration Release --output ./publish
@@ -222,7 +222,7 @@ dotnet publish ./Maritime_DataEngineering_Plaatform.sln --configuration Release 
 ## 2. **Branding Consistency: Havila References Removal**
 
 ### **Problem**
-GitHub repository description and codebase contained numerous "Havila" references from the original template, creating branding inconsistency for the MaritimeIQ Platform.
+GitHub repository description and codebase contained numerous "Havila"references from the original template, creating branding inconsistency for the MaritimeIQ Platform.
 
 ### **Root Cause Analysis**
 - Project was built from a maritime template with Havila Kystruten branding
@@ -238,16 +238,14 @@ GitHub repository description and codebase contained numerous "Havila" reference
 ### **Solution Implemented**
 ```bash
 # Systematic replacement strategy
-find . -name "*.json" -o -name "*.sql" -o -name "*.sh" | xargs sed -i 's/havila-maritime-analytics/maritimeiq-analytics/g'
-find . -name "*.css" -o -name "*.html" -o -name "*.js" | xargs sed -i 's/havila-blue/maritime-blue/g'
-# ... 20+ similar commands for different reference types
+find . -name "*.json"-o -name "*.sql"-o -name "*.sh"| xargs sed -i 's/havila-maritime-analytics/maritimeiq-analytics/g'find . -name "*.css"-o -name "*.html"-o -name "*.js"| xargs sed -i 's/havila-blue/maritime-blue/g'# ... 20+ similar commands for different reference types
 ```
 
 ### **Mapping Strategy**
 | Original | Replacement | Context |
 |----------|-------------|---------|
-| "Havila Kystruten" | "MaritimeIQ Platform" | Company names |
-| "MS Havila *" | "MS Maritime *" | Vessel names |
+| "Havila Kystruten"| "MaritimeIQ Platform"| Company names |
+| "MS Havila *"| "MS Maritime *"| Vessel names |
 | `havila-maritime-*` | `maritimeiq-platform-*` | Resource names |
 | `@havila.no` | `@maritimeiq.com` | Email domains |
 | `havila-blue` | `maritime-blue` | CSS classes |
@@ -294,10 +292,10 @@ dotnet publish Maritime_DataEngineering_Plaatform.sln --configuration Release --
 ```
 
 ### **Results**
-- ✅ All stages completed successfully
-- ⚠️ 1 warning (nullable reference in FleetAnalyticsService.cs:215)
-- ✅ Executable runs (fails on Azure Key Vault auth - expected in local env)
-- ✅ Publish generates complete deployment package
+- All stages completed successfully
+- 1 warning (nullable reference in FleetAnalyticsService.cs:215)
+- Executable runs (fails on Azure Key Vault auth - expected in local env)
+- Publish generates complete deployment package
 
 ### **Key Learning**
 - Systematic validation prevents deployment issues
@@ -330,33 +328,33 @@ Designing a comprehensive REST API with 20+ specialized controllers for maritime
 [Route("api/[controller]")]
 public class FleetAnalyticsController : BaseMaritimeController
 {
-    [HttpGet("performance")]
-    public async Task<ActionResult<FleetPerformanceResponse>> GetFleetPerformance()
-    {
-        try
-        {
-            var performance = await _fleetAnalyticsService.GetFleetPerformanceAsync();
-            return Ok(performance);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving fleet performance");
-            return StatusCode(500, new ErrorResponse("Internal server error"));
-        }
-    }
+ [HttpGet("performance")]
+ public async Task<ActionResult<FleetPerformanceResponse>> GetFleetPerformance()
+ {
+ try
+ {
+ var performance = await _fleetAnalyticsService.GetFleetPerformanceAsync();
+ return Ok(performance);
+ }
+ catch (Exception ex)
+ {
+ _logger.LogError(ex, "Error retrieving fleet performance");
+ return StatusCode(500, new ErrorResponse("Internal server error"));
+ }
+ }
 }
 
 // Base Controller with Common Functionality
 public abstract class BaseMaritimeController : ControllerBase
 {
-    protected readonly ILogger _logger;
-    protected readonly IConfiguration _configuration;
-    
-    protected ActionResult HandleException(Exception ex, string operation)
-    {
-        _logger.LogError(ex, "Error in {Operation}", operation);
-        return StatusCode(500, new ErrorResponse("An error occurred processing your request"));
-    }
+ protected readonly ILogger _logger;
+ protected readonly IConfiguration _configuration;
+ 
+ protected ActionResult HandleException(Exception ex, string operation)
+ {
+ _logger.LogError(ex, "Error in {Operation}", operation);
+ return StatusCode(500, new ErrorResponse("An error occurred processing your request"));
+ }
 }
 ```
 
@@ -388,41 +386,41 @@ Designing a comprehensive database schema for maritime operations with complex r
 ```sql
 -- Complex Maritime Database Schema
 CREATE TABLE vessels (
-    vessel_id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    vessel_name NVARCHAR(100) NOT NULL,
-    imo_number NVARCHAR(7) UNIQUE NOT NULL,
-    ship_type NVARCHAR(50) NOT NULL,
-    gross_tonnage INT,
-    passenger_capacity INT,
-    hybrid_system_type NVARCHAR(50),
-    battery_capacity_kwh INT,
-    fuel_type NVARCHAR(30),
-    year_built INT,
-    route_assignment NVARCHAR(50),
-    status NVARCHAR(20) DEFAULT 'Active',
-    created_at DATETIME2 DEFAULT GETDATE(),
-    updated_at DATETIME2 DEFAULT GETDATE()
+ vessel_id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+ vessel_name NVARCHAR(100) NOT NULL,
+ imo_number NVARCHAR(7) UNIQUE NOT NULL,
+ ship_type NVARCHAR(50) NOT NULL,
+ gross_tonnage INT,
+ passenger_capacity INT,
+ hybrid_system_type NVARCHAR(50),
+ battery_capacity_kwh INT,
+ fuel_type NVARCHAR(30),
+ year_built INT,
+ route_assignment NVARCHAR(50),
+ status NVARCHAR(20) DEFAULT 'Active',
+ created_at DATETIME2 DEFAULT GETDATE(),
+ updated_at DATETIME2 DEFAULT GETDATE()
 );
 
 CREATE TABLE voyages (
-    voyage_id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    vessel_id UNIQUEIDENTIFIER NOT NULL,
-    departure_port_id UNIQUEIDENTIFIER NOT NULL,
-    arrival_port_id UNIQUEIDENTIFIER NOT NULL,
-    scheduled_departure DATETIME2 NOT NULL,
-    actual_departure DATETIME2,
-    scheduled_arrival DATETIME2 NOT NULL,
-    actual_arrival DATETIME2,
-    voyage_status NVARCHAR(20) DEFAULT 'Scheduled',
-    passenger_count INT DEFAULT 0,
-    fuel_consumed_liters DECIMAL(10,2),
-    battery_usage_kwh DECIMAL(10,2),
-    co2_emissions_kg DECIMAL(10,2),
-    created_at DATETIME2 DEFAULT GETDATE(),
-    updated_at DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (vessel_id) REFERENCES vessels(vessel_id),
-    FOREIGN KEY (departure_port_id) REFERENCES ports(port_id),
-    FOREIGN KEY (arrival_port_id) REFERENCES ports(port_id)
+ voyage_id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+ vessel_id UNIQUEIDENTIFIER NOT NULL,
+ departure_port_id UNIQUEIDENTIFIER NOT NULL,
+ arrival_port_id UNIQUEIDENTIFIER NOT NULL,
+ scheduled_departure DATETIME2 NOT NULL,
+ actual_departure DATETIME2,
+ scheduled_arrival DATETIME2 NOT NULL,
+ actual_arrival DATETIME2,
+ voyage_status NVARCHAR(20) DEFAULT 'Scheduled',
+ passenger_count INT DEFAULT 0,
+ fuel_consumed_liters DECIMAL(10,2),
+ battery_usage_kwh DECIMAL(10,2),
+ co2_emissions_kg DECIMAL(10,2),
+ created_at DATETIME2 DEFAULT GETDATE(),
+ updated_at DATETIME2 DEFAULT GETDATE(),
+ FOREIGN KEY (vessel_id) REFERENCES vessels(vessel_id),
+ FOREIGN KEY (departure_port_id) REFERENCES ports(port_id),
+ FOREIGN KEY (arrival_port_id) REFERENCES ports(port_id)
 );
 
 -- Performance Indexes
@@ -463,35 +461,35 @@ from pyspark.ml.feature import VectorAssembler, StandardScaler
 from pyspark.ml.classification import RandomForestClassifier
 
 def train_predictive_maintenance_model(spark, data_path):
-    # Load maritime sensor data
-    df = spark.read.parquet(data_path)
-    
-    # Feature engineering
-    feature_cols = ['engine_temperature', 'vibration_level', 'fuel_consumption', 
-                   'speed', 'sea_conditions', 'operating_hours']
-    
-    assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
-    scaler = StandardScaler(inputCol="features", outputCol="scaled_features")
-    
-    # Random Forest for maintenance prediction
-    rf = RandomForestClassifier(
-        featuresCol="scaled_features",
-        labelCol="maintenance_required",
-        numTrees=100,
-        maxDepth=10,
-        seed=42
-    )
-    
-    # Create pipeline
-    pipeline = Pipeline(stages=[assembler, scaler, rf])
-    
-    # Train model
-    model = pipeline.fit(df)
-    
-    # Save model
-    model.write().overwrite().save("/models/predictive_maintenance")
-    
-    return model
+ # Load maritime sensor data
+ df = spark.read.parquet(data_path)
+ 
+ # Feature engineering
+ feature_cols = ['engine_temperature', 'vibration_level', 'fuel_consumption', 
+ 'speed', 'sea_conditions', 'operating_hours']
+ 
+ assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
+ scaler = StandardScaler(inputCol="features", outputCol="scaled_features")
+ 
+ # Random Forest for maintenance prediction
+ rf = RandomForestClassifier(
+ featuresCol="scaled_features",
+ labelCol="maintenance_required",
+ numTrees=100,
+ maxDepth=10,
+ seed=42
+ )
+ 
+ # Create pipeline
+ pipeline = Pipeline(stages=[assembler, scaler, rf])
+ 
+ # Train model
+ model = pipeline.fit(df)
+ 
+ # Save model
+ model.write().overwrite().save("/models/predictive_maintenance")
+ 
+ return model
 ```
 
 ### **Key Learning**
@@ -525,53 +523,53 @@ import React, { useState, useEffect } from 'react';
 import { WebSocketService } from '../services/websocket';
 
 export const MaritimeDashboard: React.FC = () => {
-  const [realTimeData, setRealTimeData] = useState<MaritimeData | null>(null);
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected'>('disconnected');
-  
-  useEffect(() => {
-    const ws = new WebSocketService();
-    
-    ws.onConnect(() => {
-      setConnectionStatus('connected');
-    });
-    
-    ws.onMessage((data: MaritimeData) => {
-      setRealTimeData(data);
-    });
-    
-    return () => ws.disconnect();
-  }, []);
-  
-  return (
-    <div className="min-h-screen bg-maritime-dark">
-      <header className="bg-maritime-blue shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <ShipIcon className="h-8 w-8 text-maritime-gold mr-3" />
-              <div>
-                <h1 className="text-2xl font-bold text-white">MaritimeIQ Platform</h1>
-                <p className="text-blue-200">Advanced Maritime Operations</p>
-              </div>
-            </div>
-            <ConnectionStatus status={connectionStatus} />
-          </div>
-        </div>
-      </header>
-      
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <FleetDashboard data={realTimeData?.fleet} />
-          </div>
-          <div className="space-y-6">
-            <EnvironmentalMonitoring data={realTimeData?.environmental} />
-            <SystemHealth data={realTimeData?.system} />
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+ const [realTimeData, setRealTimeData] = useState<MaritimeData | null>(null);
+ const [connectionStatus, setConnectionStatus] = useState<'connected'| 'disconnected'>('disconnected');
+ 
+ useEffect(() => {
+ const ws = new WebSocketService();
+ 
+ ws.onConnect(() => {
+ setConnectionStatus('connected');
+ });
+ 
+ ws.onMessage((data: MaritimeData) => {
+ setRealTimeData(data);
+ });
+ 
+ return () => ws.disconnect();
+ }, []);
+ 
+ return (
+ <div className="min-h-screen bg-maritime-dark">
+ <header className="bg-maritime-blue shadow-lg">
+ <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+ <div className="flex justify-between items-center py-6">
+ <div className="flex items-center">
+ <ShipIcon className="h-8 w-8 text-maritime-gold mr-3"/>
+ <div>
+ <h1 className="text-2xl font-bold text-white">MaritimeIQ Platform</h1>
+ <p className="text-blue-200">Advanced Maritime Operations</p>
+ </div>
+ </div>
+ <ConnectionStatus status={connectionStatus} />
+ </div>
+ </div>
+ </header>
+ 
+ <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+ <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+ <div className="lg:col-span-2">
+ <FleetDashboard data={realTimeData?.fleet} />
+ </div>
+ <div className="space-y-6">
+ <EnvironmentalMonitoring data={realTimeData?.environmental} />
+ <SystemHealth data={realTimeData?.system} />
+ </div>
+ </div>
+ </main>
+ </div>
+ );
 };
 ```
 
@@ -607,33 +605,33 @@ Implementing comprehensive security for maritime platform including authenticati
 [Route("api/[controller]")]
 public class FleetManagementController : ControllerBase
 {
-    [HttpGet("vessels")]
-    [Authorize(Roles = "FleetManager,OperationsManager")]
-    public async Task<ActionResult<List<Vessel>>> GetVessels()
-    {
-        var user = HttpContext.User;
-        var userRole = user.FindFirst(ClaimTypes.Role)?.Value;
-        
-        // Role-based data filtering
-        var vessels = await _vesselService.GetVesselsForRoleAsync(userRole);
-        return Ok(vessels);
-    }
-    
-    [HttpPost("vessels/{id}/maintenance")]
-    [Authorize(Roles = "MaintenanceManager")]
-    public async Task<ActionResult> ScheduleMaintenance(int id, MaintenanceRequest request)
-    {
-        // Audit logging
-        _auditService.LogAction(
-            HttpContext.User.Identity.Name,
-            "ScheduleMaintenance",
-            $"Vessel {id}",
-            request
-        );
-        
-        await _maintenanceService.ScheduleMaintenanceAsync(id, request);
-        return Ok();
-    }
+ [HttpGet("vessels")]
+ [Authorize(Roles = "FleetManager,OperationsManager")]
+ public async Task<ActionResult<List<Vessel>>> GetVessels()
+ {
+ var user = HttpContext.User;
+ var userRole = user.FindFirst(ClaimTypes.Role)?.Value;
+ 
+ // Role-based data filtering
+ var vessels = await _vesselService.GetVesselsForRoleAsync(userRole);
+ return Ok(vessels);
+ }
+ 
+ [HttpPost("vessels/{id}/maintenance")]
+ [Authorize(Roles = "MaintenanceManager")]
+ public async Task<ActionResult> ScheduleMaintenance(int id, MaintenanceRequest request)
+ {
+ // Audit logging
+ _auditService.LogAction(
+ HttpContext.User.Identity.Name,
+ "ScheduleMaintenance",
+ $"Vessel {id}",
+ request
+ );
+ 
+ await _maintenanceService.ScheduleMaintenanceAsync(id, request);
+ return Ok();
+ }
 }
 ```
 
@@ -648,7 +646,7 @@ public class FleetManagementController : ControllerBase
 
 ### **Problem**
 ```
-! [rejected]        main -> main (fetch first)
+! [rejected] main -> main (fetch first)
 error: failed to push some refs to the remote repository
 hint: Updates were rejected because the remote contains work that you do not have locally
 ```
@@ -695,23 +693,23 @@ CI/CD pipelines were inefficient and prone to errors due to:
 ```yaml
 # Before
 - name: Restore dependencies
-  run: dotnet restore
+ run: dotnet restore
 - name: Build
-  run: dotnet build --configuration Release --no-restore
+ run: dotnet build --configuration Release --no-restore
 - name: Test
-  run: dotnet test --no-restore --verbosity normal
+ run: dotnet test --no-restore --verbosity normal
 - name: Publish
-  run: dotnet publish -c Release -o ./publish
+ run: dotnet publish -c Release -o ./publish
 
 # After
 - name: Restore dependencies
-  run: dotnet restore ./Maritime_DataEngineering_Plaatform.sln
+ run: dotnet restore ./Maritime_DataEngineering_Plaatform.sln
 - name: Build
-  run: dotnet build ./Maritime_DataEngineering_Plaatform.sln --configuration Release --no-restore
+ run: dotnet build ./Maritime_DataEngineering_Plaatform.sln --configuration Release --no-restore
 - name: Test
-  run: dotnet test ./Maritime_DataEngineering_Plaatform.sln --no-build --configuration Release --verbosity normal
+ run: dotnet test ./Maritime_DataEngineering_Plaatform.sln --no-build --configuration Release --verbosity normal
 - name: Publish
-  run: dotnet publish ./Maritime_DataEngineering_Plaatform.sln --configuration Release --output ./publish --no-build
+ run: dotnet publish ./Maritime_DataEngineering_Plaatform.sln --configuration Release --output ./publish --no-build
 ```
 
 ### **Key Learning**
@@ -737,7 +735,7 @@ Understanding the relationship between solution file and project files, and why 
 Maritime_DataEngineering_Plaatform.sln (Solution File)
 ├── MaritimeIQ.Platform.csproj (Main Web API)
 └── Functions/MaritimeIQ.Platform.Functions.csproj (Azure Functions)
-    └── References: ../MaritimeIQ.Platform.csproj
+ └── References: ../MaritimeIQ.Platform.csproj
 ```
 
 ### **Key Learning**
@@ -811,14 +809,14 @@ Complex interdependencies between Web API, Azure Functions, and various Azure se
 ```
 MaritimeIQ Platform
 ├── Web API (MaritimeIQ.Platform.csproj)
-│   ├── Azure Key Vault (Configuration)
-│   ├── Azure Event Hubs (Streaming)
-│   ├── Azure Service Bus (Messaging)
-│   └── Azure SQL Database (Data)
+│ ├── Azure Key Vault (Configuration)
+│ ├── Azure Event Hubs (Streaming)
+│ ├── Azure Service Bus (Messaging)
+│ └── Azure SQL Database (Data)
 └── Azure Functions (MaritimeIQ.Platform.Functions.csproj)
-    ├── References Web API (Shared Models)
-    ├── Event Hub Triggers
-    └── Service Bus Triggers
+ ├── References Web API (Shared Models)
+ ├── Event Hub Triggers
+ └── Service Bus Triggers
 ```
 
 ### **Key Learning**
@@ -882,13 +880,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["MaritimeIQ.Platform.csproj", "."]
 COPY ["Functions/MaritimeIQ.Platform.Functions.csproj", "Functions/"]
-RUN dotnet restore "MaritimeIQ.Platform.csproj"
-COPY . .
-WORKDIR "/src"
-RUN dotnet build "MaritimeIQ.Platform.csproj" -c Release -o /app/build
+RUN dotnet restore "MaritimeIQ.Platform.csproj"COPY . .
+WORKDIR "/src"RUN dotnet build "MaritimeIQ.Platform.csproj"-c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "MaritimeIQ.Platform.csproj" -c Release -o /app/publish
+RUN dotnet publish "MaritimeIQ.Platform.csproj"-c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
@@ -925,30 +921,30 @@ Optimizing platform performance for high-throughput maritime data processing, en
 // Redis Caching Implementation
 public class CachedFleetService : IFleetService
 {
-    private readonly IFleetService _fleetService;
-    private readonly IDistributedCache _cache;
-    
-    public async Task<FleetPerformance> GetFleetPerformanceAsync()
-    {
-        const string cacheKey = "fleet_performance";
-        
-        var cachedData = await _cache.GetStringAsync(cacheKey);
-        if (cachedData != null)
-        {
-            return JsonSerializer.Deserialize<FleetPerformance>(cachedData);
-        }
-        
-        var performance = await _fleetService.GetFleetPerformanceAsync();
-        
-        var cacheOptions = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-        };
-        
-        await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(performance), cacheOptions);
-        
-        return performance;
-    }
+ private readonly IFleetService _fleetService;
+ private readonly IDistributedCache _cache;
+ 
+ public async Task<FleetPerformance> GetFleetPerformanceAsync()
+ {
+ const string cacheKey = "fleet_performance";
+ 
+ var cachedData = await _cache.GetStringAsync(cacheKey);
+ if (cachedData != null)
+ {
+ return JsonSerializer.Deserialize<FleetPerformance>(cachedData);
+ }
+ 
+ var performance = await _fleetService.GetFleetPerformanceAsync();
+ 
+ var cacheOptions = new DistributedCacheEntryOptions
+ {
+ AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+ };
+ 
+ await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(performance), cacheOptions);
+ 
+ return performance;
+ }
 }
 ```
 
@@ -981,31 +977,31 @@ Implementing comprehensive monitoring and observability for the maritime platfor
 // Application Insights Integration
 public class MaritimeTelemetryService
 {
-    private readonly TelemetryClient _telemetryClient;
-    
-    public void TrackVesselPosition(VesselPosition position)
-    {
-        var telemetry = new Dictionary<string, string>
-        {
-            ["VesselId"] = position.VesselId,
-            ["Latitude"] = position.Latitude.ToString(),
-            ["Longitude"] = position.Longitude.ToString(),
-            ["Speed"] = position.Speed.ToString()
-        };
-        
-        _telemetryClient.TrackEvent("VesselPositionUpdate", telemetry);
-    }
-    
-    public void TrackPerformanceMetrics(string operation, TimeSpan duration, bool success)
-    {
-        var metrics = new Dictionary<string, double>
-        {
-            ["Duration"] = duration.TotalMilliseconds,
-            ["Success"] = success ? 1 : 0
-        };
-        
-        _telemetryClient.TrackDependency("MaritimeOperation", operation, DateTime.UtcNow.Subtract(duration), duration, success);
-    }
+ private readonly TelemetryClient _telemetryClient;
+ 
+ public void TrackVesselPosition(VesselPosition position)
+ {
+ var telemetry = new Dictionary<string, string>
+ {
+ ["VesselId"] = position.VesselId,
+ ["Latitude"] = position.Latitude.ToString(),
+ ["Longitude"] = position.Longitude.ToString(),
+ ["Speed"] = position.Speed.ToString()
+ };
+ 
+ _telemetryClient.TrackEvent("VesselPositionUpdate", telemetry);
+ }
+ 
+ public void TrackPerformanceMetrics(string operation, TimeSpan duration, bool success)
+ {
+ var metrics = new Dictionary<string, double>
+ {
+ ["Duration"] = duration.TotalMilliseconds,
+ ["Success"] = success ? 1 : 0
+ };
+ 
+ _telemetryClient.TrackDependency("MaritimeOperation", operation, DateTime.UtcNow.Subtract(duration), duration, success);
+ }
 }
 ```
 
@@ -1036,56 +1032,51 @@ Designing and implementing complex data pipelines for maritime data ingestion, t
 ### **Solution Implemented**
 ```json
 {
-  "name": "MaritimeDataIngestionPipeline",
-  "properties": {
-    "activities": [
-      {
-        "name": "IngestAISData",
-        "type": "Copy",
-        "inputs": [
-          {
-            "referenceName": "EventHubSource",
-            "type": "DatasetReference"
-          }
-        ],
-        "outputs": [
-          {
-            "referenceName": "RawAISData",
-            "type": "DatasetReference"
-          }
-        ],
-        "typeProperties": {
-          "source": {
-            "type": "EventHubSource",
-            "eventHubName": "maritimeiq-platform-events"
-          },
-          "sink": {
-            "type": "ParquetSink",
-            "storeSettings": {
-              "type": "AzureBlobFSWriteSettings"
-            }
-          }
-        }
-      },
-      {
-        "name": "TransformMaritimeData",
-        "type": "DatabricksNotebook",
-        "dependsOn": [
-          {
-            "activity": "IngestAISData",
-            "dependencyConditions": ["Succeeded"]
-          }
-        ],
-        "typeProperties": {
-          "notebookPath": "/MaritimeDataTransformation",
-          "baseParameters": {
-            "inputPath": "@pipeline().parameters.inputPath",
-            "outputPath": "@pipeline().parameters.outputPath"
-          }
-        }
-      }
-    ]
-  }
+ "name": "MaritimeDataIngestionPipeline",
+ "properties": {
+ "activities": [
+ {
+ "name": "IngestAISData",
+ "type": "Copy",
+ "inputs": [
+ {
+ "referenceName": "EventHubSource",
+ "type": "DatasetReference"}
+ ],
+ "outputs": [
+ {
+ "referenceName": "RawAISData",
+ "type": "DatasetReference"}
+ ],
+ "typeProperties": {
+ "source": {
+ "type": "EventHubSource",
+ "eventHubName": "maritimeiq-platform-events"},
+ "sink": {
+ "type": "ParquetSink",
+ "storeSettings": {
+ "type": "AzureBlobFSWriteSettings"}
+ }
+ }
+ },
+ {
+ "name": "TransformMaritimeData",
+ "type": "DatabricksNotebook",
+ "dependsOn": [
+ {
+ "activity": "IngestAISData",
+ "dependencyConditions": ["Succeeded"]
+ }
+ ],
+ "typeProperties": {
+ "notebookPath": "/MaritimeDataTransformation",
+ "baseParameters": {
+ "inputPath": "@pipeline().parameters.inputPath",
+ "outputPath": "@pipeline().parameters.outputPath"}
+ }
+ }
+ ]
+ }
 }
 ```
 

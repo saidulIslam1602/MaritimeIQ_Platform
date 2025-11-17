@@ -4,12 +4,12 @@
 
 A comprehensive, enterprise-grade maritime data engineering platform featuring real-time vessel tracking, advanced C# data pipelines, **Apache Kafka streaming**, **Databricks data lakehouse**, **PySpark analytics**, environmental compliance monitoring, and AI-driven fleet optimization.
 
-## 🎯 Live Demo
+## Live Demo
 - **Dashboard**: https://polite-field-024d20903.2.azurestaticapps.net
 - **API**: https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io
 - **Swagger**: https://maritime-api-container.purplehill-29214279.norwayeast.azurecontainerapps.io/swagger
 
-## 🚢 Platform Overview
+## Platform Overview
 
 This enterprise maritime platform integrates advanced data engineering capabilities with comprehensive fleet operations, providing:
 
@@ -24,7 +24,7 @@ This enterprise maritime platform integrates advanced data engineering capabilit
 - **Comprehensive REST API** with 20+ specialized controllers
 - **Real-time data ingestion** from multiple maritime data sources
 
-## 🏗️ Architecture
+## Architecture
 
 - **Framework**: .NET 8.0 Web API with Entity Framework Core
 - **Streaming**: Apache Kafka with Confluent platform (exactly-once semantics)
@@ -40,7 +40,7 @@ This enterprise maritime platform integrates advanced data engineering capabilit
 - **Deployment**: Azure Container Apps / Kubernetes ready
 - **Monitoring**: Application Insights with custom metrics and SLA tracking
 
-## 🌟 Key Features
+## Key Features
 
 ### 🆕 Kafka Real-Time Streaming
 - **KafkaProducerService**: High-throughput producer with idempotence and Snappy compression
@@ -102,7 +102,7 @@ This enterprise maritime platform integrates advanced data engineering capabilit
 - Fuel efficiency maximization
 - Passenger comfort prioritization
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Local Development
 ```bash
@@ -143,7 +143,7 @@ maritime-voyages --input /path/to/data --output /path/to/results
 maritime-emissions --input /path/to/data --output /path/to/results
 ```
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### 🆕 Kafka Integration APIs
 - `POST /api/kafka/publish/ais` - Publish AIS data to Kafka stream
@@ -169,7 +169,7 @@ maritime-emissions --input /path/to/data --output /path/to/results
 - `GET /api/ais/analytics` - Get fleet AIS analytics
 - `POST /api/ais/process-data` - Process AIS vessel data
 
-### Environmental Monitoring API  
+### Environmental Monitoring API 
 - `GET /api/environmental/compliance-report` - Get compliance status
 - `POST /api/environmental/process-environmental-data` - Process emissions data
 - `GET /api/environmental/alerts` - Get environmental alerts
@@ -198,55 +198,55 @@ maritime-emissions --input /path/to/data --output /path/to/results
 ## 🗂️ Project Structure
 
 ```
-├── Controllers/                    # REST API controllers (20+ controllers)
-│   └── KafkaIntegrationController.cs  # NEW: Kafka streaming APIs
-├── Services/                      # Business logic services (15+ services)
-│   ├── KafkaProducerService.cs   # NEW: Kafka producer with idempotence
-│   └── KafkaConsumerService.cs   # NEW: Background consumer service
-├── DataPipelines/                 # Enterprise C# data pipeline services
-│   ├── ETL/                      # Extract, Transform, Load services
-│   ├── Streaming/                # Real-time streaming processors
-│   ├── Quality/                  # Data quality and validation
-│   ├── Orchestration/            # Pipeline orchestration
-│   └── Monitoring/               # Pipeline monitoring and SLA tracking
-├── Databricks/                    # NEW: Data lakehouse notebooks
-│   ├── Notebooks/                # PySpark notebooks for Databricks
-│   │   ├── 01_Maritime_Data_Ingestion.py
-│   │   └── 02_Maritime_Data_Processing.py
-│   └── deploy-notebooks.sh       # Automated deployment script
-├── PySpark/                       # NEW: Batch analytics jobs
-│   ├── batch_processing_voyages.py  # Voyage analytics processor
-│   ├── emission_analytics.py     # Emission compliance analytics
-│   └── setup.py                  # Python package setup
-├── Models/                        # Data models and DTOs
-├── Data/                         # Data access layer
-├── Functions/                    # Azure Functions for event processing
-├── config/                       # Configuration files
-│   ├── appsettings.json          # Development settings
-│   ├── appsettings.Production.json # Production settings
-│   └── kafka-databricks-config.json  # NEW: Kafka & Databricks config
-├── deployment/                   # Deployment configurations
-│   ├── docker/                   # Docker files and compose
-│   │   └── docker-compose.kafka.yml  # NEW: Local Kafka stack
-│   ├── kubernetes/               # K8s manifests
-│   ├── logic-apps/               # Azure Logic Apps workflows
-│   └── monitoring/               # Application Insights configuration
-├── .github/workflows/             # NEW: GitHub Actions CI/CD
-│   ├── deploy-kafka-integration.yml  # Auto-deploy Kafka services
-│   └── databricks-deploy.yml     # Auto-sync Databricks notebooks
-├── devops/                       # CI/CD and automation
-│   ├── pipelines/                # Pipeline definitions
-│   └── scripts/                  # Deployment scripts
-├── analytics/                    # Business intelligence
-│   ├── powerbi/                  # Power BI configurations
-│   └── stream-analytics/         # Stream processing
-├── requirements.txt              # NEW: Python dependencies
-└── docs/                         # Documentation
+├── Controllers/ # REST API controllers (20+ controllers)
+│ └── KafkaIntegrationController.cs # NEW: Kafka streaming APIs
+├── Services/ # Business logic services (15+ services)
+│ ├── KafkaProducerService.cs # NEW: Kafka producer with idempotence
+│ └── KafkaConsumerService.cs # NEW: Background consumer service
+├── DataPipelines/ # Enterprise C# data pipeline services
+│ ├── ETL/ # Extract, Transform, Load services
+│ ├── Streaming/ # Real-time streaming processors
+│ ├── Quality/ # Data quality and validation
+│ ├── Orchestration/ # Pipeline orchestration
+│ └── Monitoring/ # Pipeline monitoring and SLA tracking
+├── Databricks/ # NEW: Data lakehouse notebooks
+│ ├── Notebooks/ # PySpark notebooks for Databricks
+│ │ ├── 01_Maritime_Data_Ingestion.py
+│ │ └── 02_Maritime_Data_Processing.py
+│ └── deploy-notebooks.sh # Automated deployment script
+├── PySpark/ # NEW: Batch analytics jobs
+│ ├── batch_processing_voyages.py # Voyage analytics processor
+│ ├── emission_analytics.py # Emission compliance analytics
+│ └── setup.py # Python package setup
+├── Models/ # Data models and DTOs
+├── Data/ # Data access layer
+├── Functions/ # Azure Functions for event processing
+├── config/ # Configuration files
+│ ├── appsettings.json # Development settings
+│ ├── appsettings.Production.json # Production settings
+│ └── kafka-databricks-config.json # NEW: Kafka & Databricks config
+├── deployment/ # Deployment configurations
+│ ├── docker/ # Docker files and compose
+│ │ └── docker-compose.kafka.yml # NEW: Local Kafka stack
+│ ├── kubernetes/ # K8s manifests
+│ ├── logic-apps/ # Azure Logic Apps workflows
+│ └── monitoring/ # Application Insights configuration
+├── .github/workflows/ # NEW: GitHub Actions CI/CD
+│ ├── deploy-kafka-integration.yml # Auto-deploy Kafka services
+│ └── databricks-deploy.yml # Auto-sync Databricks notebooks
+├── devops/ # CI/CD and automation
+│ ├── pipelines/ # Pipeline definitions
+│ └── scripts/ # Deployment scripts
+├── analytics/ # Business intelligence
+│ ├── powerbi/ # Power BI configurations
+│ └── stream-analytics/ # Stream processing
+├── requirements.txt # NEW: Python dependencies
+└── docs/ # Documentation
 ```
 
 📋 **See [PROJECT-STRUCTURE.md](docs/PROJECT-STRUCTURE.md) for detailed folder organization.**
 
-## 🌊 Maritime Features
+## Maritime Features
 
 - **Enterprise data pipelines** for real-time maritime data processing
 - **Real-time vessel tracking** with Event Hub integration and concurrent processing
@@ -259,7 +259,7 @@ maritime-emissions --input /path/to/data --output /path/to/results
 - **Security monitoring** with event logging and threat detection
 - **SLA tracking** with Application Insights integration and custom metrics
 
-## 🚀 Production Deployment
+## Production Deployment
 
 The platform includes comprehensive deployment automation:
 - **Azure DevOps pipeline** with security scanning and automated testing
@@ -270,7 +270,7 @@ The platform includes comprehensive deployment automation:
 - **Application Insights** for comprehensive monitoring and alerting
 - **Circuit breaker patterns** for fault tolerance and resilience
 
-## 💼 Enterprise Features
+## Enterprise Features
 
 - **Advanced C# Data Engineering**: Real-time ETL, streaming, and quality services
 - **Fault Tolerance**: Circuit breaker patterns with exponential backoff
@@ -279,7 +279,7 @@ The platform includes comprehensive deployment automation:
 - **Security**: Comprehensive event logging and threat detection
 - **Scalability**: Event Hub partitioning and auto-scaling capabilities
 
-## 📊 Technical Highlights
+## Technical Highlights
 
 ### Real-Time Streaming
 - **Kafka Throughput**: 500+ messages/second with exactly-once semantics
@@ -312,24 +312,24 @@ The platform includes comprehensive deployment automation:
 - **ML model versioning** with MLflow tracking and deployment
 - **Cost optimization** with spot instances and auto-scaling
 
-## 🎯 Use Cases
+## Use Cases
 
-### Real-Time Fleet Monitoring 🚢
+### Real-Time Fleet Monitoring 
 Stream AIS positions via Kafka → Process in Databricks (< 10s latency) → Display on live dashboards
 
-### Environmental Compliance 🌍
+### Environmental Compliance 
 Continuous CO2/NOx/SOx monitoring → IMO 2030 compliance checks → Automated alerts for breaches
 
-### Predictive Maintenance 🔧
+### Predictive Maintenance 
 ML models predict failures 7-14 days ahead → Prevent downtime → Optimize scheduling (20-30% cost reduction)
 
-### Route Optimization 🗺️
+### Route Optimization 
 Analyze 1M+ historical voyages with PySpark → Identify optimal speeds → Reduce fuel consumption
 
-### Business Intelligence 📊
+### Business Intelligence 
 Daily/weekly/monthly automated KPIs → Power BI dashboards → Trend analysis & forecasting
 
-## 🔗 Related Documentation
+## Related Documentation
 - **Kafka Integration Guide**: `config/kafka-databricks-config.json`
 - **Databricks Notebooks**: `Databricks/Notebooks/`
 - **PySpark Jobs**: `PySpark/` directory with CLI tools

@@ -20,14 +20,12 @@ az login
 
 ```bash
 az account list --output table
-az account set --subscription "your-subscription-id"
-```
+az account set --subscription "your-subscription-id"```
 
 ### 3. Create Resource Group (if needed)
 
 ```bash
-az group create --name "maritime-platform-rg" --location "East US"
-```
+az group create --name "maritime-platform-rg"--location "East US"```
 
 ### 4. Deploy the Infrastructure
 
@@ -36,12 +34,11 @@ Navigate to the deployment directory and deploy:
 ```bash
 cd deployment/azure
 az deployment group create \
-  --resource-group "maritime-platform-rg" \
-  --template-file azure-infrastructure.json \
-  --parameters appName="maritime-platform" \
-               uniqueId="$(date +%s | tail -c 6)" \
-               sqlAdminPassword="YourSecurePassword123!"
-```
+ --resource-group "maritime-platform-rg"\
+ --template-file azure-infrastructure.json \
+ --parameters appName="maritime-platform"\
+ uniqueId="$(date +%s | tail -c 6)"\
+ sqlAdminPassword="YourSecurePassword123!"```
 
 ### Alternative: Use Azure Portal
 
@@ -51,11 +48,11 @@ az deployment group create \
 4. Copy and paste the contents of `azure-infrastructure.json`
 5. **Save** and **Purchase**
 6. Fill in the parameters:
-   - **Resource Group**: Select or create new
-   - **App Name**: `maritime-platform`
-   - **Unique Id**: Use a 5-6 digit number (e.g., `123456`)
-   - **Sql Admin Password**: Strong password for SQL server
-   - **Location**: Select your preferred region
+ - **Resource Group**: Select or create new
+ - **App Name**: `maritime-platform`
+ - **Unique Id**: Use a 5-6 digit number (e.g., `123456`)
+ - **Sql Admin Password**: Strong password for SQL server
+ - **Location**: Select your preferred region
 
 ## Deployed Resources
 
@@ -64,7 +61,7 @@ The template will create:
 - **SQL Server & Database**: For maritime data storage
 - **Storage Account**: Blob storage for data files
 - **Event Hub Namespace**: Real-time data streaming
-- **Stream Analytics Job**: Data processing pipeline  
+- **Stream Analytics Job**: Data processing pipeline 
 - **Application Insights**: Monitoring and telemetry
 - **Key Vault**: Secret management
 - **Service Bus**: Message queuing
@@ -84,9 +81,8 @@ Check deployment status:
 
 ```bash
 az deployment group show \
-  --resource-group "maritime-platform-rg" \
-  --name "azure-infrastructure"
-```
+ --resource-group "maritime-platform-rg"\
+ --name "azure-infrastructure"```
 
 ## Troubleshooting
 
@@ -100,7 +96,7 @@ az deployment group show \
 To remove all deployed resources:
 
 ```bash
-az group delete --name "maritime-platform-rg" --yes --no-wait
+az group delete --name "maritime-platform-rg"--yes --no-wait
 ```
 
 ## Security Notes
@@ -138,9 +134,9 @@ npm run export
 
 # Deploy to App Service (requires existing App Service)
 az webapp deployment source config-zip \
-  --resource-group "maritime-platform-rg" \
-  --name "your-app-service-name" \
-  --src out.zip
+ --resource-group "maritime-platform-rg"\
+ --name "your-app-service-name"\
+ --src out.zip
 ```
 
 ### Option 3: Local Development
@@ -154,11 +150,11 @@ npm run dev
 
 ### Dashboard Features
 
-- 🌊 **Real-time Fleet Monitoring**: Live vessel tracking and status
-- 📊 **Environmental Compliance**: Emissions and environmental data
-- 🗺️ **Route Optimization**: Interactive maps with route insights
-- 📈 **System Health**: Infrastructure monitoring dashboards
-- 🔔 **Alert Management**: Real-time notifications and alerts
+- **Real-time Fleet Monitoring**: Live vessel tracking and status
+- **Environmental Compliance**: Emissions and environmental data
+- **Route Optimization**: Interactive maps with route insights
+- **System Health**: Infrastructure monitoring dashboards
+- **Alert Management**: Real-time notifications and alerts
 
 ## Next Steps
 
