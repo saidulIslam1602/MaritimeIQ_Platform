@@ -6,6 +6,9 @@ sql_password.txt
 *.log
 *.tmp
 
+# Concept and documentation (local only)
+Concept/
+
 # Build artifacts
 bin/
 obj/
