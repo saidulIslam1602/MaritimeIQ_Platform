@@ -32,24 +32,34 @@
  "WorkspaceUrl": "https://adb-xxxxx.azuredatabricks.net",
  "Token": "{FromKeyVault}",
  "ClusterId": "0000-000000-xxxxxxxx",
- "Notebooks": {
- "DataIngestion": "/Workspace/MaritimeIQ/01_Maritime_Data_Ingestion",
- "DataProcessing": "/Workspace/MaritimeIQ/02_Maritime_Data_Processing",
- "MLModels": "/Workspace/MaritimeIQ/03_ML_Predictive_Maintenance"},
- "DeltaLake": {
- "MountPoint": "/mnt/maritime",
- "Tables": {
- "AISPositions": "/mnt/maritime/delta/ais_positions",
- "EnvironmentalSensors": "/mnt/maritime/delta/environmental_sensors",
- "Voyages": "/mnt/maritime/delta/voyages",
- "Alerts": "/mnt/maritime/delta/alerts",
- "Analytics": {
- "EmissionTrends": "/mnt/maritime/delta/analytics/emission_trends",
- "VesselPerformance": "/mnt/maritime/delta/analytics/vessel_performance",
- "MaintenancePredictions": "/mnt/maritime/delta/analytics/maintenance_predictions",
- "FuelEfficiency": "/mnt/maritime/delta/analytics/fuel_efficiency"}
- }
- },
+        "Notebooks": {
+            "BronzeIngestion": "/Workspace/MaritimeIQ/01_Maritime_Data_Ingestion",
+            "SilverTransformation": "/Workspace/MaritimeIQ/02_Silver_Layer_Transformation", 
+            "GoldProcessing": "/Workspace/MaritimeIQ/02_Maritime_Data_Processing",
+            "MLModels": "/Workspace/MaritimeIQ/03_ML_Predictive_Maintenance"},
+    "DeltaLake": {
+        "MountPoint": "/mnt/maritime",
+        "Bronze": {
+            "AISPositions": "/mnt/maritime/delta/ais_positions",
+            "EnvironmentalSensors": "/mnt/maritime/delta/environmental_sensors",
+            "Voyages": "/mnt/maritime/delta/voyages",
+            "Alerts": "/mnt/maritime/delta/alerts"
+        },
+        "Silver": {
+            "AISPositions": "/mnt/datalake/maritime/silver/ais_positions",
+            "EnvironmentalSensors": "/mnt/datalake/maritime/silver/environmental_sensors",
+            "Voyages": "/mnt/datalake/maritime/silver/voyages",
+            "Alerts": "/mnt/datalake/maritime/silver/alerts"
+        },
+        "Gold": {
+            "EmissionTrends": "/mnt/datalake/maritime/gold/emission_trends",
+            "VesselPerformance": "/mnt/datalake/maritime/gold/vessel_performance",
+            "MaintenancePredictions": "/mnt/datalake/maritime/gold/maintenance_predictions",
+            "FuelEfficiency": "/mnt/datalake/maritime/gold/fuel_efficiency",
+            "FleetKPIs": "/mnt/datalake/maritime/gold/fleet_kpis",
+            "RouteAnalytics": "/mnt/datalake/maritime/gold/route_analytics"
+        }
+    },
  "SparkConfig": {
  "spark.sql.adaptive.enabled": "true",
  "spark.sql.adaptive.coalescePartitions.enabled": "true",

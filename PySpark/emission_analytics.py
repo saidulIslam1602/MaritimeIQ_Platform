@@ -33,11 +33,21 @@ class EmissionAnalytics:
  
  logger.info("Emission Analytics initialized")
  
- def load_environmental_data(self, path):
- """Load environmental sensor data"""logger.info(f"Loading environmental data from {path}")
- df = self.spark.read.format("delta").load(path)
- logger.info(f"Loaded {df.count():,} sensor readings")
- return df
+def load_environmental_data(self, path):
+"""Load environmental sensor data from Silver layer with fallback to Bronze"""
+# Try Silver layer first
+silver_path = "/mnt/datalake/maritime/silver/environmental_sensors"
+bronze_path = path  # Use provided path as Bronze fallback
+
+try:
+    df = self.spark.read.format("delta").load(silver_path)
+    logger.info(f"✅ Loaded environmental data from Silver layer: {silver_path}")
+except Exception as e:
+    logger.warning(f"Silver layer not found, using Bronze layer: {bronze_path}")
+    df = self.spark.read.format("delta").load(bronze_path)
+    
+logger.info(f"Loaded {df.count():,} sensor readings")
+return df
  
  def calculate_compliance_metrics(self, df_env):
  """Calculate emissions compliance against IMO standards

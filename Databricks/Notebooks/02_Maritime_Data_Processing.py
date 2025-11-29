@@ -1,14 +1,17 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Maritime Data Processing with PySpark
-# MAGIC ## Advanced analytics and ML on vessel and environmental data
+# MAGIC # Maritime Data Processing - GOLD LAYER
+# MAGIC ## Advanced analytics and ML on cleaned Silver layer data
 # MAGIC 
 # MAGIC **Capabilities:**
-# MAGIC - Batch processing of voyage data
+# MAGIC - Batch processing of voyage data from Silver layer
 # MAGIC - Fleet-wide aggregations and KPIs
 # MAGIC - Time-series analysis of emissions
 # MAGIC - Predictive maintenance ML models
 # MAGIC - Route optimization analytics
+# MAGIC 
+# MAGIC **Input:** Silver layer tables from `/mnt/datalake/maritime/silver/`
+# MAGIC **Output:** Gold layer aggregations and ML features
 
 # COMMAND ----------
 
@@ -48,23 +51,48 @@ print(f"Spark version: {spark.version}")
 
 # COMMAND ----------
 
-# Delta Lake paths
-DELTA_PATHS = {
- "ais": "/mnt/maritime/delta/ais_positions",
- "environmental": "/mnt/maritime/delta/environmental_sensors",
- "voyages": "/mnt/maritime/delta/voyages"}
+# Silver Layer paths (Gold layer reads from Silver, not Bronze)
+SILVER_PATHS = {
+    "ais": "/mnt/datalake/maritime/silver/ais_positions",
+    "environmental": "/mnt/datalake/maritime/silver/environmental_sensors", 
+    "voyages": "/mnt/datalake/maritime/silver/voyages"
+}
+
+# Fallback to Bronze paths for development/testing
+BRONZE_PATHS = {
+    "ais": "/mnt/maritime/delta/ais_positions",
+    "environmental": "/mnt/maritime/delta/environmental_sensors",
+    "voyages": "/mnt/maritime/delta/voyages"
+}
+
+# Load data from Silver layer (with fallback to Bronze for development)
+def load_data_with_fallback(table_name, silver_path, bronze_path):
+    """Load data from Silver layer with fallback to Bronze if Silver doesn't exist"""
+    try:
+        df = spark.read.format("delta").load(silver_path)
+        print(f"✅ Loaded {table_name} from Silver layer: {silver_path}")
+        return df, "silver"
+    except Exception as e:
+        print(f"⚠️  Silver layer not found for {table_name}, falling back to Bronze: {bronze_path}")
+        try:
+            df = spark.read.format("delta").load(bronze_path)
+            print(f"✅ Loaded {table_name} from Bronze layer: {bronze_path}")
+            return df, "bronze"
+        except Exception as e2:
+            print(f"❌ Failed to load {table_name} from both Silver and Bronze layers")
+            raise e2
 
 # Load AIS data
-df_ais = spark.read.format("delta").load(DELTA_PATHS["ais"])
-print(f"AIS Records loaded: {df_ais.count():,}")
+df_ais, ais_source = load_data_with_fallback("AIS", SILVER_PATHS["ais"], BRONZE_PATHS["ais"])
+print(f"AIS Records loaded: {df_ais.count():,} (from {ais_source} layer)")
 
-# Load environmental data
-df_env = spark.read.format("delta").load(DELTA_PATHS["environmental"])
-print(f"Environmental Records loaded: {df_env.count():,}")
+# Load environmental data  
+df_env, env_source = load_data_with_fallback("Environmental", SILVER_PATHS["environmental"], BRONZE_PATHS["environmental"])
+print(f"Environmental Records loaded: {df_env.count():,} (from {env_source} layer)")
 
 # Load voyage data
-df_voyages = spark.read.format("delta").load(DELTA_PATHS["voyages"])
-print(f"Voyage Records loaded: {df_voyages.count():,}")
+df_voyages, voyage_source = load_data_with_fallback("Voyages", SILVER_PATHS["voyages"], BRONZE_PATHS["voyages"])
+print(f"Voyage Records loaded: {df_voyages.count():,} (from {voyage_source} layer)")
 
 # COMMAND ----------
 

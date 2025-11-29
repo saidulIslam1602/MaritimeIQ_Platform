@@ -1,13 +1,17 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Maritime Data Ingestion Pipeline
-# MAGIC ## Ingest historical vessel and sensor data into Delta Lake
+# MAGIC # Maritime Data Ingestion Pipeline - BRONZE LAYER
+# MAGIC ## Ingest historical vessel and sensor data into Delta Lake Bronze Layer
 # MAGIC 
 # MAGIC **Features:**
 # MAGIC - Read from Azure Event Hubs / Kafka
-# MAGIC - Schema validation and data quality checks
-# MAGIC - Write to Delta Lake with partitioning
+# MAGIC - Basic schema validation and data quality checks
+# MAGIC - Write to Bronze layer (Delta Lake) with partitioning
 # MAGIC - Support for batch and streaming ingestion
+# MAGIC - Preserve raw data for auditing and replay
+# MAGIC 
+# MAGIC **Output:** Bronze layer tables in `/mnt/maritime/delta/`
+# MAGIC **Next Step:** Silver layer transformation (`02_Silver_Layer_Transformation.py`)
 
 # COMMAND ----------
 
@@ -98,12 +102,12 @@ config = {
  "kafka.security.protocol": "SASL_SSL",
  "kafka.sasl.mechanism": "PLAIN"},
  
- # Delta Lake paths
- "delta_lake": {
- "ais_data": "/mnt/maritime/delta/ais_positions",
- "environmental_data": "/mnt/maritime/delta/environmental_sensors",
- "voyage_data": "/mnt/maritime/delta/voyages",
- "alerts": "/mnt/maritime/delta/alerts"},
+# Delta Lake paths - Bronze layer (aligned with pipeline)
+"delta_lake": {
+"ais_data": "/mnt/maritime/delta/ais_positions",  # Bronze layer path
+"environmental_data": "/mnt/maritime/delta/environmental_sensors",  # Bronze layer path
+"voyage_data": "/mnt/maritime/delta/voyages",  # Bronze layer path
+"alerts": "/mnt/maritime/delta/alerts"},  # Bronze layer path
  
  # Data quality thresholds
  "quality": {
@@ -204,16 +208,18 @@ def ingest_ais_batch_data(source_path, target_delta_path):
  .mode("append") \
  .parquet(f"{target_delta_path}_invalid")
  
- # Add metadata
- df_final = add_metadata_columns(df_valid)
- 
- # Write to Delta Lake with partitioning
- df_final.write \
- .format("delta") \
- .mode("append") \
- .partitionBy("year", "month", "day") \
- .option("mergeSchema", "true") \
- .save(target_delta_path)
+# Add metadata
+df_final = add_metadata_columns(df_valid)
+
+# Write to Bronze layer (Delta Lake) with partitioning
+print(f"Writing to Bronze layer: {target_delta_path}")
+df_final.write \
+.format("delta") \
+.mode("append") \
+.partitionBy("year", "month", "day") \
+.option("mergeSchema", "true") \
+.option("dataChange", "false") \
+.save(target_delta_path)
  
  valid_count = df_valid.count()
  print(f"Successfully ingested {valid_count} AIS records")
@@ -262,13 +268,15 @@ def ingest_kafka_stream_ais():
  .withColumn("month", month(col("Timestamp"))) \
  .withColumn("day", dayofmonth(col("Timestamp")))
  
- # Write to Delta Lake with checkpointing
- query = df_enriched.writeStream \
- .format("delta") \
- .outputMode("append") \
- .option("checkpointLocation", f"{config['delta_lake']['ais_data']}/_checkpoint") \
- .partitionBy("year", "month", "day") \
- .start(config["delta_lake"]["ais_data"])
+# Write to Bronze layer (Delta Lake) with checkpointing
+print(f"Starting streaming to Bronze layer: {config['delta_lake']['ais_data']}")
+query = df_enriched.writeStream \
+.format("delta") \
+.outputMode("append") \
+.option("checkpointLocation", f"{config['delta_lake']['ais_data']}/_checkpoint") \
+.option("dataChange", "false") \
+.partitionBy("year", "month", "day") \
+.start(config["delta_lake"]["ais_data"])
  
  print(f"Streaming query started: {query.id}")
  return query
@@ -312,12 +320,15 @@ def ingest_environmental_batch_data(source_path, target_delta_path):
  .otherwise("Review Required")
  )
  
- # Write to Delta
- df_enriched.write \
- .format("delta") \
- .mode("append") \
- .partitionBy("year", "month") \
- .save(target_delta_path)
+# Write to Bronze layer (Delta Lake)
+print(f"Writing environmental data to Bronze layer: {target_delta_path}")
+df_enriched.write \
+.format("delta") \
+.mode("append") \
+.partitionBy("year", "month") \
+.option("mergeSchema", "true") \
+.option("dataChange", "false") \
+.save(target_delta_path)
  
  count = df_valid.count()
  print(f"Successfully ingested {count} environmental sensor records")

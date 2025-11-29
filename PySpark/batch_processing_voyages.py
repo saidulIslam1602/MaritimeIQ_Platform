@@ -42,12 +42,19 @@ class MaritimeVoyageBatchProcessor:
  self.spark.sparkContext.setLogLevel("WARN")
  logger.info(f"Spark session initialized - Version: {self.spark.version}")
  
- def load_voyage_data(self, input_path, start_date=None, end_date=None):
- """Load voyage data from Delta Lake or Parquet
- """logger.info(f"Loading voyage data from {input_path}")
- 
- # Read data
- df = self.spark.read.format("delta").load(input_path)
+def load_voyage_data(self, input_path, start_date=None, end_date=None):
+"""Load voyage data from Silver layer with fallback to Bronze
+"""
+# Try Silver layer first
+silver_path = "/mnt/datalake/maritime/silver/voyages"
+bronze_path = input_path  # Use provided path as Bronze fallback
+
+try:
+    df = self.spark.read.format("delta").load(silver_path)
+    logger.info(f"✅ Loaded voyage data from Silver layer: {silver_path}")
+except Exception as e:
+    logger.warning(f"Silver layer not found, using Bronze layer: {bronze_path}")
+    df = self.spark.read.format("delta").load(bronze_path)
  
  # Apply date filter if provided
  if start_date:

@@ -21,7 +21,7 @@
  }
  ],
  "typeProperties": {
- "notebookPath": "/MaritimeIQ/Lakehouse/01_Bronze_Layer_Ingestion",
+                "notebookPath": "/MaritimeIQ/Lakehouse/01_Maritime_Data_Ingestion",
  "baseParameters": {
  "session_id": "@variables('LakehouseSessionId')",
  "ingestion_mode": "incremental",
@@ -65,7 +65,7 @@
  }
  ],
  "typeProperties": {
- "notebookPath": "/MaritimeIQ/Lakehouse/03_Gold_Layer_Aggregation",
+                "notebookPath": "/MaritimeIQ/Lakehouse/02_Maritime_Data_Processing",
  "baseParameters": {
  "session_id": "@variables('LakehouseSessionId')",
  "silver_path": "/mnt/datalake/maritime/silver",
