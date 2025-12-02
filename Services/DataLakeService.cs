@@ -119,7 +119,7 @@ namespace MaritimeIQ.Platform.Services
             }, nameof(ListBatchFilesAsync));
         }
 
-        public async Task<bool> HealthCheckAsync()
+        public override async Task<bool> HealthCheckAsync()
         {
             return await ExecuteOperationAsync(async () =>
             {
@@ -133,7 +133,7 @@ namespace MaritimeIQ.Platform.Services
                 }
                 catch (Exception ex)
                 {
-                    LogError($"Data Lake health check failed: {ex.Message}");
+                    LogError(ex, nameof(HealthCheckAsync));
                     return false;
                 }
             }, nameof(HealthCheckAsync));

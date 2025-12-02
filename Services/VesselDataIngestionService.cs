@@ -48,10 +48,10 @@ namespace MaritimeIQ.Platform.Services
  {
  return await ExecuteOperationAsync(async () =>
  {
- LogInformation($"Processing AIS data batch {aisDataBatch.BatchId} with {aisDataBatch.Messages.Count} messages");
+ LogInformation($"Processing AIS data batch {aisDataBatch.BatchId} with {aisDataBatch.Messages.Length} messages");
  
  // Track AIS data processing
- _metricsCollector?.IncrementEventCounter("ais_processing", aisDataBatch.Messages.Count);
+ _metricsCollector?.IncrementEventCounter("ais_processing", aisDataBatch.Messages.Length);
  
  await Task.Delay(150);
  
@@ -59,7 +59,7 @@ namespace MaritimeIQ.Platform.Services
  {
  BatchId = aisDataBatch.BatchId,
  Success = true,
- RecordsProcessed = aisDataBatch.Messages.Count,
+ RecordsProcessed = aisDataBatch.Messages.Length,
  RecordsRejected = 0,
  VesselsTracked = aisDataBatch.Messages.Select(m => m.MMSI).Distinct().Count(),
  ProcessingTime = TimeSpan.FromMilliseconds(150)

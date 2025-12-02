@@ -40,6 +40,10 @@
     <Content Remove="Functions\**" />
     <EmbeddedResource Remove="Functions\**" />
     <None Remove="Functions\**" />
+    <Compile Remove="Tests\**" />
+    <Content Remove="Tests\**" />
+    <EmbeddedResource Remove="Tests\**" />
+    <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
