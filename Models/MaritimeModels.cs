@@ -103,10 +103,12 @@ namespace MaritimeIQ.Platform.Models
  {
  public int Id { get; set; }
  
- [Required]
- public string Name { get; set; } = string.Empty; // e.g., "Bergen-Kirkenes"public string Description { get; set; } = string.Empty;
+	[Required]
+	public string Name { get; set; } = string.Empty; // e.g., "Bergen-Kirkenes"
+	
+	public string Description { get; set; } = string.Empty;
  
- public List<Port> Ports { get; set; } = new List<Port>();
+	public List<Port> Ports { get; set; } = new List<Port>();
  
  public TimeSpan EstimatedDuration { get; set; }
  
@@ -130,10 +132,12 @@ namespace MaritimeIQ.Platform.Models
  {
  public int Id { get; set; }
  
- [Required]
- public string Name { get; set; } = string.Empty; // e.g., "Bergen", "Tromsø"public string UNLocode { get; set; } = string.Empty; // UN/LOCODE (e.g., "NOBGO"for Bergen)
+	[Required]
+	public string Name { get; set; } = string.Empty; // e.g., "Bergen", "Tromsø"
+	
+	public string UNLocode { get; set; } = string.Empty; // UN/LOCODE (e.g., "NOBGO"for Bergen)
  
- public Position Position { get; set; } = new Position();
+	public Position Position { get; set; } = new Position();
  
  public List<Terminal> Terminals { get; set; } = new List<Terminal>();
  
@@ -501,9 +505,11 @@ namespace MaritimeIQ.Platform.Models
  [MaxLength(50)]
  public string Country { get; set; } = "Norway";
  
- [MaxLength(50)]
- public string Region { get; set; } = string.Empty; // e.g., "Northern Norway", "Western Norway"public bool HasPassengerFacilities { get; set; }
- public bool HasCargoFacilities { get; set; }
+	[MaxLength(50)]
+	public string Region { get; set; } = string.Empty; // e.g., "Northern Norway", "Western Norway"
+	
+	public bool HasPassengerFacilities { get; set; }
+	public bool HasCargoFacilities { get; set; }
  public bool HasFuelStation { get; set; }
  public bool HasMaintenance { get; set; }
  

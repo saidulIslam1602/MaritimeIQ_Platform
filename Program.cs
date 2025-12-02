@@ -171,9 +171,11 @@ builder.Services.Configure<KeyVaultConfiguration>(keyVaultSection);
 
 if (!string.IsNullOrWhiteSpace(keyVaultSection["VaultUri"]))
 {
- builder.Services.AddSingleton<IKeyVaultService, KeyVaultService>();
+	builder.Services.AddSingleton<IKeyVaultService, KeyVaultService>();
 }
 
+// Configure PowerBI
+builder.Services.Configure<PowerBIConfiguration>(builder.Configuration.GetSection("PowerBI"));
 builder.Services.AddScoped<IPowerBIWorkspaceService, PowerBIWorkspaceService>();
 
 // Add health checks for Azure services
