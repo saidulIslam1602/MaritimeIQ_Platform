@@ -9,9 +9,44 @@
 # MAGIC - Write to Bronze layer (Delta Lake) with partitioning
 # MAGIC - Support for batch and streaming ingestion
 # MAGIC - Preserve raw data for auditing and replay
+# MAGIC - **NEW**: Parameterized execution for Data Factory integration
 # MAGIC 
 # MAGIC **Output:** Bronze layer tables in `/mnt/maritime/delta/`
 # MAGIC **Next Step:** Silver layer transformation (`02_Silver_Layer_Transformation.py`)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 0. Parameter Setup for Data Factory Integration
+
+# COMMAND ----------
+
+# Setup parameters for external execution (Data Factory, API calls, etc.)
+dbutils.widgets.text("source_path", "/mnt/maritime/raw/ais_history/*.csv", "Source Data Path")
+dbutils.widgets.text("target_path", "/mnt/maritime/delta/ais_positions", "Target Delta Path")
+dbutils.widgets.text("processing_mode", "batch", "Processing Mode (batch/streaming)")
+dbutils.widgets.text("session_id", "", "Session ID for tracking")
+dbutils.widgets.text("data_type", "ais", "Data Type (ais/environmental/voyages)")
+dbutils.widgets.text("data_quality_checks", "true", "Enable Data Quality Checks")
+dbutils.widgets.text("enable_optimization", "false", "Enable Post-Processing Optimization")
+
+# Get parameters
+source_path = dbutils.widgets.get("source_path")
+target_path = dbutils.widgets.get("target_path") 
+processing_mode = dbutils.widgets.get("processing_mode")
+session_id = dbutils.widgets.get("session_id") or f"session-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+data_type = dbutils.widgets.get("data_type")
+data_quality_checks = dbutils.widgets.get("data_quality_checks").lower() == "true"
+enable_optimization = dbutils.widgets.get("enable_optimization").lower() == "true"
+
+print(f" Maritime Data Ingestion Started")
+print(f" Source Path: {source_path}")
+print(f" Target Path: {target_path}")
+print(f" Processing Mode: {processing_mode}")
+print(f" Session ID: {session_id}")
+print(f" Data Type: {data_type}")
+print(f" Quality Checks: {data_quality_checks}")
+print(f" Optimization: {enable_optimization}")
 
 # COMMAND ----------
 
@@ -25,19 +60,27 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from delta.tables import *
 import json
+from datetime import datetime
+import uuid
 
-# Initialize Spark with Delta Lake
+# Initialize Spark with Delta Lake and enhanced configuration
 spark = SparkSession.builder \
- .appName("MaritimeIQ-DataIngestion") \
+ .appName(f"MaritimeIQ-DataIngestion-{session_id}") \
  .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
  .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
+ .config("spark.sql.adaptive.enabled", "true") \
+ .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
+ .config("spark.sql.shuffle.partitions", "200") \
  .getOrCreate()
 
 # Set logging level
 spark.sparkContext.setLogLevel("WARN")
 
-print("Spark session initialized with Delta Lake support")
-print(f"Spark version: {spark.version}")
+print("✅ Spark session initialized with Delta Lake support")
+print(f"📊 Spark version: {spark.version}")
+print(f"🔖 Application Name: MaritimeIQ-DataIngestion-{session_id}")
+print(f"⚡ Adaptive Query Execution: Enabled")
+print(f"🔀 Shuffle Partitions: 200")
 
 # COMMAND ----------
 
@@ -464,5 +507,84 @@ Delta Lake Tables Created:
 
 Ready to process maritime data at scale! 
 """)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 10. Main Execution Logic for Data Factory Integration
+
+# COMMAND ----------
+
+def main_execution():
+    """
+    Main execution function for parameterized data processing
+    Supports both API-generated files and Event Hub archives
+    """
+    print(f"🚀 Starting main execution for {data_type} data processing")
+    print(f"📁 Processing files from: {source_path}")
+    
+    try:
+        if processing_mode.lower() == "batch":
+            if data_type.lower() == "ais":
+                # Process AIS batch files (CSV format from API or archives)
+                print("📊 Processing AIS batch data...")
+                df_result = ingest_ais_batch_data(source_path, target_path)
+                
+            elif data_type.lower() == "environmental":
+                # Process environmental batch files (JSON format)
+                print("🌱 Processing Environmental batch data...")
+                df_result = ingest_environmental_batch_data(source_path, target_path)
+                
+            else:
+                print(f"❌ Unsupported data type: {data_type}")
+                return False
+                
+            # Optional optimization after batch processing
+            if enable_optimization:
+                print("🔧 Running post-processing optimization...")
+                optimize_delta_tables()
+                
+            # Generate data quality report if enabled
+            if data_quality_checks:
+                print("📋 Generating data quality report...")
+                quality_report = generate_data_quality_report(df_result, f"{data_type}_batch_{session_id}")
+                
+            print(f"✅ Batch processing completed successfully for {data_type}")
+            return True
+            
+        elif processing_mode.lower() == "streaming":
+            print("🌊 Starting streaming ingestion...")
+            if data_type.lower() == "ais":
+                query = ingest_kafka_stream_ais()
+                print(f"📡 Streaming query started: {query.id}")
+                return True
+            else:
+                print(f"❌ Streaming not supported for data type: {data_type}")
+                return False
+                
+        else:
+            print(f"❌ Unsupported processing mode: {processing_mode}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error in main execution: {str(e)}")
+        raise e
+
+# Execute main logic if running in batch mode or called from Data Factory
+if processing_mode.lower() == "batch":
+    print("🎯 Executing batch processing logic...")
+    success = main_execution()
+    
+    if success:
+        print(f"🎉 Maritime data ingestion completed successfully!")
+        print(f"📊 Session ID: {session_id}")
+        print(f"📁 Data written to: {target_path}")
+        print(f"⏰ Processing completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    else:
+        print(f"💥 Maritime data ingestion failed!")
+        dbutils.notebook.exit("FAILED")
+        
+else:
+    print("⏸️ Notebook loaded in interactive mode. Use main_execution() to run batch processing.")
 
 # COMMAND ----------

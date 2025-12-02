@@ -1,0 +1,227 @@
+{
+    "name": "hourly-batch-processing-pipeline",
+    "properties": {
+        "description": "Hourly batch processing pipeline for accumulated maritime data files - Bridges API/EventHub data to Databricks batch processing",
+        "activities": [
+            {
+                "name": "Check_Available_Files",
+                "type": "GetMetadata",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.00:05:00",
+                    "retry": 2,
+                    "retryIntervalInSeconds": 30
+                },
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "AISBatchFiles",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "folderPath": "@concat('ais_history/', formatDateTime(utcnow(), 'yyyy/MM/dd/HH'))"
+                        }
+                    },
+                    "fieldList": ["childItems", "itemName", "itemType"]
+                }
+            },
+            {
+                "name": "Process_AIS_Batch_Files",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "Check_Available_Files",
+                        "dependencyConditions": ["Succeeded"]
+                    }
+                ],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@greater(length(activity('Check_Available_Files').output.childItems), 0)",
+                        "type": "Expression"
+                    },
+                    "ifTrueActivities": [
+                        {
+                            "name": "Databricks_AIS_Batch_Processing",
+                            "type": "DatabricksNotebook",
+                            "policy": {
+                                "timeout": "0.01:00:00",
+                                "retry": 2,
+                                "retryIntervalInSeconds": 30
+                            },
+                            "typeProperties": {
+                                "notebookPath": "/MaritimeIQ/Lakehouse/01_Maritime_Data_Ingestion",
+                                "baseParameters": {
+                                    "source_path": "@concat('/mnt/maritime/raw/ais_history/', formatDateTime(utcnow(), 'yyyy/MM/dd/HH'), '/*.csv')",
+                                    "target_path": "/mnt/maritime/delta/ais_positions",
+                                    "processing_mode": "batch",
+                                    "session_id": "@concat('hourly-batch-', formatDateTime(utcnow(), 'yyyyMMdd-HH'))",
+                                    "data_quality_checks": "true",
+                                    "enable_optimization": "true"
+                                }
+                            }
+                        }
+                    ],
+                    "ifFalseActivities": [
+                        {
+                            "name": "Log_No_Files_Found",
+                            "type": "Wait",
+                            "typeProperties": {
+                                "waitTimeInSeconds": 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Check_Environmental_Files",
+                "type": "GetMetadata",
+                "dependsOn": [
+                    {
+                        "activity": "Process_AIS_Batch_Files",
+                        "dependencyConditions": ["Succeeded", "Skipped"]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.00:05:00",
+                    "retry": 2,
+                    "retryIntervalInSeconds": 30
+                },
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "EnvironmentalBatchFiles",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "folderPath": "@concat('environmental/', formatDateTime(utcnow(), 'yyyy/MM/dd/HH'))"
+                        }
+                    },
+                    "fieldList": ["childItems"]
+                }
+            },
+            {
+                "name": "Process_Environmental_Batch_Files",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "Check_Environmental_Files",
+                        "dependencyConditions": ["Succeeded"]
+                    }
+                ],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@greater(length(activity('Check_Environmental_Files').output.childItems), 0)",
+                        "type": "Expression"
+                    },
+                    "ifTrueActivities": [
+                        {
+                            "name": "Databricks_Environmental_Batch_Processing",
+                            "type": "DatabricksNotebook",
+                            "policy": {
+                                "timeout": "0.01:00:00",
+                                "retry": 2,
+                                "retryIntervalInSeconds": 30
+                            },
+                            "typeProperties": {
+                                "notebookPath": "/MaritimeIQ/Lakehouse/01_Maritime_Data_Ingestion",
+                                "baseParameters": {
+                                    "source_path": "@concat('/mnt/maritime/raw/environmental/', formatDateTime(utcnow(), 'yyyy/MM/dd/HH'), '/*.json')",
+                                    "target_path": "/mnt/maritime/delta/environmental_sensors",
+                                    "processing_mode": "batch",
+                                    "session_id": "@concat('env-batch-', formatDateTime(utcnow(), 'yyyyMMdd-HH'))",
+                                    "data_type": "environmental"
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Trigger_Silver_Layer_Processing",
+                "type": "DatabricksNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "Process_Environmental_Batch_Files",
+                        "dependencyConditions": ["Succeeded", "Skipped"]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.02:00:00",
+                    "retry": 1,
+                    "retryIntervalInSeconds": 60
+                },
+                "typeProperties": {
+                    "notebookPath": "/MaritimeIQ/Lakehouse/02_Silver_Layer_Transformation",
+                    "baseParameters": {
+                        "session_id": "@concat('silver-batch-', formatDateTime(utcnow(), 'yyyyMMdd-HH'))",
+                        "bronze_path": "/mnt/maritime/delta",
+                        "silver_path": "/mnt/datalake/maritime/silver",
+                        "data_quality_checks": "true",
+                        "processing_timestamp": "@utcnow()"
+                    }
+                }
+            },
+            {
+                "name": "Cleanup_Processed_Files",
+                "type": "Delete",
+                "dependsOn": [
+                    {
+                        "activity": "Trigger_Silver_Layer_Processing",
+                        "dependencyConditions": ["Succeeded"]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 1,
+                    "retryIntervalInSeconds": 30
+                },
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "ProcessedBatchFiles",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "folderPath": "@concat('ais_history/', formatDateTime(subtractFromTime(utcnow(), 24, 'Hour'), 'yyyy/MM/dd'))"
+                        }
+                    },
+                    "logStorageSettings": {
+                        "linkedServiceName": {
+                            "referenceName": "AzureBlobStorage",
+                            "type": "LinkedServiceReference"
+                        },
+                        "path": "pipeline-logs/cleanup"
+                    },
+                    "enableLogging": true
+                }
+            }
+        ],
+        "parameters": {
+            "ProcessingDate": {
+                "type": "string",
+                "defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd')"
+            },
+            "ProcessingHour": {
+                "type": "string", 
+                "defaultValue": "@formatDateTime(utcnow(), 'HH')"
+            },
+            "EnableCleanup": {
+                "type": "bool",
+                "defaultValue": true
+            }
+        },
+        "variables": {
+            "ProcessedFileCount": {
+                "type": "Integer",
+                "defaultValue": 0
+            },
+            "BatchSessionId": {
+                "type": "String",
+                "defaultValue": "@concat('batch-', formatDateTime(utcnow(), 'yyyyMMdd-HHmmss'))"
+            }
+        },
+        "folder": {
+            "name": "MaritimeIQ/BatchProcessing"
+        },
+        "annotations": [
+            "maritime-data",
+            "batch-processing", 
+            "hourly-schedule",
+            "databricks-integration"
+        ]
+    }
+}

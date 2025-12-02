@@ -9,6 +9,7 @@ using Microsoft.ApplicationInsights;
 using MaritimeIQ.Platform.Services;
 using MaritimeIQ.Platform.Services.Interfaces;
 using MaritimeIQ.Platform.DataPipelines;
+using MaritimeIQ.Platform.Middleware;
 using System.Text.Json.Serialization;
 
 static TokenCredential ResolveKeyVaultCredential(IConfiguration configuration)
@@ -47,12 +48,23 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 
+// Register Azure Blob Storage for Data Lake
+builder.Services.AddSingleton(provider =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DataLake") 
+                          ?? builder.Configuration["DataLake:ConnectionString"];
+    return new Azure.Storage.Blobs.BlobServiceClient(connectionString);
+});
+
 // Register Maritime Platform services
 builder.Services.AddScoped<AISProcessingService>();
 builder.Services.AddScoped<EnvironmentalMonitoringService>();
 builder.Services.AddScoped<PassengerNotificationService>();
 builder.Services.AddScoped<RouteOptimizationService>();
 builder.Services.AddSingleton<IMaritimeDataService, MaritimeDataService>();
+
+// NEW: Register Data Lake service for dual-path processing
+builder.Services.AddScoped<IDataLakeService, DataLakeService>();
 
 // Register new architecture services
 builder.Services.AddScoped<IMonitoringService, MonitoringService>();
@@ -111,6 +123,11 @@ builder.Services.AddHttpClient<IAuroraForecastService, AuroraForecastService>();
 
 // Add Application Insights
 builder.Services.AddApplicationInsightsTelemetry();
+
+// Register Real Metrics Collection Services
+builder.Services.AddSingleton<IMetricsCollectorService, MetricsCollectorService>();
+builder.Services.AddSingleton<SystemMetricsCollector>();
+builder.Services.AddHostedService<MetricsBackgroundService>();
 
 // Configure Azure service options
 builder.Services.Configure<MaritimeIQ.Platform.Services.IoTHubConfiguration>(builder.Configuration.GetSection("IoTHub"));
@@ -210,6 +227,9 @@ app.UseHttpsRedirection();
 // Add CORS
 app.UseCors("MaritimePolicy");
 
+// Add Metrics Middleware to track all requests
+app.UseMiddleware<MetricsMiddleware>();
+
 app.UseRouting();
 app.UseAuthorization();
 
@@ -268,13 +288,16 @@ app.MapGet("/", () => new
  "Real-time Monitoring"}
 });
 
-app.MapGet("/api/status", () => new
+app.MapGet("/api/status", (IMetricsCollectorService metricsCollector) => new
 {
  Status = "Operational",
  Timestamp = DateTime.UtcNow,
  Platform = "MaritimeIQ Platform",
  Version = "2.0.0",
- Uptime = TimeSpan.FromMilliseconds(Environment.TickCount64),
+ Uptime = metricsCollector.GetCurrentUptime(),
+ UptimePercentage = metricsCollector.GetUptimePercentage(),
+ EventsProcessed = metricsCollector.GetThroughputMetrics().EventsProcessedTotal,
+ EventsPerHour = metricsCollector.GetEventsPerHour(),
  ActiveServices = new string[]
  {
  "AIS Processing",

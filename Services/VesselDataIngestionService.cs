@@ -8,11 +8,17 @@ namespace MaritimeIQ.Platform.Services
  /// </summary>
  public class VesselDataIngestionService : BaseMaritimeService, IVesselDataIngestionService
  {
+ private readonly IMetricsCollectorService? _metricsCollector;
+ 
  public override string ServiceName => "Vessel Data Ingestion Service";
 
- public VesselDataIngestionService(ILogger<VesselDataIngestionService> logger, IConfiguration? configuration = null) 
+ public VesselDataIngestionService(
+ ILogger<VesselDataIngestionService> logger, 
+ IConfiguration? configuration = null,
+ IMetricsCollectorService? metricsCollector = null) 
  : base(logger, configuration)
  {
+ _metricsCollector = metricsCollector;
  }
 
  public async Task<DataIngestionResult> IngestVesselTelemetryAsync(string vesselId, VesselTelemetryBatch telemetryBatch)
@@ -20,6 +26,9 @@ namespace MaritimeIQ.Platform.Services
  return await ExecuteOperationAsync(async () =>
  {
  LogInformation($"Ingesting telemetry batch {telemetryBatch.BatchId} for vessel {vesselId} with {telemetryBatch.Readings.Count} readings");
+ 
+ // Track actual events ingested
+ _metricsCollector?.IncrementEventCounter("vessel_telemetry", telemetryBatch.Readings.Count);
  
  // Simulate data processing
  await Task.Delay(100);
@@ -40,6 +49,9 @@ namespace MaritimeIQ.Platform.Services
  return await ExecuteOperationAsync(async () =>
  {
  LogInformation($"Processing AIS data batch {aisDataBatch.BatchId} with {aisDataBatch.Messages.Count} messages");
+ 
+ // Track AIS data processing
+ _metricsCollector?.IncrementEventCounter("ais_processing", aisDataBatch.Messages.Count);
  
  await Task.Delay(150);
  
